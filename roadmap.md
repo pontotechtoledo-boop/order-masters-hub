@@ -13,3 +13,9 @@
 - [ ] Gerar e validar certificados PDF
 - [ ] Configurar entrega de garantias por e-mail
 - [ ] Ativar cobrança recorrente após escolha do provedor
+## Correções operacionais solicitadas
+
+- [ ] Separar cadastros de clientes, estoque, ordens e garantias
+- [ ] Permitir pesquisar e selecionar clientes por nome ou documento nas ordens
+- [ ] Implementar movimentações e baixa automática de peças pelo consumo da ordem
+- [ ] Implementar geração de PDF e impressão para ordens e garantias
