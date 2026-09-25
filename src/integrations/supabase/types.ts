@@ -544,6 +544,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          inventory_item_id: string | null
           item_type: string
           order_id: string
           organization_id: string
@@ -556,6 +557,7 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
+          inventory_item_id?: string | null
           item_type: string
           order_id: string
           organization_id: string
@@ -568,6 +570,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          inventory_item_id?: string | null
           item_type?: string
           order_id?: string
           organization_id?: string
@@ -576,6 +579,13 @@ export type Database = {
           warranty_days?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "service_order_items_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "service_order_items_order_id_fkey"
             columns: ["order_id"]
@@ -762,7 +772,104 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consume_inventory_item: {
+        Args: {
+          _inventory_item_id: string
+          _order_id: string
+          _quantity: number
+          _unit_price: number
+          _warranty_days?: number
+        }
+        Returns: {
+          cost: number
+          created_at: string
+          description: string
+          id: string
+          inventory_item_id: string | null
+          item_type: string
+          order_id: string
+          organization_id: string
+          quantity: number
+          unit_price: number
+          warranty_days: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "service_order_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_inventory_item: {
+        Args: {
+          _branch_id: string
+          _category: string
+          _cost: number
+          _location: string
+          _minimum_quantity: number
+          _name: string
+          _organization_id: string
+          _price: number
+          _quantity: number
+          _sku: string
+          _supplier: string
+        }
+        Returns: {
+          active: boolean
+          branch_id: string | null
+          category: string | null
+          cost: number
+          created_at: string
+          id: string
+          location: string | null
+          minimum_quantity: number
+          name: string
+          organization_id: string
+          price: number
+          quantity: number
+          sku: string | null
+          supplier: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "inventory_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      move_inventory: {
+        Args: {
+          _inventory_item_id: string
+          _movement_type: string
+          _notes?: string
+          _quantity: number
+          _unit_cost?: number
+        }
+        Returns: {
+          active: boolean
+          branch_id: string | null
+          category: string | null
+          cost: number
+          created_at: string
+          id: string
+          location: string | null
+          minimum_quantity: number
+          name: string
+          organization_id: string
+          price: number
+          quantity: number
+          sku: string | null
+          supplier: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "inventory_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "owner" | "admin" | "attendant" | "technician" | "finance"

@@ -7,15 +7,14 @@
 - [x] Implementar administração SaaS
 - [x] Validar desktop e celular
 
-## Próximas integrações
-
-- [ ] Ligar formulários aos dados reais e proteger o painel após login
-- [ ] Gerar e validar certificados PDF
-- [ ] Configurar entrega de garantias por e-mail
-- [ ] Ativar cobrança recorrente após escolha do provedor
-## Correções operacionais solicitadas
+## Controles operacionais reais
 
 - [ ] Separar cadastros de clientes, estoque, ordens e garantias
 - [ ] Permitir pesquisar e selecionar clientes por nome ou documento nas ordens
 - [ ] Implementar movimentações e baixa automática de peças pelo consumo da ordem
 - [ ] Implementar geração de PDF e impressão para ordens e garantias
+
+## Próximas integrações
+
+- [ ] Configurar entrega de garantias por e-mail
+- [ ] Ativar cobrança recorrente após escolha do provedor
