@@ -86,8 +86,8 @@ function Index(){
     <CustomerDialog open={dialog==="customer"} close={()=>setDialog(null)} onSave={c=>{setCustomers(v=>[...v,c]);setDialog(null)}}/>
     <StockDialog open={dialog==="stock"} close={()=>setDialog(null)} onSave={s=>{setStock(v=>[...v,s]);setDialog(null)}}/>
     <MovementDialog open={dialog==="movement"} item={selectedStock} close={()=>setDialog(null)} onSave={(id,amount,type,note)=>{setStock(v=>v.map(s=>s.id===id?{...s,quantity:s.quantity+(type==="entry"?amount:-amount),movements:[{type:type==="entry"?"Entrada":"Saída",quantity:amount,date:today(),note},...s.movements]}:s));setDialog(null)}}/>
-    <OrderDialog open={dialog==="order"} customers={customers} stock={stock} close={()=>setDialog(null)} onSave={(o,part)=>{setOrders(v=>[o,...v]);if(part)setStock(v=>v.map(s=>s.id===part.id?{...s,quantity:s.quantity-part.quantity,movements:[{type:`Saída ${o.id}`,quantity:part.quantity,date:today(),note:"Consumo automático na ordem"},...s.movements]}:s));setSelectedOrder(o);setDialog("orderView")}}/>
-    <WarrantyDialog open={dialog==="warranty"} orders={orders} close={()=>setDialog(null)} onSave={w=>{setWarranties(v=>[w,...v]);setSelectedWarranty(w);setDialog("warrantyView")}}/>
+    <OrderDialog open={dialog==="order"} customers={customers} stock={stock} close={()=>setDialog(null)} onSave={(o,part)=>{setOrders(v=>[o,...v]);if(part)setStock(v=>v.map(s=>s.id===part.id?{...s,quantity:s.quantity-part.quantity,movements:[{type:`Saída ${o.id}`,quantity:part.quantity,date:today(),note:"Consumo automático na ordem"},...s.movements]}:s));setSelectedOrder(o);setDialog(null);window.setTimeout(()=>setDialog("orderView"),180)}}/>
+    <WarrantyDialog open={dialog==="warranty"} orders={orders} close={()=>setDialog(null)} onSave={w=>{setWarranties(v=>[w,...v]);setSelectedWarranty(w);setDialog(null);window.setTimeout(()=>setDialog("warrantyView"),180)}}/>
     <OrderDocumentDialog open={dialog==="orderView"} order={selectedOrder} close={()=>setDialog(null)}/>
     <WarrantyDocumentDialog open={dialog==="warrantyView"} warranty={selectedWarranty} close={()=>setDialog(null)}/>
   </div>
