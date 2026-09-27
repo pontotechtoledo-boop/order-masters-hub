@@ -9,10 +9,10 @@
 
 ## Controles operacionais reais
 
-- [ ] Separar cadastros de clientes, estoque, ordens e garantias
-- [ ] Permitir pesquisar e selecionar clientes por nome ou documento nas ordens
-- [ ] Implementar movimentações e baixa automática de peças pelo consumo da ordem
-- [ ] Implementar geração de PDF e impressão para ordens e garantias
+- [x] Separar cadastros de clientes, estoque, ordens e garantias
+- [x] Permitir pesquisar e selecionar clientes por nome ou documento nas ordens
+- [x] Implementar movimentações e baixa automática de peças pelo consumo da ordem
+- [x] Implementar geração de PDF e impressão para ordens e garantias
 
 ## Próximas integrações
 
