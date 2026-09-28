@@ -927,11 +927,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      has_active_subscription: {
-        Args: { check_env?: string; user_uuid: string }
-        Returns: boolean
-      }
-      is_platform_admin: { Args: never; Returns: boolean }
       move_inventory: {
         Args: {
           _inventory_item_id: string
