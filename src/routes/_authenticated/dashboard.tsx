@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [
     { title: "PontoTech Toledo | Gestão de assistência técnica" },
     { name: "description", content: "Gestão de ordens de serviço, clientes, garantias, estoque e financeiro para assistências técnicas." },
