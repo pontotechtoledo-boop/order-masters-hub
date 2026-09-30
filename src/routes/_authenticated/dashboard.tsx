@@ -93,6 +93,46 @@ function Index(){
   const open=(kind:DialogKind)=>setDialog(kind);
   const action=()=>{if(section==="Clientes")open("customer");else if(section==="Estoque")open("stock");else if(section==="Garantias")open("warranty");else open("order")};
   const labels:Partial<Record<Section,string>>={Clientes:"Novo cliente",Estoque:"Nova peça",Garantias:"Emitir garantia","Ordens de serviço":"Nova ordem"};
+  const requireOrg=()=>{if(!organizationId){alert("Esta conta não está vinculada a uma empresa no banco.");return false}return true};
+  const saveCustomer=async(c:Customer&{address?:string;notes?:string})=>{
+    if(!requireOrg())return;
+    const {data,error}=await supabase.from("customers").insert({organization_id:organizationId!,kind:"person",name:c.name,document:c.document||null,phone:c.phone||null,email:c.email||null,address:c.address??null,notes:c.notes??null}).select().single();
+    if(error){alert("Não foi possível salvar o cliente: "+error.message);return}
+    setCustomers(v=>[{id:data.id,name:data.name,document:data.document??"",phone:data.phone??"",email:data.email??""},...v]);setDialog(null);
+  };
+  const saveStock=async(s:Stock)=>{
+    if(!requireOrg())return;
+    const {data,error}=await supabase.rpc("create_inventory_item",{_organization_id:organizationId!,_branch_id:null,_sku:s.sku,_name:s.name,_category:s.category,_supplier:s.supplier,_location:s.location,_quantity:s.quantity,_minimum_quantity:s.minimum,_cost:s.cost,_price:s.price});
+    if(error){alert("Não foi possível cadastrar a peça: "+error.message);return}
+    const x=data as any;setStock(v=>[{id:x.id,sku:x.sku??"",name:x.name,category:x.category??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:s.quantity?[{type:"entry",quantity:s.quantity,date:today(),note:"Saldo inicial"}]:[]},...v]);setDialog(null);
+  };
+  const saveMovement=async(id:string,amount:number,type:string,note:string)=>{
+    const {data,error}=await supabase.rpc("move_inventory",{_inventory_item_id:id,_movement_type:type==="entry"?"entry":"exit",_quantity:amount,_notes:note,_unit_cost:null});
+    if(error){alert("Não foi possível registrar a movimentação: "+error.message);return}
+    const x=data as any;setStock(v=>v.map(s=>s.id===id?{...s,quantity:Number(x.quantity),movements:[{type:type==="entry"?"entry":"exit",quantity:amount,date:today(),note},...s.movements]}:s));setDialog(null);
+  };
+  const saveOrder=async(o:Order,part:{id:string;quantity:number}|null)=>{
+    if(!requireOrg())return;
+    const customer=customers.find(x=>x.id===o.customerId);if(!customer){alert("Cliente não encontrado.");return}
+    const brand=o.device.split(" ")[0]??"";
+    const model=o.device.split(" ").slice(1).join(" ");
+    const {data:device,error:deviceError}=await supabase.from("devices").insert({organization_id:organizationId!,customer_id:customer.id,category:"Equipamento",brand,model,serial_number:o.serial||null,condition_notes:null,accessories:null}).select().single();
+    if(deviceError){alert("Não foi possível cadastrar o aparelho da OS: "+deviceError.message);return}
+    const partTotal=o.parts.reduce((sum,p)=>sum+p.quantity*p.price,0),serviceAmount=Math.max(0,o.total-partTotal);
+    const {data:dbOrder,error:orderError}=await supabase.from("service_orders").insert({organization_id:organizationId!,customer_id:customer.id,device_id:device.id,reported_issue:o.issue,status:"received",priority:"normal",subtotal:serviceAmount,discount:0,estimated_at:null}).select().single();
+    if(orderError){alert("Não foi possível criar a ordem: "+orderError.message);return}
+    if(serviceAmount>0){const {error}=await supabase.from("service_order_items").insert({organization_id:organizationId!,order_id:dbOrder.id,item_type:"service",description:"Mão de obra / serviço técnico",quantity:1,unit_price:serviceAmount,cost:0,warranty_days:90});if(error){alert("A ordem foi criada, mas não foi possível salvar o serviço: "+error.message);}}
+    if(part&&part.quantity>0){const {error}=await supabase.rpc("consume_inventory_item",{_order_id:dbOrder.id,_inventory_item_id:part.id,_quantity:part.quantity,_unit_price:stock.find(s=>s.id===part.id)?.price??0,_warranty_days:90});if(error){alert("A ordem foi criada, mas a peça não foi baixada do estoque: "+error.message);}}
+    setDialog(null);setSelectedOrder({...o,id:"OS-"+dbOrder.order_number,dbId:dbOrder.id});setOrders(v=>[{...o,id:"OS-"+dbOrder.order_number,dbId:dbOrder.id},...v]);if(part)setStock(v=>v.map(s=>s.id===part.id?{...s,quantity:s.quantity-part.quantity}:s));window.setTimeout(()=>setDialog("orderView"),180);
+  };
+  const saveWarranty=async(w:Warranty)=>{
+    if(!requireOrg())return;
+    const order=orders.find(o=>o.id===w.orderId);if(!order?.dbId){alert("Ordem vinculada não encontrada no banco.");return}
+    const parseDate=(value:string)=>{const [d,m,y]=value.split("/");return y?y+"-"+m+"-"+d:new Date().toISOString().slice(0,10)};
+    const {data,error}=await supabase.from("warranties").insert({organization_id:organizationId!,order_id:order.dbId,starts_at:parseDate(w.starts),expires_at:parseDate(w.expires),coverage:w.coverage,terms:null,status:"active"}).select().single();
+    if(error){alert("Não foi possível emitir a garantia: "+error.message);return}
+    const saved={...w,id:data.code,dbId:data.id};setWarranties(v=>[saved,...v]);setSelectedWarranty(saved);setDialog(null);window.setTimeout(()=>setDialog("warrantyView"),180);
+  };
   return <div className="min-h-screen bg-background text-foreground">
     <Sidebar section={section} setSection={s=>{setSection(s);setMenuOpen(false);setSearch("")}} open={menuOpen} close={()=>setMenuOpen(false)}/>
     <main className="min-h-screen lg:pl-64">
