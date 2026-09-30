@@ -29,7 +29,9 @@ type Customer = { id:string; name:string; document:string; phone:string; email:s
 type Stock = { id:string; sku:string; name:string; category:string; supplier:string; location:string; quantity:number; minimum:number; cost:number; price:number; movements:{type:string; quantity:number; date:string; note:string}[] };
 type Order = { id:string; dbId?:string; deviceCategory?:string; customerId:string; client:string; document:string; device:string; serial:string; issue:string; stage:string; tech:string; total:number; due:string; tone:string; parts:{name:string; quantity:number; price:number}[] };
 type Warranty = { id:string; dbId?:string; orderId:string; customer:string; device:string; starts:string; expires:string; coverage:string; status:string };
-type DialogKind = "order" | "customer" | "stock" | "movement" | "warranty" | "orderView" | "warrantyView" | null;
+type Sale = {id:string;number:number;type:"pos"|"quick";department:"assistance"|"parts"|"store";total:number;payment_method:string;sold_at:string;notes:string|null};
+type FinanceEntry = {id:string;entry_type:string;department:string;category:string;description:string;amount:number;payment_method:string|null;entry_date:string};
+type DialogKind = "order" | "customer" | "stock" | "movement" | "warranty" | "orderView" | "warrantyView" | "pos" | "quickSale" | null;
 
 const initialCustomers: Customer[] = [];
 const initialStock: Stock[] = [];
@@ -73,32 +75,32 @@ function Index(){
       setOrganizationId(orgId);
       const orgData=members[0] as any;
       setCompanyName(orgData.organizations?.name??"Sua empresa");
-      const [customersRes,stockRes,ordersRes,warrantiesRes]=await Promise.all([
+      const [customersRes,stockRes,ordersRes,warrantiesRes,salesRes,financeRes]=await Promise.all([
         supabase.from("customers").select("*").eq("organization_id",orgId).order("created_at",{ascending:false}),
         supabase.from("inventory_items").select("*,inventory_movements(*)").eq("organization_id",orgId).eq("active",true).order("created_at",{ascending:false}),
         supabase.from("service_orders").select("*,customers(name,document,phone,email),devices(category,brand,model,serial_number),service_order_items(*)").eq("organization_id",orgId).order("created_at",{ascending:false}),
-        supabase.from("warranties").select("*,service_orders(order_number,customers(name),devices(brand,model))").eq("organization_id",orgId).order("created_at",{ascending:false}),
+        supabase.from("warranties").select("*,service_orders(order_number,customers(name),devices(brand,model))").eq("organization_id",orgId).order("created_at",{ascending:false}),\n        supabase.from("sales").select("*").eq("organization_id",orgId).order("sold_at",{ascending:false}),\n        supabase.from("financial_entries").select("*").eq("organization_id",orgId).order("entry_date",{ascending:false}),
       ]);
-      const errors=[customersRes.error,stockRes.error,ordersRes.error,warrantiesRes.error].filter(Boolean);
+      const errors=[customersRes.error,stockRes.error,ordersRes.error,warrantiesRes.error,salesRes.error,financeRes.error].filter(Boolean);
       if(errors.length){if(active){setDataError("Não foi possível carregar todos os dados do banco. Confira as permissões e tente atualizar.");setDataLoading(false)}return}
       if(!active)return;
       setCustomers((customersRes.data??[]).map((x:any)=>({id:x.id,name:x.name,document:x.document??"",phone:x.phone??"",email:x.email??""})));
       setStock((stockRes.data??[]).map((x:any)=>({id:x.id,sku:x.sku??"",name:x.name,category:x.category??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:(x.inventory_movements??[]).map((m:any)=>({type:m.movement_type,date:new Date(m.created_at).toLocaleDateString("pt-BR"),quantity:Number(m.quantity),note:m.notes??""})).sort((a:any,b:any)=>b.date.localeCompare(a.date))})));
       const statusLabels:Record<string,string>={received:"Recebida",triage:"Triagem",diagnosis:"Diagnóstico",quote:"Orçamento",awaiting_approval:"Aguardando aprovação",approved:"Aprovada",waiting_parts:"Aguardando peça",repair:"Em reparo",testing:"Em testes",ready:"Pronto para entrega",delivered:"Entregue",cancelled:"Cancelada",no_repair:"Sem reparo",warranty_return:"Retorno em garantia"};
       setOrders((ordersRes.data??[]).map((x:any)=>({id:"OS-"+x.order_number,dbId:x.id,customerId:x.customer_id,client:x.customers?.name??"Cliente",document:x.customers?.document??"",device:[x.devices?.brand,x.devices?.model].filter(Boolean).join(" ")||x.devices?.category||"Equipamento",deviceCategory:x.devices?.category??"Equipamento",serial:x.devices?.serial_number??"",issue:x.reported_issue,stage:statusLabels[x.status]??x.status,tech:"Não atribuído",total:Number(x.total??x.subtotal??0),due:x.estimated_at?new Date(x.estimated_at).toLocaleDateString("pt-BR"):"A definir",tone:x.status==="ready"?"green":x.status==="awaiting_approval"?"amber":"blue",parts:(x.service_order_items??[]).map((it:any)=>({name:it.description,quantity:Number(it.quantity),price:Number(it.unit_price)}))})));
-      setWarranties((warrantiesRes.data??[]).map((x:any)=>({id:x.code,dbId:x.id,orderId:"OS-"+(x.service_orders?.order_number??""),customer:x.service_orders?.customers?.name??"",device:[x.service_orders?.devices?.brand,x.service_orders?.devices?.model].filter(Boolean).join(" "),starts:new Date(x.starts_at+"T00:00:00").toLocaleDateString("pt-BR"),expires:new Date(x.expires_at+"T00:00:00").toLocaleDateString("pt-BR"),coverage:x.coverage??x.terms??"",status:x.status})));
+      setWarranties((warrantiesRes.data??[]).map((x:any)=>({id:x.code,dbId:x.id,orderId:"OS-"+(x.service_orders?.order_number??""),customer:x.service_orders?.customers?.name??"",device:[x.service_orders?.devices?.brand,x.service_orders?.devices?.model].filter(Boolean).join(" "),starts:new Date(x.starts_at+"T00:00:00").toLocaleDateString("pt-BR"),expires:new Date(x.expires_at+"T00:00:00").toLocaleDateString("pt-BR"),coverage:x.coverage??x.terms??"",status:x.status})));\n      setSales((salesRes.data??[]).map((x:any)=>({...x,number:Number(x.sale_number),total:Number(x.total)})));\n      setFinanceEntries((financeRes.data??[]).map((x:any)=>({...x,amount:Number(x.amount)})));
       setDataLoading(false);
     };
     load().catch(()=>{if(active){setDataError("Falha ao conectar ao banco de dados.");setDataLoading(false)}});
     return ()=>{active=false};
   },[]);
   const [section,setSection]=useState<Section>("Visão geral"),[menuOpen,setMenuOpen]=useState(false),[dialog,setDialog]=useState<DialogKind>(null),[search,setSearch]=useState("");
-  const [customers,setCustomers]=useState(initialCustomers),[stock,setStock]=useState(initialStock),[orders,setOrders]=useState(initialOrders),[warranties,setWarranties]=useState(initialWarranties);
+  const [customers,setCustomers]=useState(initialCustomers),[stock,setStock]=useState(initialStock),[orders,setOrders]=useState(initialOrders),[warranties,setWarranties]=useState(initialWarranties);\n  const [sales,setSales]=useState<Sale[]>([]),[financeEntries,setFinanceEntries]=useState<FinanceEntry[]>([]);
   const [selectedOrder,setSelectedOrder]=useState<Order|null>(null),[selectedWarranty,setSelectedWarranty]=useState<Warranty|null>(null),[selectedStock,setSelectedStock]=useState<Stock|null>(null);
   const q=search.toLowerCase();
   const filteredOrders=useMemo(()=>orders.filter(o=>Object.values(o).join(" ").toLowerCase().includes(q)),[orders,q]);
   const open=(kind:DialogKind)=>setDialog(kind);
-  const action=()=>{if(section==="Clientes")open("customer");else if(section==="Estoque")open("stock");else if(section==="Garantias")open("warranty");else open("order")};
+  const action=()=>{if(section==="Clientes")open("customer");else if(section==="Estoque")open("stock");else if(section==="Garantias")open("warranty");else if(section==="Financeiro")open("pos");else open("order")};
   const labels:Partial<Record<Section,string>>={Clientes:"Novo cliente",Estoque:"Nova peça",Garantias:"Emitir garantia","Ordens de serviço":"Nova ordem"};
   const requireOrg=()=>{if(!organizationId){alert("Esta conta não está vinculada a uma empresa no banco.");return false}return true};
   const saveCustomer=async(c:Customer&{address?:string;notes?:string})=>{
@@ -150,7 +152,7 @@ function Index(){
         {section==="Clientes"&&<CustomersView customers={customers.filter(c=>`${c.name} ${c.document} ${c.phone}`.toLowerCase().includes(q))} orders={orders} onNew={()=>open("customer")} onDelete={c=>{const linked=orders.filter(o=>o.customerId===c.id);if(linked.length){window.alert("Este cliente possui ordens de serviço vinculadas. Exclua primeiro as ordens relacionadas.");return}if(window.confirm(`Excluir o cliente ${c.name}? Essa ação não pode ser desfeita.`)){const {error}=await supabase.from("customers").delete().eq("id",c.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir o cliente: "+error.message);return}setCustomers(v=>v.filter(x=>x.id!==c.id));}}}/>}
         {section==="Estoque"&&<StockView stock={stock.filter(s=>`${s.name} ${s.sku} ${s.category}`.toLowerCase().includes(q))} onNew={()=>open("stock")} onMove={s=>{setSelectedStock(s);open("movement")}} onDelete={async s=>{if(!window.confirm(`Excluir a peça ${s.name} do estoque? O banco pode impedir a exclusão se houver histórico vinculado.`))return;const {error}=await supabase.from("inventory_items").delete().eq("id",s.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a peça. Pode haver movimentações ou ordens vinculadas. "+error.message);return}setStock(v=>v.filter(x=>x.id!==s.id));}}/>}
         {section==="Garantias"&&<WarrantyView warranties={warranties} onNew={()=>open("warranty")} onView={w=>{setSelectedWarranty(w);open("warrantyView")}}/>}
-        {["Financeiro","Equipe","Administração"].includes(section)&&<Placeholder section={section}/>} 
+        {section==="Financeiro"&&<FinanceView sales={sales} entries={financeEntries} stock={stock} onPOS={()=>open("pos")} onQuick={()=>open("quickSale")}/>} {["Equipe","Administração"].includes(section)&&<Placeholder section={section}/>}
       </div>
     </main>
     <CustomerDialog open={dialog==="customer"} close={()=>setDialog(null)} onSave={saveCustomer}/>
@@ -159,7 +161,7 @@ function Index(){
     <OrderDialog open={dialog==="order"} customers={customers} stock={stock} close={()=>setDialog(null)} onSave={saveOrder}/>
     <WarrantyDialog open={dialog==="warranty"} orders={orders} close={()=>setDialog(null)} onSave={saveWarranty}/>
     <OrderDocumentDialog open={dialog==="orderView"} order={selectedOrder} close={()=>setDialog(null)}/>
-    <WarrantyDocumentDialog open={dialog==="warrantyView"} warranty={selectedWarranty} close={()=>setDialog(null)}/>
+    <WarrantyDocumentDialog open={dialog==="warrantyView"} warranty={selectedWarranty} close={()=>setDialog(null)}/>\n    <SaleDialog open={dialog==="pos"||dialog==="quickSale"} mode={dialog==="quickSale"?"quick":"pos"} stock={stock} customers={customers} close={()=>setDialog(null)} onSave={async(payload)=>{if(!requireOrg())return;const {data,error}=await supabase.rpc("create_pos_sale",{_organization_id:organizationId!,_sale_type:payload.type,_department:payload.department,_customer_id:payload.customerId||null,_discount:payload.discount,_payment_method:payload.payment,_notes:payload.notes||null,_items:payload.items.map(i=>({inventory_item_id:i.inventoryId||null,description:i.description,quantity:i.quantity,unit_price:i.price,unit_cost:i.cost}))});if(error){alert("Não foi possível registrar a venda: "+error.message);return}const [salesR,entriesR,stockR]=await Promise.all([supabase.from("sales").select("*").eq("organization_id",organizationId!).order("sold_at",{ascending:false}),supabase.from("financial_entries").select("*").eq("organization_id",organizationId!).order("entry_date",{ascending:false}),supabase.from("inventory_items").select("*,inventory_movements(*)").eq("organization_id",organizationId!).eq("active",true).order("created_at",{ascending:false})]);if(salesR.error||entriesR.error||stockR.error){alert("Venda registrada, mas houve falha ao atualizar a tela. Atualize a página para sincronizar.");return}setSales((salesR.data??[]).map((x:any)=>({...x,number:Number(x.sale_number),total:Number(x.total)})));setFinanceEntries((entriesR.data??[]).map((x:any)=>({...x,amount:Number(x.amount)})));setStock((stockR.data??[]).map((x:any)=>({id:x.id,sku:x.sku??"",name:x.name,category:x.category??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:(x.inventory_movements??[]).map((m:any)=>({type:m.movement_type,date:new Date(m.created_at).toLocaleDateString("pt-BR"),quantity:Number(m.quantity),note:m.notes??""}))})));setDialog(null);alert("Venda registrada com sucesso!");}}}/>
   </div>
 }
 
