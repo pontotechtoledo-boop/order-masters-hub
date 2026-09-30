@@ -861,10 +861,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      ensure_user_organization: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
       consume_inventory_item: {
         Args: {
           _inventory_item_id: string
