@@ -76,13 +76,13 @@ function Index(){
       setOrganizationId(orgId);
       const orgData=members[0] as any;
       setCompanyName(orgData.organizations?.name??"Sua empresa");
-      const [customersRes,stockRes,ordersRes,warrantiesRes,salesRes,financeRes]=await Promise.all([
-        supabase.from("customers").select("*").eq("organization_id",orgId).order("created_at",{ascending:false}),
-        supabase.from("inventory_items").select("*,inventory_movements(*)").eq("organization_id",orgId).eq("active",true).order("created_at",{ascending:false}),
-        supabase.from("service_orders").select("*,customers(name,document,phone,email),devices(category,brand,model,serial_number),service_order_items(*)").eq("organization_id",orgId).order("created_at",{ascending:false}),
-        supabase.from("warranties").select("*,service_orders(order_number,customers(name),devices(brand,model))").eq("organization_id",orgId).order("created_at",{ascending:false}),
-        supabase.from("sales").select("*").eq("organization_id",orgId).order("sold_at",{ascending:false}),
-        supabase.from("financial_entries").select("*").eq("organization_id",orgId).order("entry_date",{ascending:false}),
+      const [customersRes, stockRes, ordersRes, warrantiesRes, salesRes, financeRes] = await Promise.all([
+        supabase.from("customers").select("*").eq("organization_id", orgId).order("created_at", { ascending: false }),
+        supabase.from("inventory_items").select("*,inventory_movements(*)").eq("organization_id", orgId).eq("active", true).order("created_at", { ascending: false }),
+        supabase.from("service_orders").select("*,customers(name,document,phone,email),devices(category,brand,model,serial_number),service_order_items(*)").eq("organization_id", orgId).order("created_at", { ascending: false }),
+        supabase.from("warranties").select("*,service_orders(order_number,customers(name),devices(brand,model))").eq("organization_id", orgId).order("created_at", { ascending: false }),
+        supabase.from("sales").select("*").eq("organization_id", orgId).order("sold_at", { ascending: false }),
+        supabase.from("financial_entries").select("*").eq("organization_id", orgId).order("entry_date", { ascending: false }),
       ]);
       const errors=[customersRes.error,stockRes.error,ordersRes.error,warrantiesRes.error,salesRes.error,financeRes.error].filter(Boolean);
       if(errors.length){if(active){setDataError("Não foi possível carregar todos os dados do banco. Confira as permissões e tente atualizar.");setDataLoading(false)}return}
