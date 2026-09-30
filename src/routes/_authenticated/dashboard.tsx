@@ -27,28 +27,14 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 type Section = "Visão geral" | "Ordens de serviço" | "Clientes" | "Garantias" | "Estoque" | "Financeiro" | "Equipe" | "Administração";
 type Customer = { id:string; name:string; document:string; phone:string; email:string };
 type Stock = { id:string; sku:string; name:string; category:string; supplier:string; location:string; quantity:number; minimum:number; cost:number; price:number; movements:{type:string; quantity:number; date:string; note:string}[] };
-type Order = { id:string; customerId:string; client:string; document:string; device:string; serial:string; issue:string; stage:string; tech:string; total:number; due:string; tone:string; parts:{name:string; quantity:number; price:number}[] };
-type Warranty = { id:string; orderId:string; customer:string; device:string; starts:string; expires:string; coverage:string; status:string };
+type Order = { id:string; dbId?:string; customerId:string; client:string; document:string; device:string; serial:string; issue:string; stage:string; tech:string; total:number; due:string; tone:string; parts:{name:string; quantity:number; price:number}[] };
+type Warranty = { id:string; dbId?:string; orderId:string; customer:string; device:string; starts:string; expires:string; coverage:string; status:string };
 type DialogKind = "order" | "customer" | "stock" | "movement" | "warranty" | "orderView" | "warrantyView" | null;
 
-const initialCustomers: Customer[] = [
-  {id:"c1",name:"Mariana Costa",document:"123.456.789-00",phone:"(45) 99912-4401",email:"mariana@email.com"},
-  {id:"c2",name:"Oficina Paraná",document:"12.345.678/0001-90",phone:"(45) 3055-1280",email:"contato@oficinaparana.com"},
-  {id:"c3",name:"João Mendes",document:"987.654.321-00",phone:"(45) 99821-7720",email:"joao@email.com"},
-  {id:"c4",name:"Clínica Vital",document:"28.456.741/0001-12",phone:"(45) 3035-8800",email:"ti@clinicavital.com"},
-];
-const initialStock: Stock[] = [
-  {id:"p1",sku:"TEL-IP14-OLED",name:"Tela OLED iPhone 14 Pro",category:"Telas",supplier:"Tech Parts",location:"A-03",quantity:8,minimum:3,cost:410,price:650,movements:[{type:"Entrada",quantity:10,date:"22/09/2026",note:"Nota 1842"},{type:"Saída OS-1048",quantity:2,date:"23/09/2026",note:"Consumo em reparo"}]},
-  {id:"p2",sku:"BAT-S23",name:"Bateria Galaxy S23",category:"Baterias",supplier:"Mobile Sul",location:"B-11",quantity:2,minimum:4,cost:92,price:190,movements:[{type:"Entrada",quantity:5,date:"20/09/2026",note:"Reposição"},{type:"Saída",quantity:3,date:"23/09/2026",note:"Ordens atendidas"}]},
-  {id:"p3",sku:"SSD-NVME-1TB",name:"SSD NVMe 1 TB",category:"Armazenamento",supplier:"Info Atacado",location:"C-04",quantity:12,minimum:4,cost:285,price:450,movements:[{type:"Entrada",quantity:12,date:"21/09/2026",note:"Compra mensal"}]},
-];
-const initialOrders: Order[] = [
-  {id:"OS-1048",customerId:"c1",client:"Mariana Costa",document:"123.456.789-00",device:"iPhone 14 Pro",serial:"IMEI 352099001234567",issue:"Tela sem imagem após queda",stage:"Em reparo",tech:"Carlos",total:780,due:"Hoje, 16:00",tone:"blue",parts:[{name:"Tela OLED iPhone 14 Pro",quantity:1,price:650}]},
-  {id:"OS-1047",customerId:"c2",client:"Oficina Paraná",document:"12.345.678/0001-90",device:"Notebook Dell G15",serial:"SN-DG15-8821",issue:"Não liga",stage:"Aguardando aprovação",tech:"Ana",total:460,due:"Hoje, 18:00",tone:"amber",parts:[]},
-  {id:"OS-1046",customerId:"c3",client:"João Mendes",document:"987.654.321-00",device:"Galaxy S23",serial:"IMEI 351234567891230",issue:"Bateria descarrega rapidamente",stage:"Pronto para entrega",tech:"Rafael",total:320,due:"Ontem",tone:"green",parts:[{name:"Bateria Galaxy S23",quantity:1,price:190}]},
-  {id:"OS-1045",customerId:"c4",client:"Clínica Vital",document:"28.456.741/0001-12",device:"MacBook Air M2",serial:"C02MA2VITAL",issue:"Superaquecimento",stage:"Diagnóstico",tech:"Carlos",total:0,due:"Amanhã",tone:"violet",parts:[]},
-];
-const initialWarranties: Warranty[] = [{id:"GAR-7A91C2",orderId:"OS-1046",customer:"João Mendes",device:"Galaxy S23",starts:"23/09/2026",expires:"22/12/2026",coverage:"Bateria substituída e serviço de instalação",status:"Ativa"}];
+const initialCustomers: Customer[] = [];
+const initialStock: Stock[] = [];
+const initialOrders: Order[] = [];
+const initialWarranties: Warranty[] = [];
 const nav: {label:Section;icon:typeof Gauge;group?:string}[] = [
   {label:"Visão geral",icon:LayoutDashboard},{label:"Ordens de serviço",icon:ClipboardList,group:"OPERAÇÃO"},{label:"Clientes",icon:Users},{label:"Garantias",icon:ShieldCheck},{label:"Estoque",icon:Boxes,group:"GESTÃO"},{label:"Financeiro",icon:CircleDollarSign},{label:"Equipe",icon:Wrench},{label:"Administração",icon:Building2,group:"PLATAFORMA"},
 ];
@@ -64,17 +50,39 @@ function printDocument(title:string, body:string){
 
 function Index(){
   const [companyName,setCompanyName]=useState("Sua empresa");
+  const [organizationId,setOrganizationId]=useState<string|null>(null);
+  const [dataLoading,setDataLoading]=useState(true);
+  const [dataError,setDataError]=useState("");
   useEffect(()=>{
     let active=true;
-    supabase.auth.getUser().then(({data})=>{
+    const load=async()=>{
+      setDataLoading(true);setDataError("");
+      const {data:{user},error:userError}=await supabase.auth.getUser();
+      if(userError||!user){if(active){setDataError("Sua sessão expirou. Entre novamente.");setDataLoading(false)}return}
+      const {data:members,error:memberError}=await supabase.from("organization_members").select("organization_id,organizations(name)").eq("user_id",user.id).eq("active",true).limit(1);
+      if(memberError||!members?.length){if(active){setDataError("Esta conta ainda não está vinculada a uma empresa no banco de dados. Peça ao administrador para concluir o vínculo.");setCompanyName("Empresa não vinculada");setDataLoading(false)}return}
+      const orgId=members[0].organization_id;
       if(!active)return;
-      const email=data.user?.email?.trim().toLowerCase()??"";
-      const companies:Record<string,string>={
-        "mt6celular1543@gmail.com":"MT6 CELULARES",
-        "pontotechtoledo@gmail.com":"PONTO TECH ASSISTENCIA TECNICA",
-      };
-      setCompanyName(companies[email]??"Sua empresa");
-    }).catch(()=>{if(active)setCompanyName("Sua empresa")});
+      setOrganizationId(orgId);
+      const orgData=members[0] as any;
+      setCompanyName(orgData.organizations?.name??"Sua empresa");
+      const [customersRes,stockRes,ordersRes,warrantiesRes]=await Promise.all([
+        supabase.from("customers").select("*").eq("organization_id",orgId).order("created_at",{ascending:false}),
+        supabase.from("inventory_items").select("*,inventory_movements(*)").eq("organization_id",orgId).eq("active",true).order("created_at",{ascending:false}),
+        supabase.from("service_orders").select("*,customers(name,document,phone,email),devices(category,brand,model,serial_number),service_order_items(*)").eq("organization_id",orgId).order("created_at",{ascending:false}),
+        supabase.from("warranties").select("*,service_orders(order_number,customers(name),devices(brand,model))").eq("organization_id",orgId).order("created_at",{ascending:false}),
+      ]);
+      const errors=[customersRes.error,stockRes.error,ordersRes.error,warrantiesRes.error].filter(Boolean);
+      if(errors.length){if(active){setDataError("Não foi possível carregar todos os dados do banco. Confira as permissões e tente atualizar.");setDataLoading(false)}return}
+      if(!active)return;
+      setCustomers((customersRes.data??[]).map((x:any)=>({id:x.id,name:x.name,document:x.document??"",phone:x.phone??"",email:x.email??""})));
+      setStock((stockRes.data??[]).map((x:any)=>({id:x.id,sku:x.sku??"",name:x.name,category:x.category??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:(x.inventory_movements??[]).map((m:any)=>({type:m.movement_type,date:new Date(m.created_at).toLocaleDateString("pt-BR"),quantity:Number(m.quantity),note:m.notes??""})).sort((a:any,b:any)=>b.date.localeCompare(a.date))})));
+      const statusLabels:Record<string,string>={received:"Recebida",triage:"Triagem",diagnosis:"Diagnóstico",quote:"Orçamento",awaiting_approval:"Aguardando aprovação",approved:"Aprovada",waiting_parts:"Aguardando peça",repair:"Em reparo",testing:"Em testes",ready:"Pronto para entrega",delivered:"Entregue",cancelled:"Cancelada",no_repair:"Sem reparo",warranty_return:"Retorno em garantia"};
+      setOrders((ordersRes.data??[]).map((x:any)=>({id:"OS-"+x.order_number,dbId:x.id,customerId:x.customer_id,client:x.customers?.name??"Cliente",document:x.customers?.document??"",device:[x.devices?.brand,x.devices?.model].filter(Boolean).join(" ")||x.devices?.category||"Equipamento",serial:x.devices?.serial_number??"",issue:x.reported_issue,stage:statusLabels[x.status]??x.status,tech:"Não atribuído",total:Number(x.total??x.subtotal??0),due:x.estimated_at?new Date(x.estimated_at).toLocaleDateString("pt-BR"):"A definir",tone:x.status==="ready"?"green":x.status==="awaiting_approval"?"amber":"blue",parts:(x.service_order_items??[]).map((it:any)=>({name:it.description,quantity:Number(it.quantity),price:Number(it.unit_price)}))})));
+      setWarranties((warrantiesRes.data??[]).map((x:any)=>({id:x.code,dbId:x.id,orderId:"OS-"+(x.service_orders?.order_number??""),customer:x.service_orders?.customers?.name??"",device:[x.service_orders?.devices?.brand,x.service_orders?.devices?.model].filter(Boolean).join(" "),starts:new Date(x.starts_at+"T00:00:00").toLocaleDateString("pt-BR"),expires:new Date(x.expires_at+"T00:00:00").toLocaleDateString("pt-BR"),coverage:x.coverage??x.terms??"",status:x.status})));
+      setDataLoading(false);
+    };
+    load().catch(()=>{if(active){setDataError("Falha ao conectar ao banco de dados.");setDataLoading(false)}});
     return ()=>{active=false};
   },[]);
   const [section,setSection]=useState<Section>("Visão geral"),[menuOpen,setMenuOpen]=useState(false),[dialog,setDialog]=useState<DialogKind>(null),[search,setSearch]=useState("");
