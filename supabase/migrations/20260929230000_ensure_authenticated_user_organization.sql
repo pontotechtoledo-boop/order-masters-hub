@@ -43,6 +43,24 @@ BEGIN
   VALUES (_user_id, _full_name)
   ON CONFLICT (id) DO NOTHING;
 
+  -- Reuse an unassigned organization already registered with this verified login email.
+  SELECT o.id INTO _org_id
+  FROM public.organizations o
+  WHERE lower(coalesce(o.email,'')) = _email
+    AND NOT EXISTS (
+      SELECT 1 FROM public.organization_members existing_member
+      WHERE existing_member.organization_id = o.id AND existing_member.active = true
+    )
+  ORDER BY o.created_at ASC
+  LIMIT 1;
+
+  IF _org_id IS NOT NULL THEN
+    INSERT INTO public.organization_members (organization_id, user_id, role, active)
+    VALUES (_org_id, _user_id, 'owner', true)
+    ON CONFLICT (organization_id, user_id) DO UPDATE SET active = true;
+    RETURN _org_id;
+  END IF;
+
   INSERT INTO public.organizations (name, email)
   VALUES (_org_name, _email)
   RETURNING id INTO _org_id;
