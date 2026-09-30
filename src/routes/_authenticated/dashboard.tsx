@@ -59,8 +59,15 @@ function Index(){
       setDataLoading(true);setDataError("");
       const {data:{user},error:userError}=await supabase.auth.getUser();
       if(userError||!user){if(active){setDataError("Sua sessão expirou. Entre novamente.");setDataLoading(false)}return}
-      const {data:members,error:memberError}=await supabase.from("organization_members").select("organization_id,organizations(name)").eq("user_id",user.id).eq("active",true).limit(1);
-      if(memberError||!members?.length){if(active){setDataError("Esta conta ainda não está vinculada a uma empresa no banco de dados. Peça ao administrador para concluir o vínculo.");setCompanyName("Empresa não vinculada");setDataLoading(false)}return}
+      let {data:members,error:memberError}=await supabase.from("organization_members").select("organization_id,organizations(name)").eq("user_id",user.id).eq("active",true).limit(1);
+      if(!memberError&&!members?.length){
+        const {error:provisionError}=await supabase.rpc("ensure_user_organization");
+        if(!provisionError){
+          const refreshed=await supabase.from("organization_members").select("organization_id,organizations(name)").eq("user_id",user.id).eq("active",true).limit(1);
+          members=refreshed.data;memberError=refreshed.error;
+        }else{memberError=provisionError as any}
+      }
+      if(memberError||!members?.length){if(active){setDataError("Não foi possível vincular esta conta a uma empresa. Confirme se as migrações do projeto foram aplicadas no Lovable Cloud.");setCompanyName("Empresa não vinculada");setDataLoading(false)}return}
       const orgId=members[0].organization_id;
       if(!active)return;
       setOrganizationId(orgId);
