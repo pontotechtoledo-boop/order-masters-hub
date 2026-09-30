@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FinanceView, SaleDialog } from "@/components/FinanceSales";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [
