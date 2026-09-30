@@ -63,6 +63,20 @@ function printDocument(title:string, body:string){
 }
 
 function Index(){
+  const [companyName,setCompanyName]=useState("Sua empresa");
+  useEffect(()=>{
+    let active=true;
+    supabase.auth.getUser().then(({data})=>{
+      if(!active)return;
+      const email=data.user?.email?.trim().toLowerCase()??"";
+      const companies:Record<string,string>={
+        "mt6celular1543@gmail.com":"MT6 CELULARES",
+        "pontotechtoledo@gmail.com":"PONTO TECH ASSISTENCIA TECNICA",
+      };
+      setCompanyName(companies[email]??"Sua empresa");
+    }).catch(()=>{if(active)setCompanyName("Sua empresa")});
+    return ()=>{active=false};
+  },[]);
   const [section,setSection]=useState<Section>("Visão geral"),[menuOpen,setMenuOpen]=useState(false),[dialog,setDialog]=useState<DialogKind>(null),[search,setSearch]=useState("");
   const [customers,setCustomers]=useState(initialCustomers),[stock,setStock]=useState(initialStock),[orders,setOrders]=useState(initialOrders),[warranties,setWarranties]=useState(initialWarranties);
   const [selectedOrder,setSelectedOrder]=useState<Order|null>(null),[selectedWarranty,setSelectedWarranty]=useState<Warranty|null>(null),[selectedStock,setSelectedStock]=useState<Stock|null>(null);
