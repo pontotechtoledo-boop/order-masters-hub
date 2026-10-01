@@ -351,7 +351,7 @@ function OverviewHome({onSection}:{onSection:(s:Section)=>void}){
     </section>
   </div>
 }
-function AnalyticsDashboard({orders,stock,sales,onSection}:function Dashboard({orders,stock,sales,onSection}:{orders:Order[];stock:Stock[];sales:Sale[];onSection:(s:Section)=>void}){
+function AnalyticsDashboard({orders,stock,sales,onSection}:{orders:Order[];stock:Stock[];sales:Sale[];onSection:(s:Section)=>void}){
   const [salesFilter,setSalesFilter]=useState<"all"|"assistance"|"store"|"parts">("all");
   const recentOrders=orders.slice(0,5),lowStockCount=stock.filter(s=>s.quantity<=s.minimum).length,estimatedRevenue=orders.reduce((a,o)=>a+o.total,0);
   const salesByMonth=useMemo(()=>Array.from({length:6},(_,i)=>{const d=new Date(new Date().getFullYear(),new Date().getMonth()-(5-i),1);const total=sales.filter(s=>{const x=new Date(s.sold_at);return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()}).reduce((a,s)=>a+Number(s.total),0);return {month:d.toLocaleDateString("pt-BR",{month:"short"}).replace(".",""),total}}),[sales]);
