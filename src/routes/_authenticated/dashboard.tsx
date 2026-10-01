@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Bell, Boxes, Building2, CalendarDays, Check, ChevronDown, CircleDollarSign,
@@ -369,31 +369,57 @@ function CompanySettingsDialog({open,close,company,organizationId,onSave}:{open:
 function CustomerDialog({open,close,onSave}:{open:boolean;close:()=>void;onSave:(c:Customer&{address?:string;notes?:string})=>void}){return <Dialog open={open} onOpenChange={v=>!v&&close()}><DialogContent className="sm:max-w-2xl"><DialogHeader><DialogTitle>Novo cliente</DialogTitle><DialogDescription>Cadastre nome e documento em campos separados para localizar o cliente nas ordens.</DialogDescription></DialogHeader><form className="grid gap-4" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);onSave({id:crypto.randomUUID(),name:String(f.get("name")),document:String(f.get("document")),phone:String(f.get("phone")),email:String(f.get("email")),address:String(f.get("address")||""),notes:String(f.get("notes")||"")})}}><div className="grid gap-4 sm:grid-cols-2"><Field label="Nome / razão social"><Input name="name" required placeholder="Nome completo"/></Field><Field label="CPF / CNPJ"><Input name="document" required placeholder="000.000.000-00"/></Field><Field label="Telefone"><Input name="phone" required placeholder="(45) 99999-9999"/></Field><Field label="E-mail"><Input name="email" type="email" placeholder="cliente@email.com"/></Field></div><Field label="Endereço"><Input name="address" placeholder="Rua, número, bairro e cidade"/></Field><Field label="Observações"><Textarea name="notes" placeholder="Preferências e informações importantes"/></Field><FormActions close={close} label="Cadastrar cliente"/></form></DialogContent></Dialog>}
 function StockDialog({open,close,onSave}:{open:boolean;close:()=>void;onSave:(s:Stock)=>void}){return <Dialog open={open} onOpenChange={v=>!v&&close()}><DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl"><DialogHeader><DialogTitle>Nova peça ou produto</DialogTitle><DialogDescription>Defina saldo inicial, estoque mínimo, custos e localização.</DialogDescription></DialogHeader><form className="grid gap-4" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget),qty=Number(f.get("quantity"));onSave({id:crypto.randomUUID(),sku:String(f.get("sku")),name:String(f.get("name")),category:String(f.get("category")),supplier:String(f.get("supplier")),location:String(f.get("location")),quantity:qty,minimum:Number(f.get("minimum")),cost:Number(f.get("cost")),price:Number(f.get("price")),movements:qty?[{type:"Entrada",quantity:qty,date:today(),note:"Saldo inicial"}]:[]})}}><div className="grid gap-4 sm:grid-cols-2"><Field label="Nome da peça"><Input name="name" required placeholder="Ex.: Conector de carga"/></Field><Field label="SKU / código"><Input name="sku" required placeholder="CON-IP14"/></Field><Field label="Categoria"><Input name="category" required placeholder="Conectores"/></Field><Field label="Fornecedor"><Input name="supplier" placeholder="Nome do fornecedor"/></Field><Field label="Localização"><Input name="location" placeholder="A-01"/></Field><Field label="Saldo inicial"><Input name="quantity" type="number" min="0" step="1" defaultValue="0" required/></Field><Field label="Estoque mínimo"><Input name="minimum" type="number" min="0" step="1" defaultValue="1" required/></Field><Field label="Custo unitário"><Input name="cost" type="number" min="0" step="0.01" required/></Field><Field label="Preço de venda"><Input name="price" type="number" min="0" step="0.01" required/></Field></div><FormActions close={close} label="Cadastrar peça"/></form></DialogContent></Dialog>}
 function MovementDialog({open,item,close,onSave}:{open:boolean;item:Stock|null;close:()=>void;onSave:(id:string,n:number,t:string,note:string)=>void}){const [type,setType]=useState("entry");if(!item)return null;return <Dialog open={open} onOpenChange={v=>!v&&close()}><DialogContent><DialogHeader><DialogTitle>Movimentar estoque</DialogTitle><DialogDescription>{item.name} • saldo atual: {item.quantity}</DialogDescription></DialogHeader><form className="grid gap-4" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget),n=Number(f.get("quantity"));if(type==="exit"&&n>item.quantity){alert("A saída não pode ser maior que o saldo disponível.");return}onSave(item.id,n,type,String(f.get("note")))}}><div className="grid grid-cols-2 gap-2"><Button type="button" variant={type==="entry"?"default":"outline"} onClick={()=>setType("entry")}><Plus/>Entrada</Button><Button type="button" variant={type==="exit"?"default":"outline"} onClick={()=>setType("exit")}><Minus/>Saída</Button></div><Field label="Quantidade"><Input name="quantity" type="number" min="1" max={type==="exit"?item.quantity:undefined} required/></Field><Field label="Motivo / referência"><Input name="note" required placeholder="Compra, ajuste, perda…"/></Field><div className="rounded-md bg-muted p-3"><p className="text-xs font-bold">Últimas movimentações</p>{item.movements.slice(0,3).map((m,i)=><p key={i} className="mt-2 text-xs text-muted-foreground">{m.date} • {m.type} • {m.quantity} un. • {m.note}</p>)}</div><FormActions close={close} label="Registrar movimentação"/></form></DialogContent></Dialog>}
-function CustomerPicker({customers,onSelect}:{customers:Customer[];onSelect:(id:string)=>void}){const [open,setOpen]=useState(false),[term,setTerm]=useState(""),[chosen,setChosen]=useState<Customer|null>(null);const found=customers.filter(c=>`${c.name} ${c.document}`.toLowerCase().includes(term.toLowerCase()));return <div className="relative"><span className="mb-1.5 block text-sm font-semibold">Cliente</span><Button type="button" variant="outline" className="h-auto min-h-10 w-full justify-between text-left font-normal" onClick={()=>setOpen(v=>!v)}><span>{chosen?<><b>{chosen.name}</b><span className="ml-2 text-muted-foreground">{chosen.document}</span></>:"Selecione pelo nome ou documento"}</span><ChevronDown className="size-4 shrink-0"/></Button>{open&&<div className="absolute z-20 mt-1 w-full rounded-md border bg-popover p-2 shadow-lg"><div className="relative"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input autoFocus value={term} onChange={e=>setTerm(e.target.value)} placeholder="Pesquisar nome, CPF ou CNPJ" className="pl-9"/></div><div className="mt-2 max-h-48 overflow-y-auto">{found.map(c=><Button key={c.id} type="button" variant="ghost" className="h-auto w-full justify-start py-2 text-left" onClick={()=>{setChosen(c);onSelect(c.id);setOpen(false)}}><span><b className="block">{c.name}</b><small className="text-muted-foreground">{c.document}</small></span></Button>)}{!found.length&&<p className="p-3 text-sm text-muted-foreground">Nenhum cliente encontrado.</p>}</div></div>}</div>}
+function CustomerPicker({customers,onSelect}:{customers:Customer[];onSelect:(id:string)=>void}){
+  const [open,setOpen]=useState(false),[term,setTerm]=useState(""),[chosen,setChosen]=useState<Customer|null>(null);
+  const pickerRef=useRef<HTMLDivElement>(null);
+  const found=customers.filter(c=>`${c.name} ${c.document}`.toLowerCase().includes(term.toLowerCase()));
+  useEffect(()=>{
+    if(!open)return;
+    const handlePointerDown=(event:PointerEvent)=>{
+      if(pickerRef.current && !pickerRef.current.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown",handlePointerDown);
+    return()=>document.removeEventListener("pointerdown",handlePointerDown);
+  },[open]);
+  return <div ref={pickerRef} className="relative">
+    <span className="mb-1.5 block text-sm font-semibold">Cliente</span>
+    <Button type="button" variant="outline" className="h-auto min-h-10 w-full justify-between text-left font-normal" onClick={()=>setOpen(v=>!v)}>
+      <span>{chosen?<><b>{chosen.name}</b><span className="ml-2 text-muted-foreground">{chosen.document}</span></>:"Selecione pelo nome ou documento"}</span><ChevronDown className="size-4 shrink-0"/>
+    </Button>
+    {open&&<div className="absolute z-20 mt-1 w-full rounded-md border bg-popover p-2 shadow-lg">
+      <div className="relative"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input autoFocus value={term} onChange={e=>setTerm(e.target.value)} placeholder="Pesquisar nome, CPF ou CNPJ" className="pl-9"/></div>
+      <div className="mt-2 max-h-48 overflow-y-auto">{found.map(c=><Button key={c.id} type="button" variant="ghost" className="h-auto w-full justify-start py-2 text-left" onClick={()=>{setChosen(c);onSelect(c.id);setOpen(false)}}><span><b className="block">{c.name}</b><small className="text-muted-foreground">{c.document}</small></span></Button>)}{!found.length&&<p className="p-3 text-sm text-muted-foreground">Nenhum cliente encontrado.</p>}</div>
+    </div>}
+  </div>
+}
 function OrderDialog({open,customers,stock,close,onSave}:{open:boolean;customers:Customer[];stock:Stock[];close:()=>void;onSave:(o:Order,p:{id:string;quantity:number}|null)=>void}){
-  const [customerId,setCustomerId]=useState(""),[partId,setPartId]=useState(""),[category,setCategory]=useState(""),[brand,setBrand]=useState(""),[model,setModel]=useState("");
-  const brands=Object.keys(deviceCatalog[category]??{});
-  const models=(deviceCatalog[category]?.[brand]??[]);
-  useEffect(()=>{setBrand("");setModel("")},[category]);
-  useEffect(()=>{setModel("")},[brand]);
+  const [customerId,setCustomerId]=useState(""),[partId,setPartId]=useState(""),[category,setCategory]=useState(""),[brand,setBrand]=useState(""),[model,setModel]=useState(""),[customBrand,setCustomBrand]=useState(""),[customModel,setCustomModel]=useState("");
+  const brands=[...Object.keys(deviceCatalog[category]??{}),"Outros"];
+  const models=brand&&brand!=="Outros"?[...(deviceCatalog[category]?.[brand]??[]),"Outros"]:[];
+  useEffect(()=>{setBrand("");setModel("");setCustomBrand("");setCustomModel("")},[category]);
+  useEffect(()=>{setModel("");setCustomModel("")},[brand]);
+  const finalBrand=brand==="Outros"?customBrand.trim():brand;
+  const finalModel=model==="Outros"?customModel.trim():model;
   return <Dialog open={open} onOpenChange={v=>!v&&close()}><DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
-    <DialogHeader><DialogTitle>Nova ordem de serviço</DialogTitle><DialogDescription>Cadastre o aparelho com listas padronizadas e registre o diagnóstico com clareza.</DialogDescription></DialogHeader>
+    <DialogHeader><DialogTitle>Nova ordem de serviço</DialogTitle><DialogDescription>Cadastre o aparelho com listas padronizadas e use “Outros” quando a marca ou modelo não estiver na lista.</DialogDescription></DialogHeader>
     <form className="grid gap-4" onSubmit={e=>{
       e.preventDefault();
       const f=new FormData(e.currentTarget),c=customers.find(x=>x.id===customerId);
       if(!c){alert("Selecione um cliente cadastrado.");return}
-      if(!category||!brand||!model){alert("Selecione categoria, marca e modelo do aparelho.");return}
+      if(!category||!finalBrand||!finalModel){alert("Selecione o equipamento e informe a marca e o modelo.");return}
       const part=stock.find(x=>x.id===partId),qty=Number(f.get("partQuantity")||0);
       if(part&&qty>part.quantity){alert("A quantidade da peça é maior que o saldo disponível.");return}
       const parts=part&&qty?[{name:part.name,quantity:qty,price:part.price}]:[];
       const total=Number(f.get("serviceValue")||0)+parts.reduce((a,p)=>a+p.quantity*p.price,0);
-      onSave({id:"OS-PENDENTE",customerId:c.id,client:c.name,document:c.document,device:`${brand} ${model}`,deviceCategory:category,brand,model,serial:String(f.get("serial")||""),issue:String(f.get("issue")||""),apparentIssue:String(f.get("apparentIssue")||""),terms:String(f.get("terms")||""),stage:"Recebida",tech:"Não atribuído",total,due:String(f.get("due")||"A definir"),tone:"slate",parts},part&&qty?{id:part.id,quantity:qty}:null)
+      onSave({id:"OS-PENDENTE",customerId:c.id,client:c.name,document:c.document,device:`${finalBrand} ${finalModel}`,deviceCategory:category,brand:finalBrand,model:finalModel,serial:String(f.get("serial")||""),issue:String(f.get("issue")||""),apparentIssue:String(f.get("apparentIssue")||""),terms:String(f.get("terms")||""),stage:"Recebida",tech:"Não atribuído",total,due:String(f.get("due")||"A definir"),tone:"slate",parts},part&&qty?{id:part.id,quantity:qty}:null)
     }}>
       <CustomerPicker customers={customers} onSelect={setCustomerId}/>
       <div className="grid gap-4 sm:grid-cols-3">
         <Field label="Tipo de equipamento"><select name="category" value={category} onChange={e=>setCategory(e.target.value)} required className="h-10 rounded-md border bg-background px-3 text-sm"><option value="">Selecione</option>{Object.keys(deviceCatalog).map(x=><option key={x} value={x}>{x}</option>)}</select></Field>
         <Field label="Marca"><select name="brand" value={brand} onChange={e=>setBrand(e.target.value)} disabled={!category} required className="h-10 rounded-md border bg-background px-3 text-sm"><option value="">{category?"Selecione a marca":"Escolha o tipo primeiro"}</option>{brands.map(x=><option key={x} value={x}>{x}</option>)}</select></Field>
-        <Field label="Modelo"><select name="model" value={model} onChange={e=>setModel(e.target.value)} disabled={!brand} required className="h-10 rounded-md border bg-background px-3 text-sm"><option value="">{brand?"Selecione o modelo":"Escolha a marca primeiro"}</option>{models.map(x=><option key={x} value={x}>{x}</option>)}</select></Field>
+        {brand==="Outros"?<Field label="Digite a marca"><Input value={customBrand} onChange={e=>setCustomBrand(e.target.value)} placeholder="Ex.: Infinix, Oppo, TCL…"/></Field>:<Field label="Modelo"><select name="model" value={model} onChange={e=>setModel(e.target.value)} disabled={!brand} required={!!brand} className="h-10 rounded-md border bg-background px-3 text-sm"><option value="">{brand?"Selecione o modelo":"Escolha a marca primeiro"}</option>{models.map(x=><option key={x} value={x}>{x}</option>)}</select></Field>}
+        {brand==="Outros"&&<Field label="Digite o modelo"><Input value={customModel} onChange={e=>setCustomModel(e.target.value)} placeholder="Modelo do aparelho"/></Field>}
+        {brand!=="Outros"&&model==="Outros"&&<Field label="Digite o modelo"><Input value={customModel} onChange={e=>setCustomModel(e.target.value)} placeholder="Digite o modelo que não está na lista"/></Field>}
         <Field label="Número de série / IMEI"><Input name="serial" placeholder="Identificação do aparelho"/></Field>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
