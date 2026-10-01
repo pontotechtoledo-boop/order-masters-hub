@@ -120,17 +120,25 @@ function Index(){
       const loadedCompany={name:org.name??"Sua empresa",document:org.document??"",email:org.email??"",phone:org.phone??"",address:org.address??"",logoUrl:org.logo_url??""};
       setCompany(loadedCompany);
       setCompanyName(loadedCompany.name);
-      const customersRes = await supabase.from("customers").select("*").eq("organization_id", orgId).order("created_at", { ascending: false });
-      const stockRes = await supabase.from("inventory_items").select("*,inventory_movements(*)").eq("organization_id", orgId).eq("active", true).order("created_at", { ascending: false });
-      const ordersRes = await supabase.from("service_orders").select("*,customers(name,document,phone,email),devices(category,brand,model,serial_number),service_order_items(*)").eq("organization_id", orgId).order("created_at", { ascending: false });
-      const warrantiesRes = await supabase.from("warranties").select("*,service_orders(order_number,customers(name),devices(brand,model))").eq("organization_id", orgId).order("created_at", { ascending: false });
-      const salesRes = await supabase.from("sales").select("*").eq("organization_id", orgId).order("sold_at", { ascending: false });
-      const financeRes = await supabase.from("financial_entries").select("*").eq("organization_id", orgId).order("entry_date", { ascending: false });
-      const errors=[customersRes.error,stockRes.error,salesRes.error,financeRes.error].filter(Boolean);
-      if(errors.length){if(active){setDataError("Não foi possível carregar os dados principais do banco. Confira as permissões e tente atualizar.");setDataLoading(false)}return}
+      const [customersRes,stockRes,ordersRes,warrantiesRes,salesRes,financeRes] = await Promise.all([
+        supabase.from("customers").select("*").eq("organization_id", orgId).order("created_at", { ascending: false }),
+        supabase.from("inventory_items").select("*,inventory_movements(*)").eq("organization_id", orgId).eq("active", true).order("created_at", { ascending: false }),
+        supabase.from("service_orders").select("*,customers(name,document,phone,email),devices(category,brand,model,serial_number),service_order_items(*)").eq("organization_id", orgId).order("created_at", { ascending: false }),
+        supabase.from("warranties").select("*,service_orders(order_number,customers(name),devices(brand,model))").eq("organization_id", orgId).order("created_at", { ascending: false }),
+        supabase.from("sales").select("*").eq("organization_id", orgId).order("sold_at", { ascending: false }),
+        supabase.from("financial_entries").select("*").eq("organization_id", orgId).order("entry_date", { ascending: false }),
+      ]);
+      if(!active)return;
+      if(customersRes.error){
+        setDataError("Não foi possível carregar os clientes: "+customersRes.error.message);
+      } else {
+        setDataError("");
+      }
+      if(stockRes.error) console.warn("Estoque não carregado:",stockRes.error.message);
       if(ordersRes.error) console.warn("Ordens não carregadas:",ordersRes.error.message);
       if(warrantiesRes.error) console.warn("Garantias não carregadas:",warrantiesRes.error.message);
-      if(!active)return;
+      if(salesRes.error) console.warn("Vendas não carregadas:",salesRes.error.message);
+      if(financeRes.error) console.warn("Financeiro não carregado:",financeRes.error.message);
       setCustomers((customersRes.data??[]).map((x:any)=>({id:x.id,name:x.name,document:x.document??"",phone:x.phone??"",email:x.email??""})));
       setStock((stockRes.data??[]).map((x:any)=>({id:x.id,sku:x.sku??"",name:x.name,category:x.category??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:(x.inventory_movements??[]).map((m:any)=>({type:m.movement_type,date:new Date(m.created_at).toLocaleDateString("pt-BR"),quantity:Number(m.quantity),note:m.notes??""})).sort((a:any,b:any)=>b.date.localeCompare(a.date))})));
       const statusLabels:Record<string,string>={received:"Recebida",triage:"Triagem",diagnosis:"Diagnóstico",quote:"Orçamento",awaiting_approval:"Aguardando aprovação",approved:"Aprovada",waiting_parts:"Aguardando peça",repair:"Em reparo",testing:"Em testes",ready:"Pronto para entrega",delivered:"Entregue",cancelled:"Cancelada",no_repair:"Sem reparo",warranty_return:"Retorno em garantia"};
@@ -153,11 +161,17 @@ function Index(){
   const action=()=>{if(section==="Clientes")open("customer");else if(section==="Estoque")open("stock");else if(section==="Garantias")open("warranty");else if(section==="Financeiro")open("pos");else open("order")};
   const labels:Partial<Record<Section,string>>={Clientes:"Novo cliente",Estoque:"Nova peça",Garantias:"Emitir garantia","Ordens de serviço":"Nova ordem"};
   const requireOrg=()=>{if(!organizationId){alert("Esta conta não está vinculada a uma empresa no banco.");return false}return true};
-  const saveCustomer=async(c:Customer&{address?:string;notes?:string})=>{
-    if(!requireOrg())return;
+  const createCustomer=async(c:Customer&{address?:string;notes?:string}):Promise<Customer|null>=>{
+    if(!requireOrg())return null;
     const {data,error}=await supabase.from("customers").insert({organization_id:organizationId!,kind:"person",name:c.name,document:c.document||null,phone:c.phone||null,email:c.email||null,address:c.address??null,notes:c.notes??null}).select().single();
-    if(error){alert("Não foi possível salvar o cliente: "+error.message);return}
-    setCustomers(v=>[{id:data.id,name:data.name,document:data.document??"",phone:data.phone??"",email:data.email??""},...v]);setDialog(null);
+    if(error){alert("Não foi possível salvar o cliente: "+error.message);return null}
+    const created={id:data.id,name:data.name,document:data.document??"",phone:data.phone??"",email:data.email??""};
+    setCustomers(v=>[created,...v]);
+    return created;
+  };
+  const saveCustomer=async(c:Customer&{address?:string;notes?:string})=>{
+    const created=await createCustomer(c);
+    if(created)setDialog(null);
   };
   const saveStock=async(s:Stock)=>{
     if(!requireOrg())return;
@@ -216,7 +230,7 @@ function Index(){
     <CustomerDialog open={dialog==="customer"} close={()=>setDialog(null)} onSave={saveCustomer}/>
     <StockDialog open={dialog==="stock"} close={()=>setDialog(null)} onSave={saveStock}/>
     <MovementDialog open={dialog==="movement"} item={selectedStock} close={()=>setDialog(null)} onSave={saveMovement}/>
-    <OrderDialog open={dialog==="order"} customers={customers} stock={stock} close={()=>setDialog(null)} onSave={saveOrder}/>
+    <OrderDialog open={dialog==="order"} customers={customers} stock={stock} close={()=>setDialog(null)} onSave={saveOrder} onCreateCustomer={createCustomer}/>
     <WarrantyDialog open={dialog==="warranty"} orders={orders} close={()=>setDialog(null)} onSave={saveWarranty}/>
     <OrderDocumentDialog open={dialog==="orderView"} order={selectedOrder} company={company} close={()=>setDialog(null)}/>
     <WarrantyDocumentDialog open={dialog==="warrantyView"} warranty={selectedWarranty} company={company} close={()=>setDialog(null)}/>
@@ -406,7 +420,7 @@ function CustomerDialog({open,close,onSave}:{open:boolean;close:()=>void;onSave:
 }
 function StockDialog({open,close,onSave}:{open:boolean;close:()=>void;onSave:(s:Stock)=>void}){return <Dialog open={open} onOpenChange={v=>!v&&close()}><DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl"><DialogHeader><DialogTitle>Nova peça ou produto</DialogTitle><DialogDescription>Defina saldo inicial, estoque mínimo, custos e localização.</DialogDescription></DialogHeader><form className="grid gap-4" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget),qty=Number(f.get("quantity"));onSave({id:crypto.randomUUID(),sku:String(f.get("sku")),name:String(f.get("name")),category:String(f.get("category")),supplier:String(f.get("supplier")),location:String(f.get("location")),quantity:qty,minimum:Number(f.get("minimum")),cost:Number(f.get("cost")),price:Number(f.get("price")),movements:qty?[{type:"Entrada",quantity:qty,date:today(),note:"Saldo inicial"}]:[]})}}><div className="grid gap-4 sm:grid-cols-2"><Field label="Nome da peça"><Input name="name" required placeholder="Ex.: Conector de carga"/></Field><Field label="SKU / código"><Input name="sku" required placeholder="CON-IP14"/></Field><Field label="Categoria"><Input name="category" required placeholder="Conectores"/></Field><Field label="Fornecedor"><Input name="supplier" placeholder="Nome do fornecedor"/></Field><Field label="Localização"><Input name="location" placeholder="A-01"/></Field><Field label="Saldo inicial"><Input name="quantity" type="number" min="0" step="1" defaultValue="0" required/></Field><Field label="Estoque mínimo"><Input name="minimum" type="number" min="0" step="1" defaultValue="1" required/></Field><Field label="Custo unitário"><Input name="cost" type="number" min="0" step="0.01" required/></Field><Field label="Preço de venda"><Input name="price" type="number" min="0" step="0.01" required/></Field></div><FormActions close={close} label="Cadastrar peça"/></form></DialogContent></Dialog>}
 function MovementDialog({open,item,close,onSave}:{open:boolean;item:Stock|null;close:()=>void;onSave:(id:string,n:number,t:string,note:string)=>void}){const [type,setType]=useState("entry");if(!item)return null;return <Dialog open={open} onOpenChange={v=>!v&&close()}><DialogContent><DialogHeader><DialogTitle>Movimentar estoque</DialogTitle><DialogDescription>{item.name} • saldo atual: {item.quantity}</DialogDescription></DialogHeader><form className="grid gap-4" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget),n=Number(f.get("quantity"));if(type==="exit"&&n>item.quantity){alert("A saída não pode ser maior que o saldo disponível.");return}onSave(item.id,n,type,String(f.get("note")))}}><div className="grid grid-cols-2 gap-2"><Button type="button" variant={type==="entry"?"default":"outline"} onClick={()=>setType("entry")}><Plus/>Entrada</Button><Button type="button" variant={type==="exit"?"default":"outline"} onClick={()=>setType("exit")}><Minus/>Saída</Button></div><Field label="Quantidade"><Input name="quantity" type="number" min="1" max={type==="exit"?item.quantity:undefined} required/></Field><Field label="Motivo / referência"><Input name="note" required placeholder="Compra, ajuste, perda…"/></Field><div className="rounded-md bg-muted p-3"><p className="text-xs font-bold">Últimas movimentações</p>{item.movements.slice(0,3).map((m,i)=><p key={i} className="mt-2 text-xs text-muted-foreground">{m.date} • {m.type} • {m.quantity} un. • {m.note}</p>)}</div><FormActions close={close} label="Registrar movimentação"/></form></DialogContent></Dialog>}
-function CustomerPicker({customers,onSelect}:{customers:Customer[];onSelect:(id:string)=>void}){
+function CustomerPicker({customers,onSelect,onCreate}:{customers:Customer[];onSelect:(id:string)=>void;onCreate:()=>void}){
   const [open,setOpen]=useState(false),[term,setTerm]=useState(""),[chosen,setChosen]=useState<Customer|null>(null);
   const pickerRef=useRef<HTMLDivElement>(null);
   const found=customers.filter(c=>`${c.name} ${c.document}`.toLowerCase().includes(term.toLowerCase()));
@@ -419,18 +433,21 @@ function CustomerPicker({customers,onSelect}:{customers:Customer[];onSelect:(id:
     return()=>document.removeEventListener("pointerdown",handlePointerDown);
   },[open]);
   return <div ref={pickerRef} className="relative">
-    <span className="mb-1.5 block text-sm font-semibold">Cliente</span>
+    <div className="mb-1.5 flex items-center justify-between gap-2">
+      <span className="text-sm font-semibold">Cliente</span>
+      <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={onCreate}><Plus className="size-3.5"/>Cadastrar cliente</Button>
+    </div>
     <Button type="button" variant="outline" className="h-auto min-h-10 w-full justify-between text-left font-normal" onClick={()=>setOpen(v=>!v)}>
       <span>{chosen?<><b>{chosen.name}</b><span className="ml-2 text-muted-foreground">{chosen.document}</span></>:"Selecione pelo nome ou documento"}</span><ChevronDown className="size-4 shrink-0"/>
     </Button>
     {open&&<div className="absolute z-20 mt-1 w-full rounded-md border bg-popover p-2 shadow-lg">
       <div className="relative"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input autoFocus value={term} onChange={e=>setTerm(e.target.value)} placeholder="Pesquisar nome, CPF ou CNPJ" className="pl-9"/></div>
-      <div className="mt-2 max-h-48 overflow-y-auto">{found.map(c=><Button key={c.id} type="button" variant="ghost" className="h-auto w-full justify-start py-2 text-left" onClick={()=>{setChosen(c);onSelect(c.id);setOpen(false)}}><span><b className="block">{c.name}</b><small className="text-muted-foreground">{c.document}</small></span></Button>)}{!found.length&&<p className="p-3 text-sm text-muted-foreground">Nenhum cliente encontrado.</p>}</div>
+      <div className="mt-2 max-h-48 overflow-y-auto">{found.map(c=><Button key={c.id} type="button" variant="ghost" className="h-auto w-full justify-start py-2 text-left" onClick={()=>{setChosen(c);onSelect(c.id);setOpen(false)}}><span><b className="block">{c.name}</b><small className="text-muted-foreground">{c.document}</small></span></Button>)}{!found.length&&<div className="p-3 text-sm text-muted-foreground"><p>Nenhum cliente encontrado.</p><Button type="button" variant="link" className="mt-1 h-auto p-0" onClick={onCreate}><Plus className="size-4"/>Cadastrar agora</Button></div>}</div>
     </div>}
   </div>
 }
-function OrderDialog({open,customers,stock,close,onSave}:{open:boolean;customers:Customer[];stock:Stock[];close:()=>void;onSave:(o:Order,p:{id:string;quantity:number}|null)=>void}){
-  const [customerId,setCustomerId]=useState(""),[partId,setPartId]=useState(""),[category,setCategory]=useState(""),[brand,setBrand]=useState(""),[model,setModel]=useState(""),[customBrand,setCustomBrand]=useState(""),[customModel,setCustomModel]=useState(""),[serialNA,setSerialNA]=useState(false);
+function OrderDialog({open,customers,stock,close,onSave,onCreateCustomer}:{open:boolean;customers:Customer[];stock:Stock[];close:()=>void;onSave:(o:Order,p:{id:string;quantity:number}|null)=>void;onCreateCustomer:(c:Customer&{address?:string;notes?:string})=>Promise<Customer|null>}){
+  const [customerId,setCustomerId]=useState(""),[partId,setPartId]=useState(""),[category,setCategory]=useState(""),[brand,setBrand]=useState(""),[model,setModel]=useState(""),[customBrand,setCustomBrand]=useState(""),[customModel,setCustomModel]=useState(""),[serialNA,setSerialNA]=useState(false),[quickCustomerOpen,setQuickCustomerOpen]=useState(false);
   const brands=[...Object.keys(deviceCatalog[category]??{}),"Outros"];
   const models=brand&&brand!=="Outros"?[...(deviceCatalog[category]?.[brand]??[]),"Outros"]:[];
   useEffect(()=>{setBrand("");setModel("");setCustomBrand("");setCustomModel("")},[category]);
@@ -450,7 +467,8 @@ function OrderDialog({open,customers,stock,close,onSave}:{open:boolean;customers
       const total=Number(f.get("serviceValue")||0)+parts.reduce((a,p)=>a+p.quantity*p.price,0);
       onSave({id:"OS-PENDENTE",customerId:c.id,client:c.name,document:c.document,device:`${finalBrand} ${finalModel}`,deviceCategory:category,brand:finalBrand,model:finalModel,serial:serialNA?"N/A":String(f.get("serial")||""),issue:String(f.get("issue")||""),apparentIssue:String(f.get("apparentIssue")||""),terms:String(f.get("terms")||""),stage:"Recebida",tech:"Não atribuído",total,due:String(f.get("due")||"A definir"),tone:"slate",parts},part&&qty?{id:part.id,quantity:qty}:null)
     }}>
-      <CustomerPicker customers={customers} onSelect={setCustomerId}/>
+      <CustomerPicker customers={customers} onSelect={setCustomerId} onCreate={()=>setQuickCustomerOpen(true)}/>
+      <CustomerDialog open={quickCustomerOpen} close={()=>setQuickCustomerOpen(false)} onSave={async c=>{const created=await onCreateCustomer(c);if(created){setCustomerId(created.id);setQuickCustomerOpen(false);}}}/>
       <div className="grid gap-4 sm:grid-cols-3">
         <Field label="Tipo de equipamento"><select name="category" value={category} onChange={e=>setCategory(e.target.value)} required className="h-10 rounded-md border bg-background px-3 text-sm"><option value="">Selecione</option>{Object.keys(deviceCatalog).map(x=><option key={x} value={x}>{x}</option>)}</select></Field>
         <Field label="Marca"><select name="brand" value={brand} onChange={e=>setBrand(e.target.value)} disabled={!category} required className="h-10 rounded-md border bg-background px-3 text-sm"><option value="">{category?"Selecione a marca":"Escolha o tipo primeiro"}</option>{brands.map(x=><option key={x} value={x}>{x}</option>)}</select></Field>
