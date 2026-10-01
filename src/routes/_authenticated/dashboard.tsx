@@ -5,7 +5,7 @@ import {
   Bell, Boxes, Building2, CalendarDays, Check, ChevronDown, CircleDollarSign,
   ClipboardList, Clock3, FileCheck2, Gauge, LayoutDashboard, Menu, MoreHorizontal,
   PackageSearch, Plus, Printer, Search, Settings, ShieldCheck, TrendingUp, Users,
-  Wrench, X, Minus, ArrowDownToLine, History, Eye, FileDown, Trash2,
+  Wrench, X, Minus, ArrowDownToLine, History, Eye, FileDown, Trash2, ShoppingBag, ShoppingCart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -151,7 +151,7 @@ function Index(){
     <main className="min-h-screen lg:pl-64">
       <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-7"><Button variant="ghost" size="icon" className="lg:hidden" aria-label="Abrir menu" onClick={()=>setMenuOpen(true)}><Menu/></Button><div className="relative hidden max-w-xl flex-1 md:block"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar nesta área…" className="h-10 border-0 bg-muted pl-10 shadow-none"/></div><div className="ml-auto flex items-center gap-2"><Button variant="ghost" size="icon" aria-label="Notificações"><Bell/></Button><span className="grid size-8 place-items-center rounded-md bg-primary font-bold text-primary-foreground">{companyName.slice(0,2).toUpperCase()}</span><span className="hidden text-sm font-semibold sm:block">{companyName}</span><ChevronDown className="hidden size-4 sm:block"/></div></header>
       <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-7 md:py-8">{dataError&&<div role="alert" className="mb-5 rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">{dataError}</div>}{dataLoading&&<div className="mb-5 rounded-md border bg-card p-4 text-sm text-muted-foreground">Carregando dados reais da empresa…</div>}<div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="mb-1 text-sm font-medium text-muted-foreground">{new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"})}</p><h1 className="text-2xl font-bold md:text-3xl">{section}</h1><p className="mt-1 text-sm text-muted-foreground">Bem-vindo, {companyName}. Sua operação está sob controle.</p></div>{["Clientes","Estoque","Garantias","Ordens de serviço","Visão geral"].includes(section)&&<Button className="h-10 w-full sm:w-auto" onClick={action}><Plus/>{labels[section]??"Nova ordem"}</Button>}</div>
-        {section==="Visão geral"&&<Dashboard orders={filteredOrders} stock={stock} onNew={()=>open("order")} onSection={setSection}/>} 
+        {section==="Visão geral"&&<Dashboard orders={filteredOrders} stock={stock} sales={sales} onNew={()=>open("order")} onSection={setSection}/>} 
         {section==="Ordens de serviço"&&<OrdersView orders={filteredOrders} onNew={()=>open("order")} onView={o=>{setSelectedOrder(o);open("orderView")}} onDelete={async o=>{if(!window.confirm(`Excluir a ordem ${o.id} de ${o.client}? Essa ação não pode ser desfeita.`))return;if(!o.dbId){alert("Esta ordem não está salva no banco.");return}const {error}=await supabase.from("service_orders").delete().eq("id",o.dbId).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a ordem. Se houver consumo de estoque vinculado, a exclusão pode ser bloqueada para preservar o histórico. "+error.message);return}setOrders(v=>v.filter(x=>x.id!==o.id));setWarranties(v=>v.filter(w=>w.orderId!==o.id));}}/>}
         {section==="Clientes"&&<CustomersView customers={customers.filter(c=>`${c.name} ${c.document} ${c.phone}`.toLowerCase().includes(q))} orders={orders} onNew={()=>open("customer")} onDelete={async c=>{const linked=orders.filter(o=>o.customerId===c.id);if(linked.length){window.alert("Este cliente possui ordens de serviço vinculadas. Exclua primeiro as ordens relacionadas.");return}if(window.confirm(`Excluir o cliente ${c.name}? Essa ação não pode ser desfeita.`)){const {error}=await supabase.from("customers").delete().eq("id",c.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir o cliente: "+error.message);return}setCustomers(v=>v.filter(x=>x.id!==c.id));}}}/>}
         {section==="Estoque"&&<StockView stock={stock.filter(s=>`${s.name} ${s.sku} ${s.category}`.toLowerCase().includes(q))} onNew={()=>open("stock")} onMove={s=>{setSelectedStock(s);open("movement")}} onDelete={async s=>{if(!window.confirm(`Excluir a peça ${s.name} do estoque? O banco pode impedir a exclusão se houver histórico vinculado.`))return;const {error}=await supabase.from("inventory_items").delete().eq("id",s.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a peça. Pode haver movimentações ou ordens vinculadas. "+error.message);return}setStock(v=>v.filter(x=>x.id!==s.id));}}/>}
@@ -171,7 +171,83 @@ function Index(){
 }
 
 function Sidebar({section,setSection,open,close}:{section:Section;setSection:(s:Section)=>void;open:boolean;close:()=>void}){return <>{open&&<Button variant="ghost" className="fixed inset-0 z-40 h-auto w-auto rounded-none bg-foreground/30 lg:hidden" onClick={close} aria-label="Fechar menu"/>}<aside className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar transition-transform lg:translate-x-0 ${open?"translate-x-0":"-translate-x-full"}`}><div className="flex h-16 items-center border-b px-5"><div className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground"><Wrench className="size-5"/></div><div className="ml-3"><div className="text-base font-extrabold leading-4">Service Pro Hub</div><div className="text-[10px] font-bold uppercase text-primary">Gestão inteligente</div></div><Button variant="ghost" size="icon" onClick={close} className="ml-auto lg:hidden"><X/></Button></div><nav className="flex-1 overflow-y-auto px-3 py-4">{nav.map((item,i)=><div key={item.label}>{item.group&&<p className={`mb-2 px-3 text-[10px] font-bold text-muted-foreground ${i?"mt-6":""}`}>{item.group}</p>}<Button variant="ghost" onClick={()=>setSection(item.label)} className={`mb-1 h-10 w-full justify-start gap-3 px-3 ${section===item.label?"bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground":"text-sidebar-foreground"}`}><item.icon className="size-[18px]"/>{item.label}</Button></div>)}</nav><div className="border-t p-3"><div className="rounded-md bg-muted p-3 text-xs font-semibold"><Settings className="mb-2 size-4 text-primary"/>Configurações da empresa</div></div></aside></>}
-function Dashboard({orders,stock,onNew,onSection}:{orders:Order[];stock:Stock[];onNew:()=>void;onSection:(s:Section)=>void}){const metrics=[{label:"Ordens em andamento",value:String(orders.length),note:"Operação atual",icon:ClipboardList},{label:"Aguardando aprovação",value:String(orders.filter(o=>o.stage.includes("aprovação")).length),note:"Orçamentos pendentes",icon:Clock3},{label:"Receita estimada",value:money(orders.reduce((a,o)=>a+o.total,0)),note:"Ordens listadas",icon:TrendingUp},{label:"Estoque baixo",value:String(stock.filter(s=>s.quantity<=s.minimum).length),note:"Itens para repor",icon:PackageSearch}];return <div className="space-y-6"><section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{metrics.map(m=><article key={m.label} className="rounded-lg border bg-card p-5 shadow-card"><div className="grid size-9 place-items-center rounded-md bg-muted text-primary"><m.icon className="size-[18px]"/></div><p className="mt-5 text-2xl font-bold">{m.value}</p><p className="mt-1 text-sm font-medium">{m.label}</p><p className="mt-2 text-xs text-muted-foreground">{m.note}</p></article>)}</section><section className="grid gap-6 xl:grid-cols-[1.65fr_1fr]"><div className="min-w-0 rounded-lg border bg-card shadow-card"><div className="flex items-center justify-between border-b px-5 py-4"><div><h2 className="font-bold">Ordens recentes</h2><p className="text-xs text-muted-foreground">Clientes, equipamentos e prazos</p></div><Button variant="ghost" size="sm" onClick={()=>onSection("Ordens de serviço")}>Ver todas</Button></div><OrderTable orders={orders}/></div><div className="rounded-lg border bg-card p-5 shadow-card"><h2 className="font-bold">Ações rápidas</h2><div className="mt-5 grid gap-2"><Button onClick={onNew}><Plus/>Nova ordem</Button><Button variant="outline" onClick={()=>onSection("Clientes")}><Users/>Gerenciar clientes</Button><Button variant="outline" onClick={()=>onSection("Estoque")}><Boxes/>Gerenciar estoque</Button><Button variant="outline" onClick={()=>onSection("Garantias")}><ShieldCheck/>Emitir garantia</Button></div></div></section><section className="grid gap-4 md:grid-cols-3"><InfoCard icon={History} title="Histórico preservado" text="Movimentações de peças ficam registradas por data e origem."/><InfoCard icon={CalendarDays} title="Agenda de hoje" text="Consulte as ordens e garantias cadastradas para acompanhar os próximos atendimentos."/><InfoCard icon={FileCheck2} title="Documentos prontos" text="Ordens e garantias podem ser impressas ou salvas em PDF."/></section></div>}
+function Dashboard({orders,stock,sales,onNew,onSection}:{orders:Order[];stock:Stock[];sales:Sale[];onNew:()=>void;onSection:(s:Section)=>void}){
+  const [salesFilter,setSalesFilter]=useState<"all"|"assistance"|"store"|"parts">("all");
+  const recentOrders=orders.slice(0,5);
+  const lowStockCount=stock.filter(s=>s.quantity<=s.minimum).length;
+  const estimatedRevenue=orders.reduce((a,o)=>a+o.total,0);
+  const salesByDay=useMemo(()=>{
+    const now=new Date();
+    return Array.from({length:7},(_,index)=>{
+      const d=new Date(now);
+      d.setHours(0,0,0,0);
+      d.setDate(now.getDate()-(6-index));
+      const key=d.toLocaleDateString("en-CA");
+      const total=sales.filter(s=>{
+        if(salesFilter!=="all"&&s.department!==salesFilter)return false;
+        const sd=new Date(s.sold_at);
+        return sd.toLocaleDateString("en-CA")===key;
+      }).reduce((sum,s)=>sum+Number(s.total),0);
+      return {label:d.toLocaleDateString("pt-BR",{weekday:"short"}).replace(".",""),date:d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}),total};
+    });
+  },[sales,salesFilter]);
+  const maxDay=Math.max(...salesByDay.map(d=>d.total),1);
+  const weekTotal=salesByDay.reduce((a,d)=>a+d.total,0);
+  const cards=[
+    {title:"Assistência técnica",description:"Ordens de serviço, reparos e acompanhamento",icon:Wrench,classes:"bg-blue-600 text-white",target:"Ordens de serviço" as Section},
+    {title:"Loja / Produtos",description:"Produtos, preços e movimentação de vendas",icon:ShoppingBag,classes:"bg-violet-600 text-white",target:"Estoque" as Section},
+    {title:"Estoque de peças",description:"Peças, saldos e reposição de estoque",icon:Boxes,classes:"bg-amber-500 text-white",target:"Estoque" as Section},
+    {title:"Vendas",description:"Vendas, receitas e histórico financeiro",icon:ShoppingCart,classes:"bg-emerald-600 text-white",target:"Financeiro" as Section},
+    {title:"Clientes",description:"Cadastro e histórico de atendimentos",icon:Users,classes:"bg-cyan-600 text-white",target:"Clientes" as Section},
+  ];
+  return <div className="space-y-6">
+    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      {cards.map(card=><button type="button" key={card.title} onClick={()=>onSection(card.target)} className={"group min-h-[150px] rounded-xl p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg "+card.classes}>
+        <div className="flex items-start justify-between gap-3"><div className="grid size-11 place-items-center rounded-lg bg-white/15"><card.icon className="size-5"/></div><span className="text-2xl opacity-70 transition group-hover:translate-x-1">→</span></div>
+        <h2 className="mt-7 text-lg font-bold">{card.title}</h2>
+        <p className="mt-1 text-xs leading-5 text-white/80">{card.description}</p>
+      </button>)}
+    </section>
+
+    <section className="grid gap-3 sm:grid-cols-3">
+      <Stat label="Ordens em andamento" value={String(orders.length)} />
+      <Stat label="Receita estimada" value={money(estimatedRevenue)} />
+      <div className="rounded-lg border bg-card p-5 shadow-card"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold text-muted-foreground">Estoque baixo</p><p className="mt-2 text-2xl font-bold">{lowStockCount}</p></div><PackageSearch className="size-5 text-primary"/></div><Button variant="link" className="mt-2 h-auto px-0 text-xs" onClick={()=>onSection("Estoque")}>Ver tudo →</Button></div>
+    </section>
+
+    <section className="grid gap-6 xl:grid-cols-[1.25fr_1fr]">
+      <div className="min-w-0 rounded-lg border bg-card shadow-card">
+        <div className="flex items-center justify-between gap-3 border-b px-5 py-4"><div><h2 className="font-bold">Ordens recentes</h2><p className="text-xs text-muted-foreground">Acompanhe apenas os últimos atendimentos</p></div><Button variant="ghost" size="sm" onClick={()=>onSection("Ordens de serviço")}>Ver tudo</Button></div>
+        <OrderTable orders={recentOrders}/>
+      </div>
+
+      <div className="rounded-lg border bg-card p-5 shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div><h2 className="font-bold">Vendas da semana</h2><p className="text-xs text-muted-foreground">{money(weekTotal)} no período selecionado</p></div>
+          <select aria-label="Filtrar vendas da semana" value={salesFilter} onChange={e=>setSalesFilter(e.target.value as "all"|"assistance"|"store"|"parts")} className="h-9 rounded-md border bg-background px-3 text-xs font-semibold">
+            <option value="all">Todas</option>
+            <option value="store">Produtos da loja</option>
+            <option value="assistance">Assistência técnica</option>
+            <option value="parts">Peças</option>
+          </select>
+        </div>
+        <div className="mt-7 flex h-48 items-end gap-2 border-b pb-1">
+          {salesByDay.map(day=><div key={day.date} className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2">
+            <span className="text-[10px] font-semibold text-muted-foreground">{day.total?money(day.total).replace("R$ ",""):"—"}</span>
+            <div className="flex h-32 w-full items-end justify-center"><div title={day.date+": "+money(day.total)} className="w-full max-w-8 rounded-t-md bg-primary/80 transition-all" style={{height:day.total?Math.max(10,(day.total/maxDay)*100):4}}/></div>
+            <span className="text-[10px] font-medium text-muted-foreground">{day.label}</span>
+          </div>)}
+        </div>
+        <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">{salesByDay.map(day=><span key={day.date}>{day.date}</span>)}</div>
+      </div>
+    </section>
+
+    <section className="rounded-lg border bg-card shadow-card">
+      <div className="flex items-center justify-between gap-3 border-b px-5 py-4"><div><h2 className="font-bold">Produtos em baixo estoque</h2><p className="text-xs text-muted-foreground">Consulte a lista completa somente quando precisar</p></div><Button variant="outline" size="sm" onClick={()=>onSection("Estoque")}>Ver tudo</Button></div>
+      <div className="flex items-center justify-between p-5"><div><p className="text-sm font-semibold">{lowStockCount?" + lowStockCount + " item(ns) precisam de reposição.":"Nenhum item abaixo do estoque mínimo."}</p><p className="mt-1 text-xs text-muted-foreground">Os detalhes ficam concentrados na área de estoque para manter a tela inicial limpa.</p></div><PackageSearch className="size-8 text-primary"/></div>
+    </section>
+  </div>
+}
 function InfoCard({icon:Icon,title,text}:{icon:typeof History;title:string;text:string}){return <article className="rounded-lg border bg-card p-5 shadow-card"><Icon className="size-5 text-primary"/><h3 className="mt-4 font-bold">{title}</h3><p className="mt-1 text-sm text-muted-foreground">{text}</p></article>}
 function OrderTable({orders,onView,onDelete}:{orders:Order[];onView?:(o:Order)=>void;onDelete?:(o:Order)=>void}){return <div className="overflow-x-auto"><table className="w-full min-w-[800px] text-left text-sm"><thead><tr className="text-xs text-muted-foreground"><th className="px-5 py-3">ORDEM</th><th className="px-3 py-3">CLIENTE / EQUIPAMENTO</th><th className="px-3 py-3">STATUS</th><th className="px-3 py-3">VALOR</th><th className="px-5 py-3">AÇÕES</th></tr></thead><tbody>{orders.map(o=><tr key={o.id} className="border-t hover:bg-muted/50"><td className="px-5 py-4 font-bold text-primary">{o.id}</td><td className="px-3 py-4"><div className="font-semibold">{o.client}</div><div className="text-xs text-muted-foreground">{o.device}</div></td><td className="px-3 py-4"><span className={`status status-${o.tone}`}><i/>{o.stage}</span></td><td className="px-3 py-4 font-semibold">{o.total?money(o.total):"—"}</td><td className="px-5 py-4"><div className="flex items-center gap-1">{onView&&<Button variant="ghost" size="sm" onClick={()=>onView(o)}><Eye/>Abrir</Button>}{onDelete&&<Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" aria-label={`Excluir ordem ${o.id}`} title="Excluir ordem" onClick={()=>onDelete(o)}><Trash2 className="size-4"/></Button>}</div></td></tr>)}</tbody></table>{!orders.length&&<Empty text="Nenhuma ordem encontrada."/>}</div>}
 function OrdersView({orders,onNew,onView,onDelete}:{orders:Order[];onNew:()=>void;onView:(o:Order)=>void;onDelete:(o:Order)=>void}){return <section className="rounded-lg border bg-card shadow-card"><div className="flex items-center justify-between border-b p-5"><div><h2 className="font-bold">Todas as ordens</h2><p className="text-xs text-muted-foreground">Pesquise por número, cliente, documento ou equipamento</p></div><Button onClick={onNew}><Plus/>Nova ordem</Button></div><OrderTable orders={orders} onView={onView} onDelete={onDelete}/></section>}
