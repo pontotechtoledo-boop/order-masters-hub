@@ -353,6 +353,46 @@ function Placeholder({section}:{section:Section}){return <div className="flex mi
 function Field({label,children}:{label:string;children:React.ReactNode}){return <label className="grid gap-1.5 text-sm font-semibold">{label}{children}</label>}
 function FormActions({close,label}:{close:()=>void;label:string}){return <div className="mt-2 flex justify-end gap-2"><Button type="button" variant="outline" onClick={close}>Cancelar</Button><Button type="submit"><Check/>{label}</Button></div>}
 
+function NotificationDialog({open,close}:{open:boolean;close:()=>void}){
+  const [items,setItems]=useState<{id:string;title:string;message:string;created_at:string}[]>([]);
+  const [owner,setOwner]=useState(false);
+  const [loading,setLoading]=useState(false);
+  const [publishing,setPublishing]=useState(false);
+  const [showForm,setShowForm]=useState(false);
+  const load=async()=>{
+    setLoading(true);
+    const {data:ownerData}=await supabase.rpc("is_platform_owner");
+    setOwner(Boolean(ownerData));
+    const {data}=await supabase.from("system_announcements").select("id,title,message,created_at").eq("active",true).order("created_at",{ascending:false});
+    setItems(data??[]);
+    setLoading(false);
+  };
+  useEffect(()=>{if(open)load()},[open]);
+  const claim=async()=>{
+    const {data,error}=await supabase.rpc("claim_platform_owner");
+    if(error){alert("Não foi possível ativar a administração de avisos: "+error.message);return}
+    if(data){setOwner(true);setShowForm(true);alert("Esta conta agora pode publicar avisos globais. Faça essa ativação antes de começar a vender o sistema para clientes.");}
+    else alert("A administração da plataforma já está vinculada a outra conta.");
+  };
+  const publish=async(e:React.FormEvent<HTMLFormElement>)=>{
+    e.preventDefault();
+    const f=new FormData(e.currentTarget),title=String(f.get("title")||"").trim(),message=String(f.get("message")||"").trim();
+    if(!title||!message)return;
+    setPublishing(true);
+    const {error}=await supabase.from("system_announcements").insert({title,message,active:true,created_by:(await supabase.auth.getUser()).data.user?.id??null});
+    setPublishing(false);
+    if(error){alert("Não foi possível publicar o aviso: "+error.message);return}
+    e.currentTarget.reset();setShowForm(false);await load();
+  };
+  return <Dialog open={open} onOpenChange={v=>!v&&close()}><DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg"><DialogHeader><DialogTitle>Notificações</DialogTitle><DialogDescription>Avisos importantes e atualizações do Service Pro Hub.</DialogDescription></DialogHeader>
+    <div className="grid gap-3">
+      {loading?<p className="text-sm text-muted-foreground">Carregando avisos…</p>:!items.length?<div className="rounded-lg border border-dashed p-6 text-center"><Bell className="mx-auto size-7 text-muted-foreground"/><p className="mt-3 text-sm font-semibold">Nenhum aviso no momento</p><p className="mt-1 text-xs text-muted-foreground">Quando houver uma atualização ou comunicado, ele aparecerá aqui.</p></div>:items.map(item=><article key={item.id} className="rounded-lg border bg-muted/20 p-4"><p className="font-bold">{item.title}</p><p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{item.message}</p><p className="mt-3 text-[11px] text-muted-foreground">{new Date(item.created_at).toLocaleString("pt-BR")}</p></article>)}
+      {owner&&!showForm&&<Button onClick={()=>setShowForm(true)}><Plus/>Novo aviso</Button>}
+      {!owner&&<div className="rounded-md border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">A publicação de avisos é restrita ao administrador da plataforma.</p><Button variant="outline" size="sm" className="mt-2" onClick={claim}>Ativar administração nesta conta</Button></div>}
+      {owner&&showForm&&<form className="grid gap-3 rounded-lg border p-4" onSubmit={publish}><Field label="Título"><Input name="title" required placeholder="Ex.: Atualização do sistema"/></Field><Field label="Mensagem"><Textarea name="message" required placeholder="Escreva o comunicado que todos os clientes verão no sininho."/></Field><div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={()=>setShowForm(false)}>Cancelar</Button><Button type="submit" disabled={publishing}>{publishing?"Publicando…":"Publicar aviso"}</Button></div></form>}
+    </div>
+  </DialogContent></Dialog>
+}
 function CompanySettingsDialog({open,close,company,organizationId,onSave}:{open:boolean;close:()=>void;company:CompanySettings;organizationId:string|null;onSave:(c:CompanySettings)=>void}){
   const [logoPreview,setLogoPreview]=useState(company.logoUrl);
   const [uploading,setUploading]=useState(false);
