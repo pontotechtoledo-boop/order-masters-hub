@@ -64,7 +64,7 @@ function Index(){
       setDataLoading(true);setDataError("");
       const {data:{user},error:userError}=await supabase.auth.getUser();
       if(userError||!user){if(active){setDataError("Sua sessão expirou. Entre novamente.");setDataLoading(false)}return}
-      let {data:members,error:memberError}=await supabase.from("organization_members").select("organization_id,organizations(name)").eq("user_id",user.id).eq("active",true).limit(1);
+      let {data:members,error:memberError}=await supabase.from("organization_members").select("organization_id,organizations(name,document,email,phone,address,logo_url)").eq("user_id",user.id).eq("active",true).limit(1);
       if(!memberError&&!members?.length){
         const {error:provisionError}=await supabase.rpc("ensure_user_organization");
         if(!provisionError){
@@ -182,7 +182,7 @@ function Sidebar({section,setSection,open,close,collapsed,toggleCollapsed,onComp
       <div className={"flex h-16 items-center border-b "+(collapsed?"justify-center px-2":"px-4")}>
         <div className="grid size-9 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground"><Wrench className="size-5"/></div>
         {!collapsed&&<div className="ml-3 min-w-0"><div className="truncate text-base font-extrabold leading-4">Service Pro Hub</div><div className="text-[10px] font-bold uppercase text-primary">Gestão inteligente</div></div>}
-        <Button variant="ghost" size="icon" onClick={toggleCollapsed} className={collapsed?"absolute right-1 top-3 hidden lg:flex":"ml-auto hidden lg:flex"} aria-label={collapsed?"Expandir menu":"Minimizar menu"} title={collapsed?"Expandir menu":"Minimizar menu"}><PanelLeft className="size-4"/></Button>
+        <Button variant="ghost" size="icon" onClick={toggleCollapsed} className={collapsed?"absolute right-1 top-3 flex":"ml-auto flex"} aria-label={collapsed?"Expandir menu":"Minimizar menu"} title={collapsed?"Expandir menu":"Minimizar menu"}><PanelLeft className="size-4"/></Button>
         {!collapsed&&<Button variant="ghost" size="icon" onClick={close} className="ml-auto lg:hidden"><X/></Button>}
       </div>
       <nav className={"flex-1 overflow-y-auto py-4 "+(collapsed?"px-2":"px-3")}>
