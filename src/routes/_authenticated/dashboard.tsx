@@ -42,7 +42,7 @@ const initialStock: Stock[] = [];
 const initialOrders: Order[] = [];
 const initialWarranties: Warranty[] = [];
 const nav: {label:Section;icon:typeof Gauge;group?:string}[] = [
-  {label:"Visão geral",icon:LayoutDashboard},{label:"Dashboard",icon:BarChart3},{label:"Ordens de serviço",icon:ClipboardList,group:"OPERAÇÃO"},{label:"Clientes",icon:Users},{label:"Garantias",icon:ShieldCheck},{label:"Estoque",icon:Boxes,group:"GESTÃO"},{label:"Financeiro",icon:CircleDollarSign},{label:"Administração",icon:Building2,group:"PLATAFORMA"},
+  {label:"Visão geral",icon:LayoutDashboard},{label:"Dashboard",icon:BarChart3},{label:"Ordens de serviço",icon:ClipboardList,group:"OPERAÇÃO"},{label:"Clientes",icon:Users},{label:"Garantias",icon:ShieldCheck},{label:"Estoque",icon:Boxes,group:"GESTÃO"},{label:"Financeiro / Vendas",icon:CircleDollarSign},{label:"Administração",icon:Building2,group:"PLATAFORMA"},
 ];
 const money=(n:number)=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const deviceCatalog:Record<string,Record<string,string[]>>={
@@ -179,7 +179,7 @@ function Index(){
   const [selectedOrder,setSelectedOrder]=useState<Order|null>(null),[selectedWarranty,setSelectedWarranty]=useState<Warranty|null>(null),[selectedStock,setSelectedStock]=useState<Stock|null>(null),[selectedCustomer,setSelectedCustomer]=useState<Customer|null>(null);
   const filteredOrders=orders;
   const open=(kind:DialogKind)=>setDialog(kind);
-  const action=()=>{if(section==="Clientes")open("customer");else if(section==="Dados"||section==="Dashboard"||section==="Visão geral")return;else if(section==="Estoque")open("stock");else if(section==="Garantias")open("warranty");else if(section==="Financeiro")open("pos");else open("order")};
+  const action=()=>{if(section==="Clientes")open("customer");else if(section==="Dados"||section==="Dashboard"||section==="Visão geral")return;else if(section==="Estoque")open("stock");else if(section==="Garantias")open("warranty");else if(section==="Financeiro / Vendas")open("pos");else open("order")};
   const labels:Partial<Record<Section,string>>={Clientes:"Novo cliente",Estoque:"Nova peça",Garantias:"Emitir garantia","Ordens de serviço":"Nova ordem"};
   const requireOrg=()=>{if(!organizationId){alert("Esta conta não está vinculada a uma empresa no banco.");return false}return true};
   const createCustomer=async(c:Customer&{address?:string;notes?:string}):Promise<Customer|null>=>{
@@ -272,7 +272,7 @@ function Index(){
         {section==="Clientes"&&<CustomersView customers={customers} orders={orders} onNew={()=>open("customer")} onEdit={c=>{setSelectedCustomer(c);open("customerEdit")}} onDelete={async c=>{const linked=orders.filter(o=>o.customerId===c.id);if(linked.length){window.alert("Este cliente possui ordens de serviço vinculadas. Exclua primeiro as ordens relacionadas.");return}if(window.confirm(`Excluir o cliente ${c.name}? Essa ação não pode ser desfeita.`)){const {error}=await supabase.from("customers").delete().eq("id",c.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir o cliente: "+error.message);return}setCustomers(v=>v.filter(x=>x.id!==c.id));}}}/>}
         {section==="Estoque"&&<StockView stock={stock} company={company} onNew={()=>open("stock")} onMove={s=>{setSelectedStock(s);open("movement")}} onEdit={s=>{setSelectedStock(s);open("stockEdit")}} onDelete={async s=>{if(!window.confirm(`Excluir a peça ${s.name} do estoque? O banco pode impedir a exclusão se houver histórico vinculado.`))return;const {error}=await supabase.from("inventory_items").delete().eq("id",s.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a peça. Pode haver movimentações ou ordens vinculadas. "+error.message);return}setStock(v=>v.filter(x=>x.id!==s.id));}}/>}
         {section==="Garantias"&&<WarrantyView warranties={warranties} onNew={()=>open("warranty")} onView={w=>{setSelectedWarranty(w);open("warrantyView")}} onEdit={w=>{setSelectedWarranty(w);open("warrantyEdit")}}/>}
-        {section==="Financeiro"&&<FinanceView sales={sales} entries={financeEntries} onPOS={()=>open("pos")} onQuick={()=>open("quickSale")}/>} {section==="Administração"&&<Placeholder section={section}/>}
+        {section==="Financeiro / Vendas"&&<FinanceView sales={sales} entries={financeEntries} onPOS={()=>open("pos")} onQuick={()=>open("quickSale")}/>} {section==="Administração"&&<Placeholder section={section}/>}
       </div>
     </main>
     <CompanySettingsDialog open={dialog==="companySettings"} close={()=>setDialog(null)} company={company} organizationId={organizationId} onSave={async next=>{if(!requireOrg())return;const {error}=await supabase.from("organizations").update({name:next.name,document:next.document||null,email:next.email||null,phone:next.phone||null,address:next.address||null,logo_url:next.logoUrl||null}).eq("id",organizationId!);if(error){alert("Não foi possível salvar os dados da empresa: "+error.message);return}setCompany(next);setCompanyName(next.name);setDialog(null);alert("Dados da empresa atualizados com sucesso.");}}/>
