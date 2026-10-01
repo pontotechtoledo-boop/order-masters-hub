@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Index,
 });
 
-type Section = "Visão geral" | "Dashboard" | "Dados" | "Ordens de serviço" | "Clientes" | "Garantias" | "Estoque" | "Financeiro" | "Administração";
+type Section = "Visão geral" | "Dashboard" | "Ordens de serviço" | "Clientes" | "Garantias" | "Estoque" | "Financeiro" | "Administração";
 type Customer = { id:string; name:string; document:string; phone:string; email:string; address?:string; notes?:string };
 type Stock = { id:string; sku:string; name:string; itemType:"part"|"store"; category:string; supplier:string; location:string; quantity:number; minimum:number; cost:number; price:number; movements:{type:string; quantity:number; date:string; note:string}[] };
 type Order = { id:string; dbId?:string; deviceCategory?:string; brand?:string; model?:string; customerId:string; client:string; document:string; device:string; serial:string; issue:string; apparentIssue?:string; terms?:string; stage:string; tech:string; total:number; due:string; tone:string; parts:{name:string; quantity:number; price:number}[] };
@@ -42,7 +42,7 @@ const initialStock: Stock[] = [];
 const initialOrders: Order[] = [];
 const initialWarranties: Warranty[] = [];
 const nav: {label:Section;icon:typeof Gauge;group?:string}[] = [
-  {label:"Visão geral",icon:LayoutDashboard},{label:"Dashboard",icon:BarChart3},{label:"Dados",icon:Database},{label:"Ordens de serviço",icon:ClipboardList,group:"OPERAÇÃO"},{label:"Clientes",icon:Users},{label:"Garantias",icon:ShieldCheck},{label:"Estoque",icon:Boxes,group:"GESTÃO"},{label:"Financeiro",icon:CircleDollarSign},{label:"Administração",icon:Building2,group:"PLATAFORMA"},
+  {label:"Visão geral",icon:LayoutDashboard},{label:"Dashboard",icon:BarChart3},{label:"Ordens de serviço",icon:ClipboardList,group:"OPERAÇÃO"},{label:"Clientes",icon:Users},{label:"Garantias",icon:ShieldCheck},{label:"Estoque",icon:Boxes,group:"GESTÃO"},{label:"Financeiro",icon:CircleDollarSign},{label:"Administração",icon:Building2,group:"PLATAFORMA"},
 ];
 const money=(n:number)=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const deviceCatalog:Record<string,Record<string,string[]>>={
@@ -267,7 +267,7 @@ function Index(){
     <main className={"min-h-screen transition-[padding] duration-200 "+(sidebarCollapsed?"lg:pl-20":"lg:pl-64")}>
       <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-7"><Button variant="ghost" size="icon" className="lg:hidden" aria-label="Abrir menu" onClick={()=>{setSidebarCollapsed(false);setMenuOpen(true)}}><Menu/></Button><div className="flex-1"/><div className="ml-auto flex items-center gap-2"><div className="relative"><Button variant="ghost" size="icon" aria-label="Notificações" title="Notificações" onClick={()=>setDialog("notifications")}><Bell/></Button>{unreadNotifications>0&&<span className="pointer-events-none absolute -right-0.5 -top-0.5 grid min-w-4 h-4 place-items-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">{unreadNotifications}</span>}</div><span className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-md bg-primary font-bold text-primary-foreground">{company.logoUrl?<img src={company.logoUrl} alt="Logo da empresa" className="h-full w-full object-contain"/>:companyName.slice(0,2).toUpperCase()}</span><span className="hidden text-sm font-semibold sm:block">{companyName}</span><Button variant="ghost" size="icon" aria-label="Sair" title="Sair" onClick={async()=>{await supabase.auth.signOut();window.location.reload()}}><LogOut/></Button></div></header>
       <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-7 md:py-8">{showFullscreenTip&&<div className="mb-4 flex w-fit max-w-full items-center gap-2 rounded-md border bg-card/95 px-3 py-2 text-xs shadow-sm animate-in fade-in duration-500 transition-opacity"><div className="grid size-7 shrink-0 place-items-center rounded bg-primary/10 text-[10px] font-bold text-primary">F11</div><div className="leading-4"><span className="font-semibold">Dica rápida:</span> use <b>F11</b> para aproveitar a tela inteira.<span className="ml-1 text-muted-foreground">Em alguns notebooks: Fn + F11.</span></div></div>}{dataError&&<div role="alert" className="mb-5 rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">{dataError}</div>}{dataLoading&&<div className="mb-5 rounded-md border bg-card p-4 text-sm text-muted-foreground">Carregando dados reais da empresa…</div>}<div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="mb-1 text-sm font-medium text-muted-foreground">{new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"})}</p><h1 className="text-2xl font-bold md:text-3xl">{section}</h1><p className="mt-1 text-sm text-muted-foreground">Bem-vindo, {companyName}. Sua operação está sob controle.</p></div>{["Clientes","Estoque","Garantias","Ordens de serviço"].includes(section)&&<Button className="h-10 w-full sm:w-auto" onClick={action}><Plus/>{labels[section]??"Nova ordem"}</Button>}</div>
-        {section==="Visão geral"&&<OverviewHome onSection={setSection}/>} {section==="Dashboard"&&<AnalyticsDashboard orders={filteredOrders} stock={stock} sales={sales} onSection={setSection}/>} {section==="Dados"&&<DataExportView customers={customers} orders={orders} stock={stock} sales={sales} financeEntries={financeEntries}/>} 
+        {section==="Visão geral"&&<OverviewHome onSection={setSection}/>} {section==="Dashboard"&&<AnalyticsDashboard orders={filteredOrders} stock={stock} sales={sales} onSection={setSection}/>}  
         {section==="Ordens de serviço"&&<OrdersView orders={filteredOrders} onNew={()=>open("order")} onView={o=>{setSelectedOrder(o);open("orderView")}} onEdit={o=>{setSelectedOrder(o);open("orderEdit")}} onDelete={async o=>{if(!window.confirm(`Excluir a ordem ${o.id} de ${o.client}? Essa ação não pode ser desfeita.`))return;if(!o.dbId){alert("Esta ordem não está salva no banco.");return}const {error}=await supabase.from("service_orders").delete().eq("id",o.dbId).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a ordem. Se houver consumo de estoque vinculado, a exclusão pode ser bloqueada para preservar o histórico. "+error.message);return}setOrders(v=>v.filter(x=>x.id!==o.id));setWarranties(v=>v.filter(w=>w.orderId!==o.id));}}/>}
         {section==="Clientes"&&<CustomersView customers={customers} orders={orders} onNew={()=>open("customer")} onEdit={c=>{setSelectedCustomer(c);open("customerEdit")}} onDelete={async c=>{const linked=orders.filter(o=>o.customerId===c.id);if(linked.length){window.alert("Este cliente possui ordens de serviço vinculadas. Exclua primeiro as ordens relacionadas.");return}if(window.confirm(`Excluir o cliente ${c.name}? Essa ação não pode ser desfeita.`)){const {error}=await supabase.from("customers").delete().eq("id",c.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir o cliente: "+error.message);return}setCustomers(v=>v.filter(x=>x.id!==c.id));}}}/>}
         {section==="Estoque"&&<StockView stock={stock} company={company} onNew={()=>open("stock")} onMove={s=>{setSelectedStock(s);open("movement")}} onEdit={s=>{setSelectedStock(s);open("stockEdit")}} onDelete={async s=>{if(!window.confirm(`Excluir a peça ${s.name} do estoque? O banco pode impedir a exclusão se houver histórico vinculado.`))return;const {error}=await supabase.from("inventory_items").delete().eq("id",s.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a peça. Pode haver movimentações ou ordens vinculadas. "+error.message);return}setStock(v=>v.filter(x=>x.id!==s.id));}}/>}
@@ -313,72 +313,6 @@ function Sidebar({section,setSection,open,close,collapsed,toggleCollapsed,onComp
       </div>
     </aside>
   </>
-}
-function exportExcelFile(filename:string,headers:string[],rows:(string|number|null|undefined)[][]){
-  const esc=(v:any)=>'"'+String(v??"").replace(/"/g,'""')+'"';
-  const csv="\\ufeff"+[headers,...rows].map(r=>r.map(esc).join(";")).join("\\r\\n");
-  const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
-  const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
-}
-function DataExportView({customers,orders,stock,sales,financeEntries}:{customers:Customer[];orders:Order[];stock:Stock[];sales:Sale[];financeEntries:FinanceEntry[]}){
-  const exportCustomers=()=>exportExcelFile("clientes.csv",["Nome","CPF/CNPJ","Telefone","E-mail","Endereço","Observações"],customers.map(c=>[c.name,c.document,c.phone,c.email,c.address,c.notes]));
-  const exportOrders=()=>exportExcelFile("ordens-de-servico.csv",["Ordem","Cliente","Documento","Equipamento","IMEI/Série","Defeito relatado","Defeito aparente","Status","Valor","Previsão"],orders.map(o=>[o.id,o.client,o.document,o.device,o.serial,o.issue,o.apparentIssue,o.stage,o.total,o.due]));
-  const exportStock=()=>exportExcelFile("estoque.csv",["SKU","Item","Tipo","Categoria","Fornecedor","Localização","Saldo","Mínimo","Custo","Preço de venda"],stock.map(s=>[s.sku,s.name,s.itemType==="store"?"Produto da loja":"Peça técnica",s.category,s.supplier,s.location,s.quantity,s.minimum,s.cost,s.price]));
-  const exportSales=()=>exportExcelFile("vendas.csv",["Venda","Tipo","Setor","Total","Pagamento","Data"],sales.map(s=>[s.number,s.type,s.department,s.total,s.payment_method,new Date(s.sold_at).toLocaleString("pt-BR")]));
-  const exportFinance=()=>exportExcelFile("financeiro.csv",["Tipo","Setor","Categoria","Descrição","Valor","Pagamento","Data"],financeEntries.map(e=>[e.entry_type,e.department,e.category,e.description,e.amount,e.payment_method,e.entry_date]));
-  const cards=[[ "Clientes",customers.length,exportCustomers,Users ],[ "Ordens de serviço",orders.length,exportOrders,ClipboardList ],[ "Estoque",stock.length,exportStock,Boxes ],[ "Vendas",sales.length,exportSales,ShoppingCart ],[ "Financeiro",financeEntries.length,exportFinance,CircleDollarSign ]] as const;
-  return <div className="space-y-6"><section className="rounded-xl border bg-card p-5 shadow-card"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-lg font-bold">Exportar dados</h2><p className="text-sm text-muted-foreground">Baixe os dados da sua empresa em formato compatível com Excel. Os dados permanecem separados por empresa.</p></div><Button onClick={()=>{exportCustomers();setTimeout(exportOrders,150);setTimeout(exportStock,300);setTimeout(exportSales,450);setTimeout(exportFinance,600)}}><Download/>Exportar todos</Button></div></section><section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{cards.map(([label,count,fn,Icon])=><div key={label} className="rounded-xl border bg-card p-5 shadow-card"><div className="flex items-start justify-between"><div className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary"><Icon className="size-5"/></div><span className="text-sm font-bold">{count}</span></div><h3 className="mt-4 font-bold">{label}</h3><p className="mt-1 text-xs text-muted-foreground">Todos os registros disponíveis.</p><Button className="mt-4 w-full" variant="outline" onClick={fn}><FileDown/>Exportar para Excel</Button></div>)}</section><p className="text-xs text-muted-foreground">Os arquivos CSV abrem normalmente no Excel e preservam acentos e colunas.</p></div>
-}
-function OverviewHome({onSection}:{onSection:(s:Section)=>void}){
-  const cards=[
-    {title:"Assistência técnica",description:"Ordens de serviço, reparos e acompanhamento",icon:Wrench,classes:"bg-blue-600 text-white",target:"Ordens de serviço" as Section},
-    {title:"Loja / Produtos",description:"Produtos, preços e movimentação de vendas",icon:ShoppingBag,classes:"bg-violet-600 text-white",target:"Estoque" as Section},
-    {title:"Estoque de peças",description:"Peças, saldos e reposição de estoque",icon:Boxes,classes:"bg-amber-500 text-white",target:"Estoque" as Section},
-    {title:"Vendas",description:"Vendas, receitas e histórico financeiro",icon:ShoppingCart,classes:"bg-emerald-600 text-white",target:"Financeiro" as Section},
-    {title:"Clientes",description:"Cadastro e histórico de atendimentos",icon:Users,classes:"bg-cyan-600 text-white",target:"Clientes" as Section},
-  ];
-  return <div className="space-y-6">
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-      {cards.map(card=><button type="button" key={card.title} onClick={()=>onSection(card.target)} className={"group min-h-[150px] rounded-xl p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg "+card.classes}>
-        <div className="flex items-start justify-between gap-3"><div className="grid size-11 place-items-center rounded-lg bg-white/15"><card.icon className="size-5"/></div><span className="text-2xl opacity-70 transition group-hover:translate-x-1">→</span></div>
-        <h2 className="mt-7 text-lg font-bold">{card.title}</h2><p className="mt-1 text-xs leading-5 text-white/80">{card.description}</p>
-      </button>)}
-    </section>
-    <section className="grid gap-3 sm:grid-cols-3">
-      <Stat label="Ordens em andamento" value="Acesse ordens" />
-      <Stat label="Estoque" value="Acesse estoque" />
-      <Stat label="Financeiro" value="Acesse vendas" />
-    </section>
-  </div>
-}
-function AnalyticsDashboard({orders,stock,sales,onSection}:{orders:Order[];stock:Stock[];sales:Sale[];onSection:(s:Section)=>void}){
-  const [salesFilter,setSalesFilter]=useState<"all"|"assistance"|"store"|"parts">("all");
-  const recentOrders=orders.slice(0,5),lowStockCount=stock.filter(s=>s.quantity<=s.minimum).length,estimatedRevenue=orders.reduce((a,o)=>a+o.total,0);
-  const salesByMonth=useMemo(()=>Array.from({length:6},(_,i)=>{const d=new Date(new Date().getFullYear(),new Date().getMonth()-(5-i),1);const total=sales.filter(s=>{const x=new Date(s.sold_at);return x.getFullYear()===d.getFullYear()&&x.getMonth()===d.getMonth()}).reduce((a,s)=>a+Number(s.total),0);return {month:d.toLocaleDateString("pt-BR",{month:"short"}).replace(".",""),total}}),[sales]);
-  const mix=useMemo(()=>[{name:"Assistência",value:sales.filter(s=>s.department==="assistance").reduce((a,s)=>a+Number(s.total),0)},{name:"Peças",value:sales.filter(s=>s.department==="parts").reduce((a,s)=>a+Number(s.total),0)},{name:"Loja",value:sales.filter(s=>s.department==="store").reduce((a,s)=>a+Number(s.total),0)}],[sales]);
-  const week=useMemo(()=>{const now=new Date();return Array.from({length:7},(_,i)=>{const d=new Date(now);d.setHours(0,0,0,0);d.setDate(now.getDate()-6+i);const key=d.toLocaleDateString("en-CA");const total=sales.filter(s=>(salesFilter==="all"||s.department===salesFilter)&&new Date(s.sold_at).toLocaleDateString("en-CA")===key).reduce((a,s)=>a+Number(s.total),0);return {date:d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}),total}})},[sales,salesFilter]);
-  const weekTotal=week.reduce((a,d)=>a+d.total,0);
-  const cards=[
-    {title:"Assistência técnica",description:"Ordens de serviço, reparos e acompanhamento",icon:Wrench,classes:"bg-blue-600 text-white",target:"Ordens de serviço" as Section},
-    {title:"Loja / Produtos",description:"Produtos, preços e movimentação de vendas",icon:ShoppingBag,classes:"bg-violet-600 text-white",target:"Estoque" as Section},
-    {title:"Estoque de peças",description:"Peças, saldos e reposição de estoque",icon:Boxes,classes:"bg-amber-500 text-white",target:"Estoque" as Section},
-    {title:"Vendas",description:"Vendas, receitas e histórico financeiro",icon:ShoppingCart,classes:"bg-emerald-600 text-white",target:"Financeiro" as Section},
-    {title:"Clientes",description:"Cadastro e histórico de atendimentos",icon:Users,classes:"bg-cyan-600 text-white",target:"Clientes" as Section},
-  ];
-  return <div className="space-y-6">
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-      {cards.map(card=><button type="button" key={card.title} onClick={()=>onSection(card.target)} className={"group min-h-[150px] rounded-xl p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg "+card.classes}>
-        <div className="flex items-start justify-between gap-3"><div className="grid size-11 place-items-center rounded-lg bg-white/15"><card.icon className="size-5"/></div><span className="text-2xl opacity-70 transition group-hover:translate-x-1">→</span></div>
-        <h2 className="mt-7 text-lg font-bold">{card.title}</h2>
-        <p className="mt-1 text-xs leading-5 text-white/80">{card.description}</p>
-      </button>)}
-    </section>
-    <section className="grid gap-3 sm:grid-cols-3">
-      <Stat label="Ordens em andamento" value={String(orders.length)} />
-      <Stat label="Receita estimada" value={money(estimatedRevenue)} />
-      <Stat label="Vendas nos últimos 7 dias" value={money(weekTotal)} />
-    </section>
-  </div>
 }
 function InfoCard({icon:Icon,title,text}:{icon:typeof History;title:string;text:string}){return <article className="rounded-lg border bg-card p-5 shadow-card"><Icon className="size-5 text-primary"/><h3 className="mt-4 font-bold">{title}</h3><p className="mt-1 text-sm text-muted-foreground">{text}</p></article>}
 function OrderTable({orders,onView,onEdit,onDelete}:{orders:Order[];onView?:(o:Order)=>void;onEdit?:(o:Order)=>void;onDelete?:(o:Order)=>void}){return <div className="overflow-x-auto"><table className="w-full min-w-[800px] text-left text-sm"><thead><tr className="text-xs text-muted-foreground"><th className="px-5 py-3">ORDEM</th><th className="px-3 py-3">CLIENTE / EQUIPAMENTO</th><th className="px-3 py-3">STATUS</th><th className="px-3 py-3">VALOR</th><th className="px-5 py-3">AÇÕES</th></tr></thead><tbody>{orders.map(o=><tr key={o.id} className="border-t hover:bg-muted/50"><td className="px-5 py-4 font-bold text-primary">{o.id}</td><td className="px-3 py-4"><div className="font-semibold">{o.client}</div><div className="text-xs text-muted-foreground">{o.device}</div></td><td className="px-3 py-4"><span className={`status status-${o.tone}`}><i/>{o.stage}</span></td><td className="px-3 py-4 font-semibold">{o.total?money(o.total):"—"}</td><td className="px-5 py-4"><div className="flex items-center gap-1">{onView&&<Button variant="ghost" size="sm" onClick={()=>onView(o)}><Eye/>Abrir</Button>}{onDelete&&<>{onEdit&&<Button variant="ghost" size="icon" title="Editar ordem" onClick={()=>onEdit(o)}><Pencil className="size-4"/></Button>}<Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" aria-label={`Excluir ordem ${o.id}`} title="Excluir ordem" onClick={()=>onDelete(o)}><Trash2 className="size-4"/></Button></>}</div></td></tr>)}</tbody></table>{!orders.length&&<Empty text="Nenhuma ordem encontrada."/>}</div>}
