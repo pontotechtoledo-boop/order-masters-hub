@@ -298,7 +298,7 @@ function CompanySettingsDialog({open,close,company,organizationId,onSave}:{open:
   };
   const uploadLogo=async(file:File)=>{
     if(!organizationId)return;
-    if(!file.type.startsWith("image/")){alert("Selecione uma imagem PNG, JPG ou WEBP.");return}
+    if(!file.type.startsWith("image/")){alert("Selecione uma imagem PNG, JPG/JPEG ou WEBP.");return}
     if(file.size>2*1024*1024){alert("A logo deve ter no máximo 2 MB.");return}
     setUploading(true);
     const ext=(file.name.split(".").pop()||"png").toLowerCase().replace(/[^a-z0-9]/g,"");
@@ -313,7 +313,7 @@ function CompanySettingsDialog({open,close,company,organizationId,onSave}:{open:
     <form className="grid gap-5" onSubmit={submit}>
       <div className="flex flex-col gap-4 rounded-lg border bg-muted/30 p-4 sm:flex-row sm:items-center">
         <div className="grid size-24 shrink-0 place-items-center overflow-hidden rounded-lg border bg-background">{logoPreview?<img src={logoPreview} alt="Logo da empresa" className="max-h-full max-w-full object-contain"/>:<Building2 className="size-8 text-muted-foreground"/>}</div>
-        <div className="grid gap-2"><p className="font-semibold">Logo da empresa</p><p className="text-xs text-muted-foreground">PNG, JPG ou WEBP • máximo 2 MB</p><label className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-3 text-sm font-semibold">{uploading?"Enviando…":<><Upload className="size-4"/>Escolher logo</>}<input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" disabled={uploading} onChange={e=>{const file=e.target.files?.[0];if(file)uploadLogo(file)}}/></label></div>
+        <div className="grid gap-2"><p className="font-semibold">Logo da empresa</p><p className="text-xs text-muted-foreground">PNG, JPG/JPEG ou WEBP • máximo 2 MB</p><label className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-3 text-sm font-semibold">{uploading?"Enviando…":<><Upload className="size-4"/>Escolher logo</>}<input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" disabled={uploading} onChange={e=>{const file=e.target.files?.[0];if(file)uploadLogo(file)}}/></label></div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Nome / razão social"><Input name="name" defaultValue={company.name} required/></Field>
