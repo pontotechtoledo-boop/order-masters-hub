@@ -442,7 +442,7 @@ function OrderDialog({open,customers,stock,close,onSave}:{open:boolean;customers
         {brand==="Outros"?<Field label="Digite a marca"><Input value={customBrand} onChange={e=>setCustomBrand(e.target.value)} placeholder="Ex.: Infinix, Oppo, TCL…"/></Field>:<Field label="Modelo"><select name="model" value={model} onChange={e=>setModel(e.target.value)} disabled={!brand} required={!!brand} className="h-10 rounded-md border bg-background px-3 text-sm"><option value="">{brand?"Selecione o modelo":"Escolha a marca primeiro"}</option>{models.map(x=><option key={x} value={x}>{x}</option>)}</select></Field>}
         {brand==="Outros"&&<Field label="Digite o modelo"><Input value={customModel} onChange={e=>setCustomModel(e.target.value)} placeholder="Modelo do aparelho"/></Field>}
         {brand!=="Outros"&&model==="Outros"&&<Field label="Digite o modelo"><Input value={customModel} onChange={e=>setCustomModel(e.target.value)} placeholder="Digite o modelo que não está na lista"/></Field>}
-        <Field label="Número de série / IMEI"><Input name="serial" placeholder="Identificação do aparelho"/></Field>
+        <Field label="Número de série / IMEI"><Input name="serial" placeholder="Identificação do aparelho ou N/A"/></Field>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Defeito relatado pelo cliente"><Textarea name="issue" required placeholder="O que o cliente informou ao deixar o aparelho"/></Field>
