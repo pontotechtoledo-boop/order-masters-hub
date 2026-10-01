@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Index,
 });
 
-type Section = "Visão geral" | "Dashboard" | "Ordens de serviço" | "Clientes" | "Garantias" | "Estoque" | "Financeiro" | "Administração";
+type Section = "Visão geral" | "Dashboard" | "Ordens de serviço" | "Clientes" | "Garantias" | "Estoque" | "Financeiro / Vendas" | "Administração";
 type Customer = { id:string; name:string; document:string; phone:string; email:string; address?:string; notes?:string };
 type Stock = { id:string; sku:string; name:string; itemType:"part"|"store"; category:string; supplier:string; location:string; quantity:number; minimum:number; cost:number; price:number; movements:{type:string; quantity:number; date:string; note:string}[] };
 type Order = { id:string; dbId?:string; deviceCategory?:string; brand?:string; model?:string; customerId:string; client:string; document:string; device:string; serial:string; issue:string; apparentIssue?:string; terms?:string; stage:string; tech:string; total:number; due:string; tone:string; parts:{name:string; quantity:number; price:number}[] };
