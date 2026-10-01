@@ -212,7 +212,7 @@ function Dashboard({orders,stock,sales,onSection}:{orders:Order[];stock:Stock[];
     <section className="grid gap-3 sm:grid-cols-3">
       <Stat label="Ordens em andamento" value={String(orders.length)} />
       <Stat label="Receita estimada" value={money(estimatedRevenue)} />
-      <div className="rounded-lg border bg-card p-5 shadow-card"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold text-muted-foreground">Estoque baixo</p><p className="mt-2 text-2xl font-bold">{lowStockCount}</p></div><PackageSearch className="size-5 text-primary"/></div><Button variant="link" className="mt-2 h-auto px-0 text-xs" onClick={()=>onSection("Estoque")}>Ver tudo →</Button></div>
+      <Stat label="Vendas nos últimos 7 dias" value={money(weekTotal)} />
     </section>
 
     <section className="grid gap-6 xl:grid-cols-[1.25fr_1fr]">
