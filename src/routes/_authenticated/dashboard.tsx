@@ -1,3 +1,181 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Bell, Boxes, Building2, CalendarDays, Check, ChevronDown, CircleDollarSign,
+  ClipboardList, Clock3, FileCheck2, Gauge, LayoutDashboard, Menu, MoreHorizontal,
+  PackageSearch, Plus, Printer, Search, Settings, ShieldCheck, TrendingUp, Users,
+  Wrench, X, Minus, ArrowDownToLine, History, Eye, FileDown, Trash2, ShoppingBag, ShoppingCart, PanelLeft, Upload,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FinanceView, SaleDialog } from "@/components/FinanceSales";
+
+export const Route = createFileRoute("/_authenticated/dashboard")({
+  head: () => ({ meta: [
+    { title: "Service Pro Hub | Gestão de assistência técnica" },
+    { name: "description", content: "Gestão de ordens de serviço, clientes, garantias, estoque e financeiro para assistências técnicas." },
+    { property: "og:title", content: "Service Pro Hub" },
+    { property: "og:description", content: "Operação completa para assistências técnicas." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+  ] }),
+  component: Index,
+});
+
+type Section = "Visão geral" | "Ordens de serviço" | "Clientes" | "Garantias" | "Estoque" | "Financeiro" | "Equipe" | "Administração";
+type Customer = { id:string; name:string; document:string; phone:string; email:string };
+type Stock = { id:string; sku:string; name:string; category:string; supplier:string; location:string; quantity:number; minimum:number; cost:number; price:number; movements:{type:string; quantity:number; date:string; note:string}[] };
+type Order = { id:string; dbId?:string; deviceCategory?:string; customerId:string; client:string; document:string; device:string; serial:string; issue:string; stage:string; tech:string; total:number; due:string; tone:string; parts:{name:string; quantity:number; price:number}[] };
+type Warranty = { id:string; dbId?:string; orderId:string; customer:string; device:string; starts:string; expires:string; coverage:string; status:string };
+type Sale = {id:string;number:number;type:"pos"|"quick";department:"assistance"|"parts"|"store";total:number;payment_method:string;sold_at:string;notes:string|null};
+type CompanySettings = {name:string;document:string;email:string;phone:string;address:string;logoUrl:string};
+type FinanceEntry = {id:string;entry_type:string;department:string;category:string;description:string;amount:number;payment_method:string|null;entry_date:string};
+type DialogKind = "order" | "customer" | "stock" | "movement" | "warranty" | "orderView" | "warrantyView" | "pos" | "quickSale" | "companySettings" | null;
+
+const initialCustomers: Customer[] = [];
+const initialStock: Stock[] = [];
+const initialOrders: Order[] = [];
+const initialWarranties: Warranty[] = [];
+const nav: {label:Section;icon:typeof Gauge;group?:string}[] = [
+  {label:"Visão geral",icon:LayoutDashboard},{label:"Ordens de serviço",icon:ClipboardList,group:"OPERAÇÃO"},{label:"Clientes",icon:Users},{label:"Garantias",icon:ShieldCheck},{label:"Estoque",icon:Boxes,group:"GESTÃO"},{label:"Financeiro",icon:CircleDollarSign},{label:"Equipe",icon:Wrench},{label:"Administração",icon:Building2,group:"PLATAFORMA"},
+];
+const money=(n:number)=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const today=()=>new Date().toLocaleDateString("pt-BR");
+const addDays=(days:number)=>{const d=new Date();d.setDate(d.getDate()+days);return d.toLocaleDateString("pt-BR")};
+const escapeHtml=(s:string)=>s.replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[c] ?? c);
+
+function printDocument(title:string, body:string, company:CompanySettings){
+  const popup=window.open("","_blank","width=900,height=760"); if(!popup)return;
+  popup.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>@page{size:A4;margin:16mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#172033;margin:0;font-size:12px}.head{display:flex;justify-content:space-between;border-bottom:3px solid #0878bd;padding-bottom:16px;margin-bottom:22px}.brand{font-size:24px;font-weight:800}.muted{color:#667085}.badge{border:1px solid #0878bd;color:#0878bd;padding:5px 9px;font-weight:700}h1{font-size:20px;margin:0 0 4px}h2{font-size:12px;text-transform:uppercase;color:#667085;margin:22px 0 8px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px}.box{border:1px solid #d9dee8;padding:12px;margin:8px 0}.row{display:flex;justify-content:space-between;border-bottom:1px solid #e8ebf0;padding:8px 0}.total{font-size:16px;font-weight:700}.sign{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:70px;text-align:center}.line{border-top:1px solid #172033;padding-top:7px}.no-print{margin:0 0 18px}@media print{.no-print{display:none}}</style></head><body><button class="no-print" onclick="window.print()">Imprimir / Salvar como PDF</button><div class="head"><div style="display:flex;gap:14px;align-items:center">${company.logoUrl?`<img src="${escapeHtml(company.logoUrl)}" style="max-width:110px;max-height:55px;object-fit:contain" />`:""}<div><div class="brand">${escapeHtml(company.name||"Sua empresa")}</div><div class="muted">${escapeHtml(company.document||"")} ${company.phone?"• "+escapeHtml(company.phone):""}</div><div class="muted">${escapeHtml(company.address||company.email||"")}</div></div></div><div class="badge">${escapeHtml(title)}</div></div>${body}<div class="sign"><div class="line">Responsável técnico</div><div class="line">Cliente</div></div><script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`); popup.document.close();
+}
+
+function Index(){
+  const [companyName,setCompanyName]=useState("Sua empresa");
+  const [company,setCompany]=useState<CompanySettings>({name:"Sua empresa",document:"",email:"",phone:"",address:"",logoUrl:""});
+  const [organizationId,setOrganizationId]=useState<string|null>(null);
+  const [dataLoading,setDataLoading]=useState(true);
+  const [dataError,setDataError]=useState("");
+  useEffect(()=>{
+    let active=true;
+    const load=async()=>{
+      setDataLoading(true);setDataError("");
+      const {data:{user},error:userError}=await supabase.auth.getUser();
+      if(userError||!user){if(active){setDataError("Sua sessão expirou. Entre novamente.");setDataLoading(false)}return}
+      let {data:members,error:memberError}=await supabase.from("organization_members").select("organization_id,organizations(name)").eq("user_id",user.id).eq("active",true).limit(1);
+      if(!memberError&&!members?.length){
+        const {error:provisionError}=await supabase.rpc("ensure_user_organization");
+        if(!provisionError){
+          const refreshed=await supabase.from("organization_members").select("organization_id,organizations(name)").eq("user_id",user.id).eq("active",true).limit(1);
+          members=refreshed.data;memberError=refreshed.error;
+        }else{memberError=provisionError as any}
+      }
+      if(memberError||!members?.length){if(active){setDataError("Não foi possível vincular esta conta a uma empresa. Confirme se as migrações do projeto foram aplicadas no Lovable Cloud.");setCompanyName("Empresa não vinculada");setDataLoading(false)}return}
+      const orgId=members[0].organization_id;
+      if(!active)return;
+      setOrganizationId(orgId);
+      const orgData=members[0] as any;
+      const org=orgData.organizations??{};
+      const loadedCompany={name:org.name??"Sua empresa",document:org.document??"",email:org.email??"",phone:org.phone??"",address:org.address??"",logoUrl:org.logo_url??""};
+      setCompany(loadedCompany);
+      setCompanyName(loadedCompany.name);
+      const customersRes = await supabase.from("customers").select("*").eq("organization_id", orgId).order("created_at", { ascending: false });
+      const stockRes = await supabase.from("inventory_items").select("*,inventory_movements(*)").eq("organization_id", orgId).eq("active", true).order("created_at", { ascending: false });
+      const ordersRes = await supabase.from("service_orders").select("*,customers(name,document,phone,email),devices(category,brand,model,serial_number),service_order_items(*)").eq("organization_id", orgId).order("created_at", { ascending: false });
+      const warrantiesRes = await supabase.from("warranties").select("*,service_orders(order_number,customers(name),devices(brand,model))").eq("organization_id", orgId).order("created_at", { ascending: false });
+      const salesRes = await supabase.from("sales").select("*").eq("organization_id", orgId).order("sold_at", { ascending: false });
+      const financeRes = await supabase.from("financial_entries").select("*").eq("organization_id", orgId).order("entry_date", { ascending: false });
+      const errors=[customersRes.error,stockRes.error,ordersRes.error,warrantiesRes.error,salesRes.error,financeRes.error].filter(Boolean);
+      if(errors.length){if(active){setDataError("Não foi possível carregar todos os dados do banco. Confira as permissões e tente atualizar.");setDataLoading(false)}return}
+      if(!active)return;
+      setCustomers((customersRes.data??[]).map((x:any)=>({id:x.id,name:x.name,document:x.document??"",phone:x.phone??"",email:x.email??""})));
+      setStock((stockRes.data??[]).map((x:any)=>({id:x.id,sku:x.sku??"",name:x.name,category:x.category??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:(x.inventory_movements??[]).map((m:any)=>({type:m.movement_type,date:new Date(m.created_at).toLocaleDateString("pt-BR"),quantity:Number(m.quantity),note:m.notes??""})).sort((a:any,b:any)=>b.date.localeCompare(a.date))})));
+      const statusLabels:Record<string,string>={received:"Recebida",triage:"Triagem",diagnosis:"Diagnóstico",quote:"Orçamento",awaiting_approval:"Aguardando aprovação",approved:"Aprovada",waiting_parts:"Aguardando peça",repair:"Em reparo",testing:"Em testes",ready:"Pronto para entrega",delivered:"Entregue",cancelled:"Cancelada",no_repair:"Sem reparo",warranty_return:"Retorno em garantia"};
+      setOrders((ordersRes.data??[]).map((x:any)=>({id:"OS-"+x.order_number,dbId:x.id,customerId:x.customer_id,client:x.customers?.name??"Cliente",document:x.customers?.document??"",device:[x.devices?.brand,x.devices?.model].filter(Boolean).join(" ")||x.devices?.category||"Equipamento",deviceCategory:x.devices?.category??"Equipamento",serial:x.devices?.serial_number??"",issue:x.reported_issue,stage:statusLabels[x.status]??x.status,tech:"Não atribuído",total:Number(x.total??x.subtotal??0),due:x.estimated_at?new Date(x.estimated_at).toLocaleDateString("pt-BR"):"A definir",tone:x.status==="ready"?"green":x.status==="awaiting_approval"?"amber":"blue",parts:(x.service_order_items??[]).map((it:any)=>({name:it.description,quantity:Number(it.quantity),price:Number(it.unit_price)}))})));
+      setWarranties((warrantiesRes.data??[]).map((x:any)=>({id:x.code,dbId:x.id,orderId:"OS-"+(x.service_orders?.order_number??""),customer:x.service_orders?.customers?.name??"",device:[x.service_orders?.devices?.brand,x.service_orders?.devices?.model].filter(Boolean).join(" "),starts:new Date(x.starts_at+"T00:00:00").toLocaleDateString("pt-BR"),expires:new Date(x.expires_at+"T00:00:00").toLocaleDateString("pt-BR"),coverage:x.coverage??x.terms??"",status:x.status})));
+      setSales((salesRes.data??[]).map((x:any)=>({...x,number:Number(x.sale_number),total:Number(x.total)})));
+      setFinanceEntries((financeRes.data??[]).map((x:any)=>({...x,amount:Number(x.amount)})));
+      setDataLoading(false);
+    };
+    load().catch(()=>{if(active){setDataError("Falha ao conectar ao banco de dados.");setDataLoading(false)}});
+    return ()=>{active=false};
+  },[]);
+  const [section,setSection]=useState<Section>("Visão geral"),[menuOpen,setMenuOpen]=useState(false),[sidebarCollapsed,setSidebarCollapsed]=useState(true),[dialog,setDialog]=useState<DialogKind>(null),[search,setSearch]=useState("");
+  const [customers,setCustomers]=useState(initialCustomers),[stock,setStock]=useState(initialStock),[orders,setOrders]=useState(initialOrders),[warranties,setWarranties]=useState(initialWarranties);
+  const [sales,setSales]=useState<Sale[]>([]),[financeEntries,setFinanceEntries]=useState<FinanceEntry[]>([]);
+  const [selectedOrder,setSelectedOrder]=useState<Order|null>(null),[selectedWarranty,setSelectedWarranty]=useState<Warranty|null>(null),[selectedStock,setSelectedStock]=useState<Stock|null>(null);
+  const q=search.toLowerCase();
+  const filteredOrders=useMemo(()=>orders.filter(o=>Object.values(o).join(" ").toLowerCase().includes(q)),[orders,q]);
+  const open=(kind:DialogKind)=>setDialog(kind);
+  const action=()=>{if(section==="Clientes")open("customer");else if(section==="Estoque")open("stock");else if(section==="Garantias")open("warranty");else if(section==="Financeiro")open("pos");else open("order")};
+  const labels:Partial<Record<Section,string>>={Clientes:"Novo cliente",Estoque:"Nova peça",Garantias:"Emitir garantia","Ordens de serviço":"Nova ordem"};
+  const requireOrg=()=>{if(!organizationId){alert("Esta conta não está vinculada a uma empresa no banco.");return false}return true};
+  const saveCustomer=async(c:Customer&{address?:string;notes?:string})=>{
+    if(!requireOrg())return;
+    const {data,error}=await supabase.from("customers").insert({organization_id:organizationId!,kind:"person",name:c.name,document:c.document||null,phone:c.phone||null,email:c.email||null,address:c.address??null,notes:c.notes??null}).select().single();
+    if(error){alert("Não foi possível salvar o cliente: "+error.message);return}
+    setCustomers(v=>[{id:data.id,name:data.name,document:data.document??"",phone:data.phone??"",email:data.email??""},...v]);setDialog(null);
+  };
+  const saveStock=async(s:Stock)=>{
+    if(!requireOrg())return;
+    const {data,error}=await supabase.rpc("create_inventory_item",{_organization_id:organizationId!,_branch_id:null,_sku:s.sku,_name:s.name,_category:s.category,_supplier:s.supplier,_location:s.location,_quantity:s.quantity,_minimum_quantity:s.minimum,_cost:s.cost,_price:s.price});
+    if(error){alert("Não foi possível cadastrar a peça: "+error.message);return}
+    const x=data as any;setStock(v=>[{id:x.id,sku:x.sku??"",name:x.name,category:x.category??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:s.quantity?[{type:"entry",quantity:s.quantity,date:today(),note:"Saldo inicial"}]:[]},...v]);setDialog(null);
+  };
+  const saveMovement=async(id:string,amount:number,type:string,note:string)=>{
+    const {data,error}=await supabase.rpc("move_inventory",{_inventory_item_id:id,_movement_type:type==="entry"?"entry":"exit",_quantity:amount,_notes:note,_unit_cost:null});
+    if(error){alert("Não foi possível registrar a movimentação: "+error.message);return}
+    const x=data as any;setStock(v=>v.map(s=>s.id===id?{...s,quantity:Number(x.quantity),movements:[{type:type==="entry"?"entry":"exit",quantity:amount,date:today(),note},...s.movements]}:s));setDialog(null);
+  };
+  const saveOrder=async(o:Order,part:{id:string;quantity:number}|null)=>{
+    if(!requireOrg())return;
+    const customer=customers.find(x=>x.id===o.customerId);if(!customer){alert("Cliente não encontrado.");return}
+    const brand=o.device.split(" ")[0]??"";
+    const model=o.device.split(" ").slice(1).join(" ");
+    const {data:device,error:deviceError}=await supabase.from("devices").insert({organization_id:organizationId!,customer_id:customer.id,category:o.deviceCategory??"Equipamento",brand,model,serial_number:o.serial||null,condition_notes:null,accessories:null}).select().single();
+    if(deviceError){alert("Não foi possível cadastrar o aparelho da OS: "+deviceError.message);return}
+    const partTotal=o.parts.reduce((sum,p)=>sum+p.quantity*p.price,0),serviceAmount=Math.max(0,o.total-partTotal);
+    const {data:dbOrder,error:orderError}=await supabase.from("service_orders").insert({organization_id:organizationId!,customer_id:customer.id,device_id:device.id,reported_issue:o.issue,status:"received",priority:"normal",subtotal:serviceAmount,discount:0,estimated_at:o.due&&o.due!=="A definir"?new Date(o.due+"T12:00:00").toISOString():null}).select().single();
+    if(orderError){alert("Não foi possível criar a ordem: "+orderError.message);return}
+    if(serviceAmount>0){const {error}=await supabase.from("service_order_items").insert({organization_id:organizationId!,order_id:dbOrder.id,item_type:"service",description:"Mão de obra / serviço técnico",quantity:1,unit_price:serviceAmount,cost:0,warranty_days:90});if(error){alert("A ordem foi criada, mas não foi possível salvar o serviço: "+error.message);}}
+    if(part&&part.quantity>0){const {error}=await supabase.rpc("consume_inventory_item",{_order_id:dbOrder.id,_inventory_item_id:part.id,_quantity:part.quantity,_unit_price:stock.find(s=>s.id===part.id)?.price??0,_warranty_days:90});if(error){alert("A ordem foi criada, mas a peça não foi baixada do estoque: "+error.message);}}
+    setDialog(null);setSelectedOrder({...o,id:"OS-"+dbOrder.order_number,dbId:dbOrder.id});setOrders(v=>[{...o,id:"OS-"+dbOrder.order_number,dbId:dbOrder.id},...v]);if(part)setStock(v=>v.map(s=>s.id===part.id?{...s,quantity:s.quantity-part.quantity}:s));window.setTimeout(()=>setDialog("orderView"),180);
+  };
+  const saveWarranty=async(w:Warranty)=>{
+    if(!requireOrg())return;
+    const order=orders.find(o=>o.id===w.orderId);if(!order?.dbId){alert("Ordem vinculada não encontrada no banco.");return}
+    const parseDate=(value:string)=>{const [d,m,y]=value.split("/");return y?y+"-"+m+"-"+d:new Date().toISOString().slice(0,10)};
+    const {data,error}=await supabase.from("warranties").insert({organization_id:organizationId!,order_id:order.dbId,starts_at:parseDate(w.starts),expires_at:parseDate(w.expires),coverage:w.coverage,terms:null,status:"active"}).select().single();
+    if(error){alert("Não foi possível emitir a garantia: "+error.message);return}
+    const saved={...w,id:data.code,dbId:data.id};setWarranties(v=>[saved,...v]);setSelectedWarranty(saved);setDialog(null);window.setTimeout(()=>setDialog("warrantyView"),180);
+  };
+  return <div className="min-h-screen bg-background text-foreground">
+    <Sidebar section={section} setSection={s=>{setSection(s);setMenuOpen(false);setSearch("")}} open={menuOpen} close={()=>setMenuOpen(false)} collapsed={sidebarCollapsed} toggleCollapsed={()=>setSidebarCollapsed(v=>!v)} onCompanySettings={()=>setDialog("companySettings")}/>
+    <main className={"min-h-screen transition-[padding] duration-200 "+(sidebarCollapsed?"lg:pl-[72px]":"lg:pl-64")}>
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-7"><Button variant="ghost" size="icon" className="lg:hidden" aria-label="Abrir menu" onClick={()=>setMenuOpen(true)}><Menu/></Button><div className="relative hidden max-w-xl flex-1 md:block"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar nesta área…" className="h-10 border-0 bg-muted pl-10 shadow-none"/></div><div className="ml-auto flex items-center gap-2"><Button variant="ghost" size="icon" aria-label="Notificações"><Bell/></Button><span className="grid size-8 place-items-center rounded-md bg-primary font-bold text-primary-foreground">{companyName.slice(0,2).toUpperCase()}</span><span className="hidden text-sm font-semibold sm:block">{companyName}</span><ChevronDown className="hidden size-4 sm:block"/></div></header>
+      <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-7 md:py-8">{dataError&&<div role="alert" className="mb-5 rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">{dataError}</div>}{dataLoading&&<div className="mb-5 rounded-md border bg-card p-4 text-sm text-muted-foreground">Carregando dados reais da empresa…</div>}<div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="mb-1 text-sm font-medium text-muted-foreground">{new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"})}</p><h1 className="text-2xl font-bold md:text-3xl">{section}</h1><p className="mt-1 text-sm text-muted-foreground">Bem-vindo, {companyName}. Sua operação está sob controle.</p></div>{["Clientes","Estoque","Garantias","Ordens de serviço","Visão geral"].includes(section)&&<Button className="h-10 w-full sm:w-auto" onClick={action}><Plus/>{labels[section]??"Nova ordem"}</Button>}</div>
+        {section==="Visão geral"&&<Dashboard orders={filteredOrders} stock={stock} sales={sales} onSection={setSection}/>} 
+        {section==="Ordens de serviço"&&<OrdersView orders={filteredOrders} onNew={()=>open("order")} onView={o=>{setSelectedOrder(o);open("orderView")}} onDelete={async o=>{if(!window.confirm(`Excluir a ordem ${o.id} de ${o.client}? Essa ação não pode ser desfeita.`))return;if(!o.dbId){alert("Esta ordem não está salva no banco.");return}const {error}=await supabase.from("service_orders").delete().eq("id",o.dbId).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a ordem. Se houver consumo de estoque vinculado, a exclusão pode ser bloqueada para preservar o histórico. "+error.message);return}setOrders(v=>v.filter(x=>x.id!==o.id));setWarranties(v=>v.filter(w=>w.orderId!==o.id));}}/>}
+        {section==="Clientes"&&<CustomersView customers={customers.filter(c=>`${c.name} ${c.document} ${c.phone}`.toLowerCase().includes(q))} orders={orders} onNew={()=>open("customer")} onDelete={async c=>{const linked=orders.filter(o=>o.customerId===c.id);if(linked.length){window.alert("Este cliente possui ordens de serviço vinculadas. Exclua primeiro as ordens relacionadas.");return}if(window.confirm(`Excluir o cliente ${c.name}? Essa ação não pode ser desfeita.`)){const {error}=await supabase.from("customers").delete().eq("id",c.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir o cliente: "+error.message);return}setCustomers(v=>v.filter(x=>x.id!==c.id));}}}/>}
+        {section==="Estoque"&&<StockView stock={stock.filter(s=>`${s.name} ${s.sku} ${s.category}`.toLowerCase().includes(q))} onNew={()=>open("stock")} onMove={s=>{setSelectedStock(s);open("movement")}} onDelete={async s=>{if(!window.confirm(`Excluir a peça ${s.name} do estoque? O banco pode impedir a exclusão se houver histórico vinculado.`))return;const {error}=await supabase.from("inventory_items").delete().eq("id",s.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a peça. Pode haver movimentações ou ordens vinculadas. "+error.message);return}setStock(v=>v.filter(x=>x.id!==s.id));}}/>}
+        {section==="Garantias"&&<WarrantyView warranties={warranties} onNew={()=>open("warranty")} onView={w=>{setSelectedWarranty(w);open("warrantyView")}}/>}
+        {section==="Financeiro"&&<FinanceView sales={sales} entries={financeEntries} onPOS={()=>open("pos")} onQuick={()=>open("quickSale")}/>} {["Equipe","Administração"].includes(section)&&<Placeholder section={section}/>}
+      </div>
+    </main>
+    <CompanySettingsDialog open={dialog==="companySettings"} close={()=>setDialog(null)} company={company} organizationId={organizationId} onSave={async next=>{if(!requireOrg())return;const {error}=await supabase.from("organizations").update({name:next.name,document:next.document||null,email:next.email||null,phone:next.phone||null,address:next.address||null,logo_url:next.logoUrl||null}).eq("id",organizationId!);if(error){alert("Não foi possível salvar os dados da empresa: "+error.message);return}setCompany(next);setCompanyName(next.name);setDialog(null);alert("Dados da empresa atualizados com sucesso.");}}/>
+    <CustomerDialog open={dialog==="customer"} close={()=>setDialog(null)} onSave={saveCustomer}/>
+    <StockDialog open={dialog==="stock"} close={()=>setDialog(null)} onSave={saveStock}/>
+    <MovementDialog open={dialog==="movement"} item={selectedStock} close={()=>setDialog(null)} onSave={saveMovement}/>
+    <OrderDialog open={dialog==="order"} customers={customers} stock={stock} close={()=>setDialog(null)} onSave={saveOrder}/>
+    <WarrantyDialog open={dialog==="warranty"} orders={orders} close={()=>setDialog(null)} onSave={saveWarranty}/>
+    <OrderDocumentDialog open={dialog==="orderView"} order={selectedOrder} company={company} close={()=>setDialog(null)}/>
+    <WarrantyDocumentDialog open={dialog==="warrantyView"} warranty={selectedWarranty} company={company} close={()=>setDialog(null)}/>
+    <SaleDialog open={dialog==="pos"||dialog==="quickSale"} mode={dialog==="quickSale"?"quick":"pos"} stock={stock} customers={customers} close={()=>setDialog(null)} onSave={async(payload)=>{if(!requireOrg())return;const {data,error}=await supabase.rpc("create_pos_sale",{_organization_id:organizationId!,_sale_type:payload.type,_department:payload.department,_customer_id:payload.customerId||null,_discount:payload.discount,_payment_method:payload.payment,_notes:payload.notes||null,_items:payload.items.map(i=>({inventory_item_id:i.inventoryId||null,description:i.description,quantity:i.quantity,unit_price:i.price,unit_cost:i.cost}))});if(error){alert("Não foi possível registrar a venda: "+error.message);return}const [salesR,entriesR,stockR]=await Promise.all([supabase.from("sales").select("*").eq("organization_id",organizationId!).order("sold_at",{ascending:false}),supabase.from("financial_entries").select("*").eq("organization_id",organizationId!).order("entry_date",{ascending:false}),supabase.from("inventory_items").select("*,inventory_movements(*)").eq("organization_id",organizationId!).eq("active",true).order("created_at",{ascending:false})]);if(salesR.error||entriesR.error||stockR.error){alert("Venda registrada, mas houve falha ao atualizar a tela. Atualize a página para sincronizar.");return}setSales((salesR.data??[]).map((x:any)=>({...x,number:Number(x.sale_number),total:Number(x.total)})));setFinanceEntries((entriesR.data??[]).map((x:any)=>({...x,amount:Number(x.amount)})));setStock((stockR.data??[]).map((x:any)=>({id:x.id,sku:x.sku??"",name:x.name,category:x.category??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:(x.inventory_movements??[]).map((m:any)=>({type:m.movement_type,date:new Date(m.created_at).toLocaleDateString("pt-BR"),quantity:Number(m.quantity),note:m.notes??""}))})));setDialog(null);alert("Venda registrada com sucesso!");}}/>
+  </div>
+}
+
 function Sidebar({section,setSection,open,close,collapsed,toggleCollapsed,onCompanySettings}:{section:Section;setSection:(s:Section)=>void;open:boolean;close:()=>void;collapsed:boolean;toggleCollapsed:()=>void;onCompanySettings:()=>void}){
   return <>{open&&<Button variant="ghost" className="fixed inset-0 z-40 h-auto w-auto rounded-none bg-foreground/30 lg:hidden" onClick={close} aria-label="Fechar menu"/>}
     <aside className={"fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-sidebar transition-[width,transform] duration-200 lg:translate-x-0 "+(collapsed?"w-[72px]":"w-64")+" "+(open?"translate-x-0":"-translate-x-full")}>
