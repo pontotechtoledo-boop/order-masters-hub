@@ -168,8 +168,10 @@ export type Database = {
           branch_id: string | null
           category: string
           created_at: string
+          department: string
           description: string
           due_date: string | null
+          entry_date: string
           entry_type: Database["public"]["Enums"]["financial_type"]
           id: string
           order_id: string | null
@@ -184,8 +186,10 @@ export type Database = {
           branch_id?: string | null
           category: string
           created_at?: string
+          department?: string
           description: string
           due_date?: string | null
+          entry_date?: string
           entry_type: Database["public"]["Enums"]["financial_type"]
           id?: string
           order_id?: string | null
@@ -200,8 +204,10 @@ export type Database = {
           branch_id?: string | null
           category?: string
           created_at?: string
+          department?: string
           description?: string
           due_date?: string | null
+          entry_date?: string
           entry_type?: Database["public"]["Enums"]["financial_type"]
           id?: string
           order_id?: string | null
@@ -243,6 +249,7 @@ export type Database = {
           cost: number
           created_at: string
           id: string
+          item_type: string
           location: string | null
           minimum_quantity: number
           name: string
@@ -260,6 +267,7 @@ export type Database = {
           cost?: number
           created_at?: string
           id?: string
+          item_type?: string
           location?: string | null
           minimum_quantity?: number
           name: string
@@ -277,6 +285,7 @@ export type Database = {
           cost?: number
           created_at?: string
           id?: string
+          item_type?: string
           location?: string | null
           minimum_quantity?: number
           name?: string
@@ -564,6 +573,127 @@ export type Database = {
         }
         Relationships: []
       }
+      sale_items: {
+        Row: {
+          description: string
+          id: string
+          inventory_item_id: string | null
+          organization_id: string
+          quantity: number
+          sale_id: string
+          unit_cost: number
+          unit_price: number
+        }
+        Insert: {
+          description: string
+          id?: string
+          inventory_item_id?: string | null
+          organization_id: string
+          quantity: number
+          sale_id: string
+          unit_cost?: number
+          unit_price?: number
+        }
+        Update: {
+          description?: string
+          id?: string
+          inventory_item_id?: string | null
+          organization_id?: string
+          quantity?: number
+          sale_id?: string
+          unit_cost?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_items_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_items_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          department: string
+          discount: number
+          id: string
+          notes: string | null
+          number: number
+          organization_id: string
+          payment_method: string | null
+          sold_at: string
+          subtotal: number
+          total: number
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          department: string
+          discount?: number
+          id?: string
+          notes?: string | null
+          number?: never
+          organization_id: string
+          payment_method?: string | null
+          sold_at?: string
+          subtotal?: number
+          total?: number
+          type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          department?: string
+          discount?: number
+          id?: string
+          notes?: string | null
+          number?: never
+          organization_id?: string
+          payment_method?: string | null
+          sold_at?: string
+          subtotal?: number
+          total?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_order_items: {
         Row: {
           cost: number
@@ -805,6 +935,33 @@ export type Database = {
           },
         ]
       }
+      system_announcements: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          message: string
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message: string
+          title: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message?: string
+          title?: string
+        }
+        Relationships: []
+      }
       warranties: {
         Row: {
           code: string
@@ -919,6 +1076,7 @@ export type Database = {
           cost: number
           created_at: string
           id: string
+          item_type: string
           location: string | null
           minimum_quantity: number
           name: string
@@ -936,8 +1094,43 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_pos_sale: {
+        Args: {
+          _customer_id: string
+          _department: string
+          _discount: number
+          _items: Json
+          _notes: string
+          _organization_id: string
+          _payment_method: string
+          _sale_type: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          department: string
+          discount: number
+          id: string
+          notes: string | null
+          number: number
+          organization_id: string
+          payment_method: string | null
+          sold_at: string
+          subtotal: number
+          total: number
+          type: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       ensure_user_organization: { Args: never; Returns: string }
       is_org_member: { Args: { _organization_id: string }; Returns: boolean }
+      is_platform_owner: { Args: never; Returns: boolean }
       move_inventory: {
         Args: {
           _inventory_item_id: string
@@ -953,6 +1146,7 @@ export type Database = {
           cost: number
           created_at: string
           id: string
+          item_type: string
           location: string | null
           minimum_quantity: number
           name: string
