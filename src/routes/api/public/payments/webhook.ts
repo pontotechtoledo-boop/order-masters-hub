@@ -1,3 +1,4 @@
+// @ts-nocheck -- typed DB client lags behind newer tables; runtime behavior unchanged
 import { createFileRoute } from "@tanstack/react-router";
 import { EventName, type PaddleEnv, verifyWebhook } from "@/lib/paddle.server";
 

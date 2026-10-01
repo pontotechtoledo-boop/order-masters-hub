@@ -471,6 +471,7 @@ export type Database = {
       }
       organizations: {
         Row: {
+          address: string | null
           created_at: string
           document: string | null
           email: string | null
@@ -484,6 +485,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          address?: string | null
           created_at?: string
           document?: string | null
           email?: string | null
@@ -497,6 +499,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          address?: string | null
           created_at?: string
           document?: string | null
           email?: string | null
@@ -627,6 +630,7 @@ export type Database = {
       }
       service_orders: {
         Row: {
+          apparent_issue: string | null
           assigned_to: string | null
           branch_id: string | null
           completed_at: string | null
@@ -645,10 +649,12 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
           technical_report: string | null
+          terms: string | null
           total: number | null
           updated_at: string
         }
         Insert: {
+          apparent_issue?: string | null
           assigned_to?: string | null
           branch_id?: string | null
           completed_at?: string | null
@@ -667,10 +673,12 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
           technical_report?: string | null
+          terms?: string | null
           total?: number | null
           updated_at?: string
         }
         Update: {
+          apparent_issue?: string | null
           assigned_to?: string | null
           branch_id?: string | null
           completed_at?: string | null
@@ -689,6 +697,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
           technical_report?: string | null
+          terms?: string | null
           total?: number | null
           updated_at?: string
         }
@@ -927,6 +936,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      ensure_user_organization: { Args: never; Returns: string }
+      is_org_member: { Args: { _organization_id: string }; Returns: boolean }
       move_inventory: {
         Args: {
           _inventory_item_id: string
