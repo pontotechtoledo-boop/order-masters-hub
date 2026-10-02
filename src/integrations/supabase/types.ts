@@ -763,6 +763,7 @@ export type Database = {
           apparent_issue: string | null
           assigned_to: string | null
           branch_id: string | null
+          checklist: Json
           completed_at: string | null
           created_at: string
           customer_id: string
@@ -787,6 +788,7 @@ export type Database = {
           apparent_issue?: string | null
           assigned_to?: string | null
           branch_id?: string | null
+          checklist?: Json
           completed_at?: string | null
           created_at?: string
           customer_id: string
@@ -811,6 +813,7 @@ export type Database = {
           apparent_issue?: string | null
           assigned_to?: string | null
           branch_id?: string | null
+          checklist?: Json
           completed_at?: string | null
           created_at?: string
           customer_id?: string
