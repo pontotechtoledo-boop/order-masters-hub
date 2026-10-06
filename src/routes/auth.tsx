@@ -27,14 +27,14 @@ function AuthPage() {
     <section className="flex min-h-screen items-center px-6 py-10 sm:px-12 lg:px-[clamp(3rem,7vw,8rem)]">
       <div className="mx-auto w-full max-w-md lg:mx-0">
         <div className="mb-12 flex items-center gap-3"><span className="grid size-11 place-items-center rounded-lg bg-primary text-primary-foreground shadow-brand"><Wrench className="size-5"/></span><div><p className="font-display text-lg font-extrabold leading-tight">PontoTech Toledo</p><p className="text-xs font-semibold text-primary">Gestão para assistência técnica</p></div></div>
-        <div className="mb-8"><p className="mb-3 text-xs font-bold uppercase text-primary">Área segura</p><h1 className="font-display text-3xl font-extrabold sm:text-4xl">Bem-vindo de volta</h1><p className="mt-3 text-sm leading-6 text-muted-foreground">Entre para acompanhar ordens, clientes, garantias e estoque da sua empresa.</p></div>
+        <div className="mb-8"><p className="mb-3 text-xs font-bold uppercase text-primary">Área segura</p><h1 className="font-display text-3xl font-extrabold sm:text-4xl">Bem-vindo de volta</h1><p className="mt-3 text-sm leading-6 text-muted-foreground">Entre para acompanhar ordens, clientes, garantias e estoque da sua empresa. Teste grátis por 3 dias.</p></div>
         <form className="grid gap-5" onSubmit={submit}>
           <label className="grid gap-2 text-xs font-bold uppercase">Usuário ou e-mail<div className="relative"><Mail className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input className="h-12 bg-card pl-11" type="text" value={identifier} onChange={e=>setIdentifier(e.target.value)} autoComplete="username" placeholder="Digite seu usuário ou e-mail" required/></div></label>
           <label className="grid gap-2 text-xs font-bold uppercase"><span className="flex items-center justify-between"><span>Senha</span><Button type="button" variant="link" className="h-auto p-0 text-xs normal-case" onClick={forgot}>Esqueci minha senha</Button></span><div className="relative"><LockKeyhole className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input className="h-12 bg-card px-11" type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="Digite sua senha" required/><Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1" onClick={()=>setShow(v=>!v)} aria-label={show?"Ocultar senha":"Mostrar senha"}>{show?<EyeOff/>:<Eye/>}</Button></div></label>
           {message&&<p className="rounded-md border bg-muted p-3 text-sm" role="status">{message}</p>}
           <Button className="mt-1 h-12 gap-2 shadow-brand" disabled={loading}>{loading?"Entrando…":<>Entrar no painel <ArrowRight className="size-4"/></>}</Button>
         </form>
-        <p className="mt-7 text-center text-xs text-muted-foreground">Seu acesso é criado pelo administrador da plataforma.</p>
+        <p className="mt-7 text-center text-xs text-muted-foreground">Teste grátis por 3 dias. Depois, escolha o plano que melhor atende sua empresa.</p>
       </div>
     </section>
     <aside className="auth-showcase relative hidden min-h-screen overflow-hidden bg-brand-ink p-12 text-brand-ink-foreground lg:flex lg:flex-col lg:justify-between">
