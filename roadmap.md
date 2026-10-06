@@ -6,6 +6,7 @@
 - [x] Implementar ordens, clientes, garantias, estoque e financeiro
 - [x] Implementar administração SaaS
 - [x] Validar desktop e celular
+- [x] Aplicar identidade visual PontoTech Toledo em azul técnico, com Sora e Manrope
 
 ## Controles operacionais reais
 
