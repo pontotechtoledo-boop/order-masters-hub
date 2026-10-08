@@ -168,19 +168,20 @@ function SubscriptionView({organizationId}:{organizationId:string|null}){const [
         supabase.from("financial_entries").select("*").eq("organization_id", orgId).order("entry_date", { ascending: false }),
       ]);
       if(!active)return;
-      if(customersRes.error){
-        setDataError("Não foi possível carregar os clientes: "+customersRes.error.message);
-      } else {
-        setDataError("");
-      }
-      if(stockRes.error) console.warn("Estoque não carregado:",stockRes.error.message);
-      if(ordersRes.error) console.warn("Ordens não carregadas:",ordersRes.error.message);
-      if(warrantiesRes.error) console.warn("Garantias não carregadas:",warrantiesRes.error.message);
-      if(salesRes.error) console.warn("Vendas não carregadas:",salesRes.error.message);
-      if(financeRes.error) console.warn("Financeiro não carregado:",financeRes.error.message);
+      const loadErrors = [
+        customersRes.error && "Clientes: " + customersRes.error.message,
+        stockRes.error && "Estoque: " + stockRes.error.message,
+        ordersRes.error && "Ordens de serviço: " + ordersRes.error.message,
+        warrantiesRes.error && "Garantias: " + warrantiesRes.error.message,
+        salesRes.error && "Vendas: " + salesRes.error.message,
+        financeRes.error && "Financeiro: " + financeRes.error.message,
+      ].filter(Boolean);
+      setDataError(loadErrors.length
+        ? "Algumas informações não puderam ser carregadas. Confira os detalhes: " + loadErrors.join(" | ")
+        : "");
       setCustomers((customersRes.data??[]).map((x:any)=>({id:x.id,name:x.name,document:x.document??"",phone:x.phone??"",email:x.email??"",address:x.address??"",notes:x.notes??""})));
       setStock((stockRes.data??[]).map((x:any)=>({id:x.id,sku:x.sku??"",name:x.name,itemType:x.item_type==="store"?"store":"part",category:x.category??"",partType:x.part_type??"",brand:x.brand??"",model:x.model??"",quality:x.quality??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:(x.inventory_movements??[]).map((m:any)=>({type:m.movement_type,date:new Date(m.created_at).toLocaleDateString("pt-BR"),quantity:Number(m.quantity),note:m.notes??""})).sort((a:any,b:any)=>b.date.localeCompare(a.date))})));
-      const statusLabels:Record<string,string>={received:"Aberta",in_progress:"Em processo",completed:"Finalizada",triage:"Em processo",diagnosis:"Em processo",quote:"Em processo",awaiting_approval:"Em processo",approved:"Em processo",waiting_parts:"Em processo",repair:"Em processo",testing:"Em processo",ready:"Em processo",delivered:"Finalizada",cancelled:"Cancelada",no_repair:"Finalizada",warranty_return:"Em processo"};
+      const statusLabels:Record<string,string>={received:"Aberta",in_progress:"Em processo",completed:"Finalizada",triage:"Triagem",diagnosis:"Diagnóstico",quote:"Orçamento",awaiting_approval:"Aguardando aprovação",approved:"Aprovada",waiting_parts:"Aguardando peça",repair:"Em reparo",testing:"Em testes",ready:"Pronta para retirada",delivered:"Entregue",cancelled:"Cancelada",no_repair:"Sem reparo",warranty_return:"Retorno de garantia"};
       setOrders((ordersRes.data??[]).map((x:any)=>({id:"OS-"+x.order_number,dbId:x.id,customerId:x.customer_id,client:x.customers?.name??"Cliente",phone:x.customers?.phone??"",checklist:Array.isArray(x.checklist)?x.checklist:[],document:x.customers?.document??"",device:[x.devices?.brand,x.devices?.model].filter(Boolean).join(" ")||x.devices?.category||"Equipamento",createdAt:x.created_at??new Date().toISOString(),deviceCategory:x.devices?.category??"Equipamento",brand:x.devices?.brand??"",model:x.devices?.model??"",serial:x.devices?.serial_number??"",issue:x.reported_issue??"",apparentIssue:x.apparent_issue??x.devices?.condition_notes??"",terms:x.terms??"",stage:statusLabels[x.status]??x.status,tech:"Não atribuído",total:Number(x.total??x.subtotal??0),due:x.estimated_at?new Date(x.estimated_at).toLocaleDateString("pt-BR"):"A definir",tone:x.status==="ready"?"green":x.status==="awaiting_approval"?"amber":"blue",parts:(x.service_order_items??[]).map((it:any)=>({name:it.description,quantity:Number(it.quantity),price:Number(it.unit_price)}))})));
       setWarranties((warrantiesRes.data??[]).map((x:any)=>({id:x.code,createdAt:x.created_at??new Date().toISOString(),dbId:x.id,orderId:"OS-"+(x.service_orders?.order_number??""),customer:x.service_orders?.customers?.name??"",device:[x.service_orders?.devices?.brand,x.service_orders?.devices?.model].filter(Boolean).join(" "),starts:new Date(x.starts_at+"T00:00:00").toLocaleDateString("pt-BR"),expires:new Date(x.expires_at+"T00:00:00").toLocaleDateString("pt-BR"),coverage:x.coverage??x.terms??"",status:x.status})));
       setSales((salesRes.data??[]).map((x:any)=>({...x,number:Number(x.sale_number),total:Number(x.total)})));
