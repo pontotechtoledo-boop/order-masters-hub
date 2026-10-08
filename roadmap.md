@@ -18,4 +18,12 @@
 ## Próximas integrações
 
 - [ ] Configurar entrega de garantias por e-mail
-- [ ] Ativar cobrança recorrente após escolha do provedor
+- [ ] Entrega de garantias por e-mail — fora do escopo desta entrega
+
+## Assinaturas (entrega atual)
+- [ ] Configurar três preços e validar periodicidade e tributos
+- [ ] Implementar contratação, consulta, portal e troca de ciclo
+- [ ] Aplicar confirmação de pagamento, tolerância e proteção de escrita
+- [ ] Validar testes, isolamento e telas em computador/celular
+- [ ] Validar pagamento completo — depende do checkout externo
+- [ ] Habilitar pagamentos reais — depende de aprovação comercial Paddle
