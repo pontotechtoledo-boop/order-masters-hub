@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Bell, Boxes, Building2, CalendarDays, Check, CircleDollarSign,
+  Bell, Boxes, Building2, CalendarDays, Check, CircleDollarSign, Receipt,
   ClipboardList, Clock3, FileCheck2, Gauge, LayoutDashboard, Menu, MoreHorizontal,
   PackageSearch, Plus, Printer, Search, Settings, ShieldCheck, TrendingUp, Users,
   Wrench, X, Minus, ArrowDownToLine, History, Eye, FileDown, Trash2, ShoppingBag, ShoppingCart, ChevronLeft, ChevronRight, Upload, LogOut, Pencil, BarChart3, Database, Download, ChevronDown,
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FinanceView, SaleDialog } from "@/components/FinanceSales";
+import { ExpensesView } from "@/components/ExpensesView";
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Index,
 });
 
-type Section = "Visão geral" | "Dashboard" | "Bancada" | "Ordens de serviço" | "Clientes" | "Garantias" | "Estoque" | "Financeiro / Vendas" | "Relatórios" | "Minha assinatura" | "Administração";
+type Section = "Visão geral" | "Dashboard" | "Bancada" | "Ordens de serviço" | "Clientes" | "Garantias" | "Estoque" | "Financeiro / Vendas" | "Despesas" | "Relatórios" | "Minha assinatura" | "Administração";
 type Customer = { id:string; name:string; document:string; phone:string; email:string; address?:string; notes?:string };
 type Stock = { id:string; sku:string; name:string; itemType:"part"|"store"; category:string; partType?:string; brand?:string; model?:string; quality?:string; supplier:string; location:string; quantity:number; minimum:number; cost:number; price:number; movements:{type:string; quantity:number; date:string; note:string}[] };
 type Order = { id:string; createdAt:string; dbId?:string; deviceCategory?:string; brand?:string; model?:string; customerId:string; client:string; document:string; device:string; serial:string; issue:string; apparentIssue?:string; terms?:string; stage:string; tech:string; total:number; due:string; tone:string; parts:{name:string; quantity:number; price:number}[]; checklist?:{item:string;result:string}[]; phone?:string };
@@ -42,7 +43,7 @@ const initialStock: Stock[] = [];
 const initialOrders: Order[] = [];
 const initialWarranties: Warranty[] = [];
 const nav: {label:Section;icon:typeof Gauge;group?:string}[] = [
-  {label:"Visão geral",icon:LayoutDashboard},{label:"Dashboard",icon:BarChart3},{label:"Bancada",icon:Wrench,group:"OPERAÇÃO"},{label:"Ordens de serviço",icon:ClipboardList},{label:"Clientes",icon:Users},{label:"Garantias",icon:ShieldCheck},{label:"Estoque",icon:Boxes,group:"GESTÃO"},{label:"Financeiro / Vendas",icon:CircleDollarSign},{label:"Relatórios",icon:FileCheck2},{label:"Minha assinatura",icon:CircleDollarSign,group:"PLATAFORMA"},{label:"Administração",icon:Building2,group:"PLATAFORMA"},
+  {label:"Visão geral",icon:LayoutDashboard},{label:"Dashboard",icon:BarChart3},{label:"Bancada",icon:Wrench,group:"OPERAÇÃO"},{label:"Ordens de serviço",icon:ClipboardList},{label:"Clientes",icon:Users},{label:"Garantias",icon:ShieldCheck},{label:"Estoque",icon:Boxes,group:"GESTÃO"},{label:"Financeiro / Vendas",icon:CircleDollarSign},{label:"Despesas",icon:Receipt},{label:"Relatórios",icon:FileCheck2},{label:"Minha assinatura",icon:CircleDollarSign,group:"PLATAFORMA"},{label:"Administração",icon:Building2,group:"PLATAFORMA"},
 ];
 const money=(n:number)=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const deviceCatalog:Record<string,Record<string,string[]>>={
@@ -286,6 +287,12 @@ const emitOrder=async(o:Order)=>{if(!requireOrg()||!o.dbId)return;const {error}=
     setOrders(v=>v.map(x=>x.dbId===o.dbId?{...x,stage:"Em processo"}:x));setSelectedOrder({...o,stage:"Em processo"});
     whatsappNotify(o.phone,`Olá, ${o.client}! Recebemos seu aparelho ${o.device} na ${company.name}. Sua ordem de serviço ${o.id} está EM PROCESSO. Avisaremos assim que for finalizada.`);
   };
+  const refreshFinanceEntries=async()=>{
+    if(!organizationId)return;
+    const {data,error}=await supabase.from("financial_entries").select("*").eq("organization_id",organizationId).order("entry_date",{ascending:false});
+    if(error){alert("Não foi possível atualizar o financeiro: "+error.message);return}
+    setFinanceEntries((data??[]).map((x:any)=>({...x,amount:Number(x.amount)})));
+  };
   const refreshSalesAndFinance=async()=>{
     const [salesR,entriesR]=await Promise.all([
       supabase.from("sales").select("*").eq("organization_id",organizationId!).order("sold_at",{ascending:false}),
@@ -334,7 +341,7 @@ const emitOrder=async(o:Order)=>{if(!requireOrg()||!o.dbId)return;const {error}=
         {section==="Clientes"&&<CustomersView customers={customers} orders={orders} onNew={()=>open("customer")} onEdit={c=>{setSelectedCustomer(c);open("customerEdit")}} onDelete={async c=>{const linked=orders.filter(o=>o.customerId===c.id);if(linked.length){window.alert("Este cliente possui ordens de serviço vinculadas. Exclua primeiro as ordens relacionadas.");return}if(window.confirm(`Excluir o cliente ${c.name}? Essa ação não pode ser desfeita.`)){const {error}=await supabase.from("customers").delete().eq("id",c.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir o cliente: "+error.message);return}setCustomers(v=>v.filter(x=>x.id!==c.id));}}}/>}
         {section==="Estoque"&&<StockView stock={stock} orders={orders} company={company} onNew={()=>open("stock")} onMove={s=>{setSelectedStock(s);open("movement")}} onEdit={s=>{setSelectedStock(s);open("stockEdit")}} onDelete={async s=>{if(!window.confirm(`Excluir a peça ${s.name} do estoque? O banco pode impedir a exclusão se houver histórico vinculado.`))return;const {error}=await supabase.from("inventory_items").delete().eq("id",s.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a peça. Pode haver movimentações ou ordens vinculadas. "+error.message);return}setStock(v=>v.filter(x=>x.id!==s.id));}}/>}
         {section==="Garantias"&&<WarrantyView warranties={warranties} onNew={()=>open("warranty")} onView={w=>{setSelectedWarranty(w);open("warrantyView")}} onEdit={w=>{setSelectedWarranty(w);open("warrantyEdit")}}/>}
-        {section==="Financeiro / Vendas"&&<FinanceView sales={sales} entries={financeEntries} company={company} onPOS={()=>open("pos")} onQuick={()=>open("quickSale")} onEditSale={editSale} onDeleteSale={deleteSale}/>} {section==="Administração"&&<AdminView company={company} onCompanySettings={()=>setDialog("companySettings")} onNotifications={()=>setDialog("notifications")}/>}
+        {section==="Financeiro / Vendas"&&<FinanceView sales={sales} entries={financeEntries} company={company} onPOS={()=>open("pos")} onQuick={()=>open("quickSale")} onEditSale={editSale} onDeleteSale={deleteSale}/>} {section==="Despesas"&&<ExpensesView entries={financeEntries} organizationId={organizationId} company={company} onChanged={refreshFinanceEntries}/>} {section==="Administração"&&<AdminView company={company} onCompanySettings={()=>setDialog("companySettings")} onNotifications={()=>setDialog("notifications")}/>}
       </div>
     </main>
     <CompanySettingsDialog open={dialog==="companySettings"} close={()=>setDialog(null)} company={company} organizationId={organizationId} onSave={async next=>{if(!requireOrg())return;const {error}=await supabase.from("organizations").update({name:next.name,document:next.document||null,email:next.email||null,phone:next.phone||null,address:next.address||null,logo_url:next.logoUrl||null}).eq("id",organizationId!);if(error){alert("Não foi possível salvar os dados da empresa: "+error.message);return}setCompany(next);setCompanyName(next.name);setDialog(null);alert("Dados da empresa atualizados com sucesso.");}}/>
