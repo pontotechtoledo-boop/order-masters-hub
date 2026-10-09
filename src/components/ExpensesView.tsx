@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Plus, Pencil, Trash2, FileDown, Receipt } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -31,8 +31,8 @@ export function ExpensesView({entries,organizationId,company,onChanged}:{entries
   const expenses=useMemo(()=>entries.filter(e=>e.entry_type==="expense"&&(!range.from||key(e.entry_date)>=range.from)&&(!range.to||key(e.entry_date)<=range.to)).sort((a,b)=>key(b.entry_date).localeCompare(key(a.entry_date))),[entries,range]);
   const total=expenses.reduce((sum,e)=>sum+Number(e.amount||0),0);
   const startNew=()=>{setEditing(null);setCategory("parts");setCustomCategory("");setDescription("");setAmount("");setDate(today());setPayment("pix");setNotes("");setOpen(true)};
-  const startEdit=(e:Entry)=>{setEditing(e);setCategory(categories.some(c=>c.value===e.department)?e.department:"other");setCustomCategory(categories.some(c=>c.label===e.category)? "":e.category||"");setDescription(e.description||"");setAmount(String(e.amount));setDate(key(e.entry_date)||today());setPayment(e.payment_method||"other");setNotes(e.status||"");setOpen(true)};
-  const save=async(e:React.FormEvent)=>{e.preventDefault();if(!organizationId){alert("Esta conta não está vinculada a uma empresa.");return}const value=Number(amount);if(!Number.isFinite(value)||value<=0){alert("Informe um valor de despesa maior que zero.");return}const label=category==="other"?(customCategory.trim()||"Outros"):(categories.find(c=>c.value===category)?.label||customCategory.trim()||"Outros");const payload={entry_type:"expense",department:category,category:label,description:description.trim()||label,amount:value,payment_method:payment,entry_date:date};
+  const startEdit=(e:Entry)=>{setEditing(e);setCategory(categories.some(c=>c.value===e.department)?e.department:"other");setCustomCategory(categories.some(c=>c.label===e.category)? "":e.category||"");setDescription(e.description||"");setAmount(String(e.amount));setDate(key(e.entry_date)||today());setPayment(e.payment_method||"other");setNotes("");setOpen(true)};
+  const save=async(e:FormEvent)=>{e.preventDefault();if(!organizationId){alert("Esta conta não está vinculada a uma empresa.");return}const value=Number(amount);if(!Number.isFinite(value)||value<=0){alert("Informe um valor de despesa maior que zero.");return}const label=category==="other"?(customCategory.trim()||"Outros"):(categories.find(c=>c.value===category)?.label||customCategory.trim()||"Outros");const payload={entry_type:"expense",department:category,category:label,description:(description.trim()||label)+(notes.trim()?" — "+notes.trim():""),amount:value,payment_method:payment,entry_date:date};
     setSaving(true);
     const result=editing?await supabase.from("financial_entries").update(payload).eq("id",editing.id).eq("organization_id",organizationId):await supabase.from("financial_entries").insert({...payload,organization_id:organizationId,sale_id:null});
     setSaving(false);
