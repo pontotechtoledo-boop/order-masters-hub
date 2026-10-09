@@ -1,6 +1,8 @@
 -- Reliable warranty finalization, automatic assistance revenue, sale maintenance and stock metadata.
 -- Additive/idempotent changes only; no existing records are removed.
 
+ALTER TYPE public.order_status ADD VALUE IF NOT EXISTS 'completed';
+
 ALTER TABLE public.inventory_items
   ADD COLUMN IF NOT EXISTS item_type text NOT NULL DEFAULT 'part',
   ADD COLUMN IF NOT EXISTS part_type text,
