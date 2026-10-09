@@ -33,7 +33,7 @@ function AuthPage() {
           {message&&<p className="rounded-md border bg-muted p-3 text-sm" role="status">{message}</p>}
           <Button className="mt-1 h-12 gap-2 shadow-brand" disabled={loading}>{loading?"Entrando…":<>Entrar no painel <ArrowRight className="size-4"/></>}</Button>
         </form>
-        <div className="mt-7 rounded-lg border bg-card p-4 text-center"><p className="text-sm font-semibold">Ainda não possui uma conta?</p><Button type="button" variant="link" className="mt-1 h-auto gap-1 p-0 text-primary" onClick={()=>navigate({to:"/cadastro"})}><UserPlus className="size-4"/> Criar cadastro e testar grátis por 3 dias <ArrowRight className="size-4"/></Button></div>
+        <div className="mt-7 rounded-lg border bg-card p-4 text-center"><p className="text-sm font-semibold">Ainda não possui uma conta?</p><p className="mt-1 text-sm text-muted-foreground">Solicite seu acesso ao administrador do sistema.</p></div>
       </div>
     </section>
     <aside className="auth-showcase relative hidden min-h-screen overflow-hidden bg-brand-ink p-12 text-brand-ink-foreground lg:flex lg:flex-col lg:justify-between">
