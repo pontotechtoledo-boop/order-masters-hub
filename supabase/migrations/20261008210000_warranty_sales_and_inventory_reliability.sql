@@ -110,8 +110,7 @@ BEGIN
 
   UPDATE public.service_orders
   SET status = 'completed',
-      delivered_at = now(),
-      updated_at = now()
+      delivered_at = now()
   WHERE id = _order_id AND organization_id = _organization_id;
 
   v_amount := greatest(coalesce(v_order.total, v_order.subtotal - coalesce(v_order.discount,0), 0), 0);
@@ -130,8 +129,7 @@ BEGIN
           department = 'assistance',
           customer_id = v_order.customer_id,
           payment_method = 'other',
-          notes = v_notes,
-          updated_at = now()
+          notes = v_notes
       WHERE id = v_sale.id
       RETURNING * INTO v_sale;
     ELSE
@@ -199,8 +197,7 @@ BEGIN
   SET subtotal = _total + coalesce(discount,0),
       total = _total,
       payment_method = _payment_method,
-      notes = _notes,
-      updated_at = now()
+      notes = _notes
   WHERE id = _sale_id;
 
   DELETE FROM public.financial_entries
