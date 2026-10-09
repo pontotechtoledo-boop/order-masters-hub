@@ -57,7 +57,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cadastro': typeof CadastroRoute
-  '/cadastro': typeof CadastroRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
