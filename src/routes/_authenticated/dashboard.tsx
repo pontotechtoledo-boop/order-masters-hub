@@ -221,8 +221,8 @@ const emitOrder=async(o:Order)=>{if(!requireOrg()||!o.dbId)return;const {error}=
     const createdStock={id:x.id,sku:x.sku??s.sku??"",name:x.name??s.name,itemType:s.itemType,category:x.category??s.category??"",partType:s.partType??"",brand:s.brand??"",model:s.model??"",quality:s.quality??"",supplier:x.supplier??s.supplier??"",location:x.location??s.location??"",quantity:Number(x.quantity??s.quantity),minimum:Number(x.minimum_quantity??s.minimum),cost:Number(x.cost??s.cost),price:Number(x.price??s.price),movements:s.quantity?[{type:"entry",quantity:s.quantity,date:today(),note:"Saldo inicial"}]:[]};
     // Exiba o item imediatamente após a criação; não deixe uma falha secundária escondê-lo da tela.
     setStock(v=>[createdStock,...v.filter(item=>item.id!==createdStock.id)]);
-    const {error:metaError}=await supabase.from("inventory_items").update(meta).eq("id",x.id).eq("organization_id",organizationId!);
-    if(metaError){alert("A peça foi criada, mas os detalhes complementares não foram salvos. Confira se as migrações de estoque foram aplicadas: "+metaError.message);return}
+    const {error:metaError}=await supabase.rpc("update_inventory_item_metadata",{_organization_id:organizationId!,_inventory_item_id:x.id,_item_type:meta.item_type,_part_type:meta.part_type,_brand:meta.brand,_model:meta.model,_quality:meta.quality});
+    if(metaError){alert("A peça foi criada e já está visível, mas os detalhes complementares falharam ao salvar: "+metaError.message);setDialog(null);return}
     setDialog(null);
   };
   const saveMovement=async(id:string,amount:number,type:string,note:string)=>{
