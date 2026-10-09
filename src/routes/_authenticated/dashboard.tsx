@@ -218,9 +218,12 @@ const emitOrder=async(o:Order)=>{if(!requireOrg()||!o.dbId)return;const {error}=
     if(error){alert("Não foi possível cadastrar o item: "+error.message);return}
     const x=data as any;
     const meta={item_type:s.itemType,part_type:s.partType||null,brand:s.brand||null,model:s.model||null,quality:s.quality||null};
+    const createdStock={id:x.id,sku:x.sku??s.sku??"",name:x.name??s.name,itemType:s.itemType,category:x.category??s.category??"",partType:s.partType??"",brand:s.brand??"",model:s.model??"",quality:s.quality??"",supplier:x.supplier??s.supplier??"",location:x.location??s.location??"",quantity:Number(x.quantity??s.quantity),minimum:Number(x.minimum_quantity??s.minimum),cost:Number(x.cost??s.cost),price:Number(x.price??s.price),movements:s.quantity?[{type:"entry",quantity:s.quantity,date:today(),note:"Saldo inicial"}]:[]};
+    // Exiba o item imediatamente após a criação; não deixe uma falha secundária escondê-lo da tela.
+    setStock(v=>[createdStock,...v.filter(item=>item.id!==createdStock.id)]);
     const {error:metaError}=await supabase.from("inventory_items").update(meta).eq("id",x.id).eq("organization_id",organizationId!);
-    if(metaError){alert("Item criado, mas não foi possível salvar os detalhes do item: "+metaError.message);return}
-    setStock(v=>[{id:x.id,sku:x.sku??"",name:x.name,itemType:s.itemType,category:x.category??"",partType:s.partType??"",brand:s.brand??"",model:s.model??"",quality:s.quality??"",supplier:x.supplier??"",location:x.location??"",quantity:Number(x.quantity),minimum:Number(x.minimum_quantity),cost:Number(x.cost),price:Number(x.price),movements:s.quantity?[{type:"entry",quantity:s.quantity,date:today(),note:"Saldo inicial"}]:[]},...v]);setDialog(null);
+    if(metaError){alert("A peça foi criada, mas os detalhes complementares não foram salvos. Confira se as migrações de estoque foram aplicadas: "+metaError.message);return}
+    setDialog(null);
   };
   const saveMovement=async(id:string,amount:number,type:string,note:string)=>{
     const {data,error}=await supabase.rpc("move_inventory",{_inventory_item_id:id,_movement_type:type==="entry"?"entry":"exit",_quantity:amount,_notes:note,_unit_cost:null});
@@ -271,7 +274,7 @@ const emitOrder=async(o:Order)=>{if(!requireOrg()||!o.dbId)return;const {error}=
     if(!requireOrg()||!selectedOrder?.dbId)return;
     const {error:deviceError}=await supabase.from("devices").update({category:o.deviceCategory??"Equipamento",brand:o.brand??"",model:o.model??"",serial_number:o.serial||null}).eq("id",(await supabase.from("service_orders").select("device_id").eq("id",selectedOrder.dbId).eq("organization_id",organizationId!).single()).data?.device_id).eq("organization_id",organizationId!);
     if(deviceError){alert("Não foi possível atualizar o aparelho: "+deviceError.message);return}
-    const statusMap:Record<string,string>={Aberta:"received","Em processo":"repair",Finalizada:"delivered",Recebida:"received",Cancelada:"cancelled"};
+    const statusMap:Record<string,string>={Aberta:"received","Em processo":"repair",Finalizada:"completed",Recebida:"received",Cancelada:"cancelled"};
     const {error}=await supabase.from("service_orders").update({reported_issue:o.issue,apparent_issue:o.apparentIssue||null,terms:o.terms||null,status:statusMap[o.stage]??"received",estimated_at:o.due&&o.due!=="A definir"?new Date(o.due+"T12:00:00").toISOString():null}).eq("id",selectedOrder.dbId).eq("organization_id",organizationId!);
     if(error){alert("Não foi possível atualizar a ordem: "+error.message);return}
     setOrders(v=>v.map(x=>x.dbId===selectedOrder.dbId?o:x));setSelectedOrder(o);setDialog(null);
@@ -283,15 +286,43 @@ const emitOrder=async(o:Order)=>{if(!requireOrg()||!o.dbId)return;const {error}=
     setOrders(v=>v.map(x=>x.dbId===o.dbId?{...x,stage:"Em processo"}:x));setSelectedOrder({...o,stage:"Em processo"});
     whatsappNotify(o.phone,`Olá, ${o.client}! Recebemos seu aparelho ${o.device} na ${company.name}. Sua ordem de serviço ${o.id} está EM PROCESSO. Avisaremos assim que for finalizada.`);
   };
+  const refreshSalesAndFinance=async()=>{
+    const [salesR,entriesR]=await Promise.all([
+      supabase.from("sales").select("*").eq("organization_id",organizationId!).order("sold_at",{ascending:false}),
+      supabase.from("financial_entries").select("*").eq("organization_id",organizationId!).order("entry_date",{ascending:false})
+    ]);
+    if(salesR.error||entriesR.error){alert("A operação foi salva, mas não foi possível atualizar o relatório automaticamente. Recarregue a página. "+(salesR.error?.message??entriesR.error?.message??""));return false}
+    setSales((salesR.data??[]).map((x:any)=>({...x,number:Number(x.sale_number),total:Number(x.total)})));
+    setFinanceEntries((entriesR.data??[]).map((x:any)=>({...x,amount:Number(x.amount)})));
+    return true;
+  };
+  const editSale=async(sale:Sale,changes:{total:number;payment_method:string;notes:string|null})=>{
+    if(!requireOrg())return false;
+    const {error}=await supabase.rpc("update_sale_record",{_sale_id:sale.id,_total:changes.total,_payment_method:changes.payment_method,_notes:changes.notes});
+    if(error){alert("Não foi possível editar a venda: "+error.message);return false}
+    return refreshSalesAndFinance();
+  };
+  const deleteSale=async(sale:Sale)=>{
+    if(!requireOrg())return false;
+    const {error}=await supabase.rpc("delete_sale_record",{_sale_id:sale.id});
+    if(error){alert("Não foi possível excluir a venda: "+error.message);return false}
+    return refreshSalesAndFinance();
+  };
   const saveWarranty=async(w:Warranty)=>{
     if(!requireOrg())return;
     const order=orders.find(o=>o.id===w.orderId);if(!order?.dbId){alert("Ordem vinculada não encontrada no banco.");return}
     const parseDate=(value:string)=>{const [d,m,y]=value.split("/");return y?y+"-"+m+"-"+d:new Date().toISOString().slice(0,10)};
-    const {data,error}=await supabase.from("warranties").insert({organization_id:organizationId!,order_id:order.dbId,starts_at:parseDate(w.starts),expires_at:parseDate(w.expires),coverage:w.coverage,terms:null,status:"active"}).select().single();
-    if(error){alert("Não foi possível emitir a garantia: "+error.message);return}
-    const {error:orderError}=await supabase.from("service_orders").update({status:"delivered",delivered_at:new Date().toISOString()}).eq("id",order.dbId).eq("organization_id",organizationId!);
-    if(orderError){alert("A garantia foi emitida, mas não foi possível finalizar a ordem automaticamente: "+orderError.message);return}
-    const saved={...w,id:data.code,createdAt:data.created_at??new Date().toISOString(),dbId:data.id};setWarranties(v=>[saved,...v]);setOrders(v=>v.map(x=>x.dbId===order.dbId?{...x,stage:"Finalizada",tone:"green"}:x));setSelectedWarranty(saved);setDialog(null);whatsappNotify(order.phone,`Olá, ${order.client}! Sua ordem de serviço ${order.id} (${order.device}) foi FINALIZADA na ${company.name}. Sua garantia ${data.code} vale até ${w.expires}. Obrigado pela preferência!`);window.setTimeout(()=>setDialog("warrantyView"),180);
+    const {data,error}=await supabase.rpc("issue_service_order_warranty",{_organization_id:organizationId!,_order_id:order.dbId,_starts_at:parseDate(w.starts),_expires_at:parseDate(w.expires),_coverage:w.coverage,_terms:null});
+    if(error){alert("Não foi possível emitir a garantia e finalizar a ordem: "+error.message);return}
+    const warrantyData=data?.warranty;
+    if(!warrantyData?.id){alert("A garantia foi processada, mas o banco não retornou os dados esperados. Confira a lista de garantias antes de tentar novamente.");return}
+    const saved={...w,id:warrantyData.code,createdAt:warrantyData.created_at??new Date().toISOString(),dbId:warrantyData.id};
+    setWarranties(v=>[saved,...v.filter(x=>x.dbId!==saved.dbId)]);
+    setOrders(v=>v.map(x=>x.dbId===order.dbId?{...x,stage:"Finalizada",tone:"green"}:x));
+    setSelectedWarranty(saved);setDialog(null);
+    await refreshSalesAndFinance();
+    whatsappNotify(order.phone,`Olá, ${order.client}! Sua ordem de serviço ${order.id} (${order.device}) foi FINALIZADA na ${company.name}. Sua garantia ${saved.id} vale até ${w.expires}. Obrigado pela preferência!`);
+    window.setTimeout(()=>setDialog("warrantyView"),180);
   };
   return <div className="min-h-screen bg-background text-foreground">
     <Sidebar section={section} setSection={s=>{setSection(s);setMenuOpen(false)}} open={menuOpen} close={()=>setMenuOpen(false)} collapsed={sidebarCollapsed} toggleCollapsed={()=>setSidebarCollapsed(v=>!v)}/>
@@ -303,7 +334,7 @@ const emitOrder=async(o:Order)=>{if(!requireOrg()||!o.dbId)return;const {error}=
         {section==="Clientes"&&<CustomersView customers={customers} orders={orders} onNew={()=>open("customer")} onEdit={c=>{setSelectedCustomer(c);open("customerEdit")}} onDelete={async c=>{const linked=orders.filter(o=>o.customerId===c.id);if(linked.length){window.alert("Este cliente possui ordens de serviço vinculadas. Exclua primeiro as ordens relacionadas.");return}if(window.confirm(`Excluir o cliente ${c.name}? Essa ação não pode ser desfeita.`)){const {error}=await supabase.from("customers").delete().eq("id",c.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir o cliente: "+error.message);return}setCustomers(v=>v.filter(x=>x.id!==c.id));}}}/>}
         {section==="Estoque"&&<StockView stock={stock} orders={orders} company={company} onNew={()=>open("stock")} onMove={s=>{setSelectedStock(s);open("movement")}} onEdit={s=>{setSelectedStock(s);open("stockEdit")}} onDelete={async s=>{if(!window.confirm(`Excluir a peça ${s.name} do estoque? O banco pode impedir a exclusão se houver histórico vinculado.`))return;const {error}=await supabase.from("inventory_items").delete().eq("id",s.id).eq("organization_id",organizationId!);if(error){alert("Não foi possível excluir a peça. Pode haver movimentações ou ordens vinculadas. "+error.message);return}setStock(v=>v.filter(x=>x.id!==s.id));}}/>}
         {section==="Garantias"&&<WarrantyView warranties={warranties} onNew={()=>open("warranty")} onView={w=>{setSelectedWarranty(w);open("warrantyView")}} onEdit={w=>{setSelectedWarranty(w);open("warrantyEdit")}}/>}
-        {section==="Financeiro / Vendas"&&<FinanceView sales={sales} entries={financeEntries} company={company} onPOS={()=>open("pos")} onQuick={()=>open("quickSale")}/>} {section==="Administração"&&<AdminView company={company} onCompanySettings={()=>setDialog("companySettings")} onNotifications={()=>setDialog("notifications")}/>}
+        {section==="Financeiro / Vendas"&&<FinanceView sales={sales} entries={financeEntries} company={company} onPOS={()=>open("pos")} onQuick={()=>open("quickSale")} onEditSale={editSale} onDeleteSale={deleteSale}/>} {section==="Administração"&&<AdminView company={company} onCompanySettings={()=>setDialog("companySettings")} onNotifications={()=>setDialog("notifications")}/>}
       </div>
     </main>
     <CompanySettingsDialog open={dialog==="companySettings"} close={()=>setDialog(null)} company={company} organizationId={organizationId} onSave={async next=>{if(!requireOrg())return;const {error}=await supabase.from("organizations").update({name:next.name,document:next.document||null,email:next.email||null,phone:next.phone||null,address:next.address||null,logo_url:next.logoUrl||null}).eq("id",organizationId!);if(error){alert("Não foi possível salvar os dados da empresa: "+error.message);return}setCompany(next);setCompanyName(next.name);setDialog(null);alert("Dados da empresa atualizados com sucesso.");}}/>
