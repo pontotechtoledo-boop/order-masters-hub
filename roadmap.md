@@ -21,6 +21,8 @@
 - [ ] Entrega de garantias por e-mail — fora do escopo desta entrega
 
 ## Assinaturas (entrega atual)
+- [ ] Cadastro público na tela inicial e teste único de 3 dias no primeiro acesso
+- [ ] Atualizar anual para R$ 299,90 e validar contratação dos três ciclos
 - [ ] Configurar três preços e validar periodicidade e tributos
 - [ ] Implementar contratação, consulta, portal e troca de ciclo
 - [ ] Aplicar confirmação de pagamento, tolerância e proteção de escrita
