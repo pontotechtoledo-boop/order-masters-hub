@@ -9,6 +9,10 @@ export const Route = createFileRoute("/cadastro")({
   head: () => ({ meta: [
     { title: "Criar conta | Service Pro OS" },
     { name: "description", content: "Crie sua conta e cadastre sua empresa no Service Pro OS." },
+    { property: "og:title", content: "Criar conta | PontoTech Toledo" },
+    { property: "og:description", content: "Cadastre sua assistência e comece o teste grátis de três dias." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
   ] }),
   component: SignupPage,
 });
