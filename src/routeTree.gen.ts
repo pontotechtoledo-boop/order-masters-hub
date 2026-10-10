@@ -74,6 +74,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/cadastro': typeof CadastroRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -91,6 +92,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/cadastro'
     | '/reset-password'
     | '/dashboard'
     | '/api/public/payments/webhook'
@@ -99,6 +101,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/cadastro'
     | '/reset-password'
     | '/_authenticated/dashboard'
     | '/api/public/payments/webhook'
