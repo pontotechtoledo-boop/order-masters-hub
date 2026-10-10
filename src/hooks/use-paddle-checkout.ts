@@ -1,18 +1,21 @@
 import { useState } from "react";
-import { getPaddlePriceId, initializePaddle } from "@/lib/paddle";
+import { useServerFn } from "@tanstack/react-start";
+import { getPaddleEnvironment, initializePaddle } from "@/lib/paddle";
+import { createSubscriptionCheckout } from "@/utils/subscriptions.functions";
+import type { PlanId } from "@/lib/subscriptions";
 
 export function usePaddleCheckout() {
   const [loading, setLoading] = useState(false);
-  const openCheckout = async (user: { id: string; email?: string }, organizationId: string) => {
+  const createCheckout = useServerFn(createSubscriptionCheckout);
+  const openCheckout = async (organizationId: string, priceId: PlanId) => {
     setLoading(true);
     try {
       await initializePaddle();
-      const priceId = await getPaddlePriceId("pontotech_monthly");
-      window.Paddle?.Checkout.open({
-        items: [{ priceId, quantity: 1 }],
-        customer: user.email ? { email: user.email } : undefined,
-        customData: { userId: user.id, organizationId },
-        settings: { displayMode: "overlay", successUrl: `${window.location.origin}/dashboard?checkout=success`, allowLogout: false, variant: "one-page" },
+      const { transactionId } = await createCheckout({ data: { organizationId, priceId, environment: getPaddleEnvironment() } });
+      if (!window.Paddle) throw new Error("Pagamentos indisponíveis.");
+      window.Paddle.Checkout.open({
+        transactionId,
+        settings: { displayMode: "overlay", successUrl: `${window.location.origin}/assinatura?checkout=success`, allowLogout: false, variant: "one-page" },
       });
     } finally { setLoading(false); }
   };

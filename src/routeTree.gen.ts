@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAssinaturaRouteImport } from './routes/_authenticated/assinatura'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -41,6 +42,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAssinaturaRoute = AuthenticatedAssinaturaRouteImport.update({
+  id: '/assinatura',
+  path: '/assinatura',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cadastro': typeof CadastroRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/assinatura': typeof AuthenticatedAssinaturaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cadastro': typeof CadastroRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/assinatura': typeof AuthenticatedAssinaturaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -74,7 +82,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/cadastro': typeof CadastroRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/assinatura': typeof AuthenticatedAssinaturaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -85,13 +95,16 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cadastro'
     | '/reset-password'
+    | '/assinatura'
     | '/dashboard'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/cadastro'
     | '/reset-password'
+    | '/assinatura'
     | '/dashboard'
     | '/api/public/payments/webhook'
   id:
@@ -99,7 +112,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/cadastro'
     | '/reset-password'
+    | '/_authenticated/assinatura'
     | '/_authenticated/dashboard'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -150,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/assinatura': {
+      id: '/_authenticated/assinatura'
+      path: '/assinatura'
+      fullPath: '/assinatura'
+      preLoaderRoute: typeof AuthenticatedAssinaturaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -168,10 +190,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAssinaturaRoute: typeof AuthenticatedAssinaturaRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAssinaturaRoute: AuthenticatedAssinaturaRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
 }
 

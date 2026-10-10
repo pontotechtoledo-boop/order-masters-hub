@@ -872,6 +872,78 @@ export type Database = {
           },
         ]
       }
+      subscription_checkouts: {
+        Row: {
+          created_at: string
+          environment: string
+          expires_at: string
+          id: string
+          organization_id: string
+          paddle_transaction_id: string | null
+          price_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          environment: string
+          expires_at?: string
+          id?: string
+          organization_id: string
+          paddle_transaction_id?: string | null
+          price_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          environment?: string
+          expires_at?: string
+          id?: string
+          organization_id?: string
+          paddle_transaction_id?: string | null
+          price_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_checkouts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_checkouts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_payment_events: {
+        Row: {
+          environment: string
+          event_id: string
+          occurred_at: string
+          processed_at: string
+        }
+        Insert: {
+          environment: string
+          event_id: string
+          occurred_at: string
+          processed_at?: string
+        }
+        Update: {
+          environment?: string
+          event_id?: string
+          occurred_at?: string
+          processed_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean
@@ -879,10 +951,13 @@ export type Database = {
           current_period_end: string | null
           current_period_start: string | null
           environment: string
+          first_failed_at: string | null
           id: string
+          last_event_at: string | null
           organization_id: string
           paddle_customer_id: string
           paddle_subscription_id: string
+          payment_confirmed_at: string | null
           price_id: string
           product_id: string
           status: string
@@ -895,10 +970,13 @@ export type Database = {
           current_period_end?: string | null
           current_period_start?: string | null
           environment?: string
+          first_failed_at?: string | null
           id?: string
+          last_event_at?: string | null
           organization_id: string
           paddle_customer_id: string
           paddle_subscription_id: string
+          payment_confirmed_at?: string | null
           price_id: string
           product_id: string
           status?: string
@@ -911,10 +989,13 @@ export type Database = {
           current_period_end?: string | null
           current_period_start?: string | null
           environment?: string
+          first_failed_at?: string | null
           id?: string
+          last_event_at?: string | null
           organization_id?: string
           paddle_customer_id?: string
           paddle_subscription_id?: string
+          payment_confirmed_at?: string | null
           price_id?: string
           product_id?: string
           status?: string
@@ -1163,6 +1244,41 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "inventory_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      process_subscription_payment: {
+        Args: {
+          _environment: string
+          _event_id: string
+          _event_type: string
+          _occurred_at: string
+          _payload: Json
+        }
+        Returns: undefined
+      }
+      reserve_subscription_checkout: {
+        Args: {
+          _environment: string
+          _organization_id: string
+          _price_id: string
+          _user_id: string
+        }
+        Returns: {
+          created_at: string
+          environment: string
+          expires_at: string
+          id: string
+          organization_id: string
+          paddle_transaction_id: string | null
+          price_id: string
+          status: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "subscription_checkouts"
           isOneToOne: true
           isSetofReturn: false
         }
