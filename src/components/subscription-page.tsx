@@ -16,7 +16,7 @@ export const billingQueryOptions = (organizationId?: string) => ({
 
 const date = (value: string | null | undefined) => value ? new Date(value).toLocaleDateString("pt-BR") : "—";
 
-export function SubscriptionPage({ organizationId }: { organizationId?: string }) {
+export function SubscriptionPage({ organizationId, embedded = false }: { organizationId?: string; embedded?: boolean }) {
   const { data, error, isPending, refetch, isFetching } = useQuery({ ...billingQueryOptions(organizationId), refetchInterval: 5000 });
   const { openCheckout, loading } = usePaddleCheckout();
   const portal = useServerFn(createBillingPortal);
@@ -46,16 +46,17 @@ export function SubscriptionPage({ organizationId }: { organizationId?: string }
   return <div className="space-y-6">
     <PaymentTestModeBanner />
     <header className="flex flex-wrap items-start justify-between gap-3">
-      <div><p className="mb-2 text-xs font-semibold text-primary">PontoTech Toledo · {data?.organization.name ?? "Sua empresa"}</p><h1 className="font-display text-2xl font-bold">Minha assinatura</h1><p className="mt-2 text-sm text-muted-foreground">{existing ? "Seu plano, vencimento e cobranças." : "Escolha o ciclo para continuar com sua assistência."}</p></div>
+      <div><p className="mb-2 text-xs font-semibold text-primary">PontoTech Toledo · {data?.organization.name ?? "Sua empresa"}</p>{!embedded && <h1 className="font-display text-2xl font-bold">Minha assinatura</h1>}<p className="mt-2 text-sm text-muted-foreground">{existing ? "Seu plano, vencimento e cobranças." : "Escolha o ciclo para continuar com sua assistência."}</p></div>
       <Button variant="ghost" size="icon" aria-label="Atualizar assinatura" title="Atualizar assinatura" onClick={() => refetch()} disabled={isFetching}><RefreshCw className={isFetching ? "animate-spin" : ""} /></Button>
     </header>
     {isPending ? <p className="flex items-center gap-2 py-10 text-muted-foreground"><LoaderCircle className="size-4 animate-spin" /> Consultando assinatura…</p> : error ? <div role="alert" className="border-l-4 border-destructive bg-destructive/5 p-4"><p className="text-sm text-destructive">{error.message}</p><Button variant="outline" className="mt-3" onClick={() => refetch()}>Tentar novamente</Button></div> : <>
       <section className="grid gap-5 border-y py-5 sm:grid-cols-3">
         <div><p className="text-xs text-muted-foreground">Situação</p><p className="mt-2 flex items-center gap-2 font-semibold"><ShieldCheck className="size-4 text-primary" />{status}</p></div>
-        <div><p className="text-xs text-muted-foreground">Plano atual</p><p className="mt-2 font-semibold">{currentPlan?.name ?? "Teste grátis de 3 dias"}</p></div>
+        <div><p className="text-xs text-muted-foreground">Plano atual</p><p className="mt-2 font-semibold">{currentPlan?.name ?? (sub ? "Plano não identificado" : "Teste grátis")}</p></div>
         <div><p className="text-xs text-muted-foreground">{sub ? "Fim do período / próxima cobrança" : "Fim do teste grátis"}</p><p className="mt-2 font-semibold">{date(sub?.current_period_end ?? data?.organization.trial_ends_at)}</p></div>
       </section>
       {!existing && <p role="status" className="border-l-4 border-primary bg-accent p-4 text-sm">{data?.trialActive ? `Seu teste termina em ${date(data.organization.trial_ends_at)} (${trialDays} ${trialDays === 1 ? "dia restante" : "dias restantes"}). A cobrança do plano escolhido começa ao contratar.` : "Seu teste grátis terminou. Escolha um plano para continuar."}</p>}
+      {sub?.cancel_at_period_end && <p role="status" className="border-l-4 border-primary bg-accent p-4 text-sm">Cancelamento agendado. Seu acesso permanece até {date(sub.current_period_end)}; não haverá renovação.</p>}
       {sub?.status === "pending" && <p role="status" className="bg-warning-soft p-4 text-sm text-warning">Aguardando a confirmação oficial do pagamento. A situação será atualizada automaticamente.</p>}
       {sub?.status === "past_due" && <p role="status" className="bg-warning-soft p-4 text-sm text-warning">Regularize seu pagamento na gestão da assinatura.{sub.first_failed_at && ` Prazo de tolerância: ${date(new Date(Date.parse(sub.first_failed_at) + 7 * 86400000).toISOString())}.`}</p>}
       <section>

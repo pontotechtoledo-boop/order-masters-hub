@@ -15,7 +15,7 @@ export function usePaddleCheckout() {
       if (!window.Paddle) throw new Error("Pagamentos indisponíveis.");
       window.Paddle.Checkout.open({
         transactionId,
-        settings: { displayMode: "overlay", successUrl: `${window.location.origin}/assinatura?checkout=success`, allowLogout: false, variant: "one-page" },
+        settings: { displayMode: "overlay", locale: "pt", successUrl: `${window.location.origin}/assinatura?checkout=success`, allowLogout: false, variant: "one-page" },
       });
     } finally { setLoading(false); }
   };

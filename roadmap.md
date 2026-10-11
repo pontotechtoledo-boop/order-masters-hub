@@ -21,7 +21,9 @@
 - [ ] Entrega de garantias por e-mail — fora do escopo desta entrega
 
 ## Assinaturas (entrega atual)
-- [ ] Criar página de contratação com os três planos e checkout seguro vinculado à empresa
+- [x] Criar página de contratação com os três planos e checkout seguro vinculado à empresa
+- [x] Conectar a página de contratação à opção Minha assinatura do painel
+- [ ] Retomar validação autenticada do checkout e conferir regras já instaladas
 - [ ] Cadastro público na tela inicial e teste único de 3 dias no primeiro acesso
 - [ ] Atualizar anual para R$ 299,90 e validar contratação dos três ciclos
 - [ ] Configurar três preços e validar periodicidade e tributos
