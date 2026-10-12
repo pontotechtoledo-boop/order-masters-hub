@@ -315,6 +315,9 @@ BEGIN
 END;
 $$;
 
+REVOKE ALL ON FUNCTION public.issue_service_order_warranty(uuid,uuid,date,date,text,text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.update_sale_record(uuid,numeric,text,text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.delete_sale_record(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.issue_service_order_warranty(uuid,uuid,date,date,text,text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.update_sale_record(uuid,numeric,text,text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.delete_sale_record(uuid) TO authenticated;
@@ -369,6 +372,12 @@ BEGIN
   END IF;
   IF _payment_method NOT IN ('cash','pix','credit_card','debit_card','transfer','other') THEN
     RAISE EXCEPTION 'Forma de pagamento inválida';
+  END IF;
+  IF _customer_id IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM public.customers c
+    WHERE c.id = _customer_id AND c.organization_id = _organization_id
+  ) THEN
+    RAISE EXCEPTION 'Cliente não encontrado nesta empresa';
   END IF;
   IF jsonb_typeof(coalesce(_items,'[]'::jsonb)) <> 'array'
      OR jsonb_array_length(coalesce(_items,'[]'::jsonb)) = 0 THEN
@@ -478,5 +487,6 @@ BEGIN
 END;
 $$;
 
+REVOKE ALL ON FUNCTION public.create_pos_sale_compat(uuid,text,text,uuid,numeric,text,text,jsonb) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.create_pos_sale_compat(uuid,text,text,uuid,numeric,text,text,jsonb) TO authenticated;
 NOTIFY pgrst, 'reload schema';
