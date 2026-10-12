@@ -14,7 +14,11 @@ DECLARE
   v_period_end timestamptz;
   v_found boolean := false;
 BEGIN
-  v_org_id := COALESCE(NEW.organization_id, OLD.organization_id);
+  IF TG_OP = 'DELETE' THEN
+    v_org_id := OLD.organization_id;
+  ELSE
+    v_org_id := NEW.organization_id;
+  END IF;
 
   SELECT s.status, s.product_id, s.current_period_end
     INTO v_status, v_plan, v_period_end
@@ -33,7 +37,7 @@ BEGIN
           ELSE 'expired'
         END
     WHERE id = v_org_id;
-    RETURN COALESCE(NEW, OLD);
+    IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
   END IF;
 
   UPDATE public.organizations
@@ -50,7 +54,7 @@ BEGIN
       END
   WHERE id = v_org_id;
 
-  RETURN COALESCE(NEW, OLD);
+  IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
 END;
 $$;
 
@@ -75,10 +79,14 @@ DECLARE
   v_trial_end timestamptz;
 BEGIN
   IF auth.role() = 'service_role' THEN
-    RETURN COALESCE(NEW, OLD);
+    IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
   END IF;
 
-  v_org_id := COALESCE(NEW.organization_id, OLD.organization_id);
+  IF TG_OP = 'DELETE' THEN
+    v_org_id := OLD.organization_id;
+  ELSE
+    v_org_id := NEW.organization_id;
+  END IF;
 
   SELECT o.subscription_status, o.trial_ends_at
     INTO v_status, v_trial_end
