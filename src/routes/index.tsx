@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, BarChart3, Check, ClipboardList, Clock3, Package, ShieldCheck, Smartphone, TrendingUp, Users, Wrench } from "lucide-react";
+import { ArrowRight, BarChart3, Check, CircleDollarSign, ClipboardList, Clock3, Package, ShieldCheck, Smartphone, TrendingUp, Users, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -21,7 +21,7 @@ function LandingPage() {
   const features = [
     { icon: ClipboardList, title: "Ordens de serviço", description: "Acompanhe cada aparelho, do recebimento à entrega, com histórico organizado." },
     { icon: Package, title: "Estoque sob controle", description: "Registre peças, produtos, entradas, saídas e movimentações." },
-    { icon: CircleDollarIcon, title: "Financeiro e vendas", description: "Visualize vendas, despesas e movimentações para entender melhor os resultados." },
+    { icon: CircleDollarSign, title: "Financeiro e vendas", description: "Visualize vendas, despesas e movimentações para entender melhor os resultados." },
     { icon: ShieldCheck, title: "Garantias organizadas", description: "Emita garantias vinculadas às ordens e consulte o histórico quando precisar." },
     { icon: Users, title: "Clientes centralizados", description: "Mantenha contatos e atendimentos em um só lugar." },
     { icon: BarChart3, title: "Visão do negócio", description: "Consulte indicadores e relatórios para acompanhar a operação." },
@@ -127,6 +127,3 @@ function LandingPage() {
   </main>;
 }
 
-function CircleDollarIcon(props: React.ComponentProps<typeof TrendingUp>) {
-  return <TrendingUp {...props} />;
-}
