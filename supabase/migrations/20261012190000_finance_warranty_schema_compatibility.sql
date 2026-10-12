@@ -320,3 +320,163 @@ GRANT EXECUTE ON FUNCTION public.update_sale_record(uuid,numeric,text,text) TO a
 GRANT EXECUTE ON FUNCTION public.delete_sale_record(uuid) TO authenticated;
 
 NOTIFY pgrst, 'reload schema';
+
+
+-- Stable RPC name avoids collisions with legacy create_pos_sale return types.
+-- The client uses this function so the sale, stock movements, items and ledger row
+-- are committed atomically and the financial entry always carries sale_id.
+CREATE OR REPLACE FUNCTION public.create_pos_sale_compat(
+  _organization_id uuid,
+  _sale_type text,
+  _department text,
+  _customer_id uuid,
+  _discount numeric,
+  _payment_method text,
+  _notes text,
+  _items jsonb
+) RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_sale_id uuid;
+  v_sale public.sales%ROWTYPE;
+  v_item_json jsonb;
+  v_inventory_id uuid;
+  v_quantity numeric;
+  v_price numeric;
+  v_cost numeric;
+  v_subtotal numeric := 0;
+  v_total numeric := 0;
+  v_stock public.inventory_items%ROWTYPE;
+  v_sale_label text;
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM public.organization_members m
+    WHERE m.organization_id = _organization_id
+      AND m.user_id = auth.uid()
+      AND m.active = true
+  ) THEN
+    RAISE EXCEPTION 'Acesso não autorizado à empresa';
+  END IF;
+
+  IF _sale_type NOT IN ('pos','quick') THEN
+    RAISE EXCEPTION 'Tipo de venda inválido';
+  END IF;
+  IF _department NOT IN ('assistance','parts','store') THEN
+    RAISE EXCEPTION 'Área da venda inválida';
+  END IF;
+  IF _payment_method NOT IN ('cash','pix','credit_card','debit_card','transfer','other') THEN
+    RAISE EXCEPTION 'Forma de pagamento inválida';
+  END IF;
+  IF jsonb_typeof(coalesce(_items,'[]'::jsonb)) <> 'array'
+     OR jsonb_array_length(coalesce(_items,'[]'::jsonb)) = 0 THEN
+    RAISE EXCEPTION 'Adicione ao menos um item';
+  END IF;
+
+  FOR v_item_json IN SELECT value FROM jsonb_array_elements(_items) AS e(value) LOOP
+    v_quantity := coalesce((v_item_json->>'quantity')::numeric,0);
+    v_price := coalesce((v_item_json->>'unit_price')::numeric,0);
+    v_cost := coalesce((v_item_json->>'unit_cost')::numeric,0);
+    IF v_quantity <= 0 OR v_price < 0 OR v_cost < 0 THEN
+      RAISE EXCEPTION 'Quantidade, preço ou custo inválido';
+    END IF;
+    v_subtotal := v_subtotal + v_quantity * v_price;
+  END LOOP;
+
+  IF coalesce(_discount,0) < 0 OR coalesce(_discount,0) > v_subtotal THEN
+    RAISE EXCEPTION 'Desconto inválido';
+  END IF;
+  v_total := v_subtotal - coalesce(_discount,0);
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='sales' AND column_name='sale_type'
+  ) THEN
+    EXECUTE $sql$
+      INSERT INTO public.sales
+        (organization_id, sale_type, department, customer_id, subtotal, discount,
+         total, payment_method, notes, created_by)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, auth.uid())
+      RETURNING id
+    $sql$
+    INTO v_sale_id
+    USING _organization_id, _sale_type, _department, _customer_id,
+          v_subtotal, coalesce(_discount,0), v_total, _payment_method, _notes;
+  ELSE
+    EXECUTE $sql$
+      INSERT INTO public.sales
+        (organization_id, type, department, customer_id, subtotal, discount,
+         total, payment_method, notes, created_by)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, auth.uid())
+      RETURNING id
+    $sql$
+    INTO v_sale_id
+    USING _organization_id, _sale_type, _department, _customer_id,
+          v_subtotal, coalesce(_discount,0), v_total, _payment_method, _notes;
+  END IF;
+
+  FOR v_item_json IN SELECT value FROM jsonb_array_elements(_items) AS e(value) LOOP
+    v_inventory_id := nullif(v_item_json->>'inventory_item_id','')::uuid;
+    v_quantity := (v_item_json->>'quantity')::numeric;
+    v_price := coalesce((v_item_json->>'unit_price')::numeric,0);
+    v_cost := coalesce((v_item_json->>'unit_cost')::numeric,0);
+
+    IF v_inventory_id IS NOT NULL THEN
+      SELECT * INTO v_stock
+      FROM public.inventory_items
+      WHERE id = v_inventory_id
+        AND organization_id = _organization_id
+        AND active = true
+      FOR UPDATE;
+
+      IF NOT FOUND THEN
+        RAISE EXCEPTION 'Item de estoque não encontrado nesta empresa';
+      END IF;
+      IF v_stock.quantity < v_quantity THEN
+        RAISE EXCEPTION 'Estoque insuficiente para %', v_stock.name;
+      END IF;
+
+      UPDATE public.inventory_items
+      SET quantity = quantity - v_quantity, updated_at = now()
+      WHERE id = v_inventory_id AND organization_id = _organization_id;
+
+      INSERT INTO public.inventory_movements
+        (organization_id, inventory_item_id, movement_type, quantity, unit_cost, notes, created_by)
+      VALUES
+        (_organization_id, v_inventory_id, 'exit', v_quantity, coalesce(v_stock.cost, v_cost),
+         'Venda registrada no sistema', auth.uid());
+    END IF;
+
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema='public' AND table_name='sale_items' AND column_name='line_total'
+    ) THEN
+      INSERT INTO public.sale_items
+        (organization_id, sale_id, inventory_item_id, description, quantity, unit_price, unit_cost, line_total)
+      VALUES
+        (_organization_id, v_sale_id, v_inventory_id, coalesce(nullif(v_item_json->>'description',''),'Item'),
+         v_quantity, v_price, v_cost, v_quantity * v_price);
+    ELSE
+      INSERT INTO public.sale_items
+        (organization_id, sale_id, inventory_item_id, description, quantity, unit_price, unit_cost)
+      VALUES
+        (_organization_id, v_sale_id, v_inventory_id, coalesce(nullif(v_item_json->>'description',''),'Item'),
+         v_quantity, v_price, v_cost);
+    END IF;
+  END LOOP;
+
+  SELECT * INTO v_sale FROM public.sales WHERE id = v_sale_id;
+  v_sale_label := coalesce(to_jsonb(v_sale)->>'number', to_jsonb(v_sale)->>'sale_number', v_sale_id::text);
+  PERFORM public.sync_sale_income(
+    _organization_id, v_sale_id, _department, v_total, _payment_method, 
+    coalesce(nullif(_notes,''),'Venda #' || v_sale_label)
+  );
+
+  RETURN v_sale_id;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.create_pos_sale_compat(uuid,text,text,uuid,numeric,text,text,jsonb) TO authenticated;
+NOTIFY pgrst, 'reload schema';
