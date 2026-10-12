@@ -23,3 +23,81 @@
 .auth-grid{position:absolute;inset:0;opacity:.14;background-image:linear-gradient(var(--brand-ink-border) 1px,transparent 1px),linear-gradient(90deg,var(--brand-ink-border) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,transparent,black 24%,black 76%,transparent)}
 .status{display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;border-radius:.3rem;padding:.28rem .55rem;font-size:.7rem;font-weight:700;background:var(--muted)} .status i{width:.4rem;height:.4rem;border-radius:999px;background:currentColor}.status-blue{color:oklch(.45 .16 240);background:oklch(.94 .04 240)}.status-amber{color:oklch(.52 .14 68);background:oklch(.95 .06 80)}.status-green{color:oklch(.43 .13 155);background:oklch(.94 .05 155)}.status-violet{color:oklch(.5 .17 295);background:oklch(.95 .04 295)}.status-rose{color:oklch(.52 .17 18);background:oklch(.95 .04 18)}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Service Pro OS — acabamento inspirado em interfaces móveis nativas */
+:root {
+  --radius: 1rem;
+  --ios-surface: rgba(255,255,255,.82);
+  --ios-hairline: rgba(100,116,139,.18);
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+button, [role="button"], input, select, textarea {
+  touch-action: manipulation;
+}
+button, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  min-height: 2.75rem;
+  border-radius: .85rem;
+}
+:where(button, [role="button"]) {
+  border-radius: .85rem;
+}
+:where([class*="rounded-md"]) {
+  border-radius: .85rem;
+}
+:where([class*="rounded-lg"]) {
+  border-radius: 1.1rem;
+}
+:where([class*="shadow"]) {
+  --tw-shadow-color: rgba(15, 23, 42, .045);
+}
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 36%, transparent);
+  outline-offset: 2px;
+}
+::selection {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--primary) 18%, white);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100,116,139,.28) transparent;
+}
+@supports (padding: max(0px)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+@media (max-width: 767px) {
+  body {
+    font-size: 14px;
+  }
+  :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+    font-size: 16px;
+  }
+  :where(button, [role="button"]) {
+    min-height: 2.65rem;
+  }
+  [role="dialog"] {
+    border-radius: 1.35rem;
+  }
+}
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
