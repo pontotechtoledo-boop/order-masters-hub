@@ -328,7 +328,7 @@ const emitOrder=async(o:Order)=>{if(!requireOrg()||!o.dbId)return;const {error}=
     if(!warrantyData?.id){alert("A garantia foi processada, mas o banco não retornou os dados esperados. Confira a lista de garantias antes de tentar novamente.");return}
     const saved={...w,id:warrantyData.code,createdAt:warrantyData.created_at??new Date().toISOString(),dbId:warrantyData.id};
     setWarranties(v=>[saved,...v.filter(x=>x.dbId!==saved.dbId)]);
-    setOrders(v=>v.map(x=>x.dbId===order.dbId?{...x,stage:"Finalizada",tone:"green"}:x));
+    const finalizedAt=new Date().toISOString();setOrders(v=>v.map(x=>x.dbId===order.dbId?{...x,stage:"Finalizada",tone:"green",completedAt:finalizedAt}:x));
     setSelectedWarranty(saved);setDialog(null);
     await refreshSalesAndFinance();
     whatsappNotify(order.phone,`Olá, ${order.client}! Sua ordem de serviço ${order.id} (${order.device}) foi FINALIZADA na ${company.name}. Sua garantia ${saved.id} vale até ${w.expires}. Obrigado pela preferência!`);
