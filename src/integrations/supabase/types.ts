@@ -168,16 +168,19 @@ export type Database = {
           branch_id: string | null
           category: string
           created_at: string
+          created_by: string | null
           department: string
           description: string
           due_date: string | null
           entry_date: string
           entry_type: Database["public"]["Enums"]["financial_type"]
           id: string
+          notes: string | null
           order_id: string | null
           organization_id: string
           paid_at: string | null
           payment_method: string | null
+          sale_id: string | null
           status: Database["public"]["Enums"]["financial_status"]
           updated_at: string
         }
@@ -186,16 +189,19 @@ export type Database = {
           branch_id?: string | null
           category: string
           created_at?: string
+          created_by?: string | null
           department?: string
           description: string
           due_date?: string | null
           entry_date?: string
           entry_type: Database["public"]["Enums"]["financial_type"]
           id?: string
+          notes?: string | null
           order_id?: string | null
           organization_id: string
           paid_at?: string | null
           payment_method?: string | null
+          sale_id?: string | null
           status?: Database["public"]["Enums"]["financial_status"]
           updated_at?: string
         }
@@ -204,16 +210,19 @@ export type Database = {
           branch_id?: string | null
           category?: string
           created_at?: string
+          created_by?: string | null
           department?: string
           description?: string
           due_date?: string | null
           entry_date?: string
           entry_type?: Database["public"]["Enums"]["financial_type"]
           id?: string
+          notes?: string | null
           order_id?: string | null
           organization_id?: string
           paid_at?: string | null
           payment_method?: string | null
+          sale_id?: string | null
           status?: Database["public"]["Enums"]["financial_status"]
           updated_at?: string
         }
@@ -239,12 +248,20 @@ export type Database = {
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "financial_entries_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
         ]
       }
       inventory_items: {
         Row: {
           active: boolean
           branch_id: string | null
+          brand: string | null
           category: string | null
           cost: number
           created_at: string
@@ -252,9 +269,12 @@ export type Database = {
           item_type: string
           location: string | null
           minimum_quantity: number
+          model: string | null
           name: string
           organization_id: string
+          part_type: string | null
           price: number
+          quality: string | null
           quantity: number
           sku: string | null
           supplier: string | null
@@ -263,6 +283,7 @@ export type Database = {
         Insert: {
           active?: boolean
           branch_id?: string | null
+          brand?: string | null
           category?: string | null
           cost?: number
           created_at?: string
@@ -270,9 +291,12 @@ export type Database = {
           item_type?: string
           location?: string | null
           minimum_quantity?: number
+          model?: string | null
           name: string
           organization_id: string
+          part_type?: string | null
           price?: number
+          quality?: string | null
           quantity?: number
           sku?: string | null
           supplier?: string | null
@@ -281,6 +305,7 @@ export type Database = {
         Update: {
           active?: boolean
           branch_id?: string | null
+          brand?: string | null
           category?: string | null
           cost?: number
           created_at?: string
@@ -288,9 +313,12 @@ export type Database = {
           item_type?: string
           location?: string | null
           minimum_quantity?: number
+          model?: string | null
           name?: string
           organization_id?: string
+          part_type?: string | null
           price?: number
+          quality?: string | null
           quantity?: number
           sku?: string | null
           supplier?: string | null
@@ -640,6 +668,7 @@ export type Database = {
           number: number
           organization_id: string
           payment_method: string | null
+          service_order_id: string | null
           sold_at: string
           subtotal: number
           total: number
@@ -656,6 +685,7 @@ export type Database = {
           number?: never
           organization_id: string
           payment_method?: string | null
+          service_order_id?: string | null
           sold_at?: string
           subtotal?: number
           total?: number
@@ -672,6 +702,7 @@ export type Database = {
           number?: never
           organization_id?: string
           payment_method?: string | null
+          service_order_id?: string | null
           sold_at?: string
           subtotal?: number
           total?: number
@@ -690,6 +721,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -1156,6 +1194,7 @@ export type Database = {
         Returns: {
           active: boolean
           branch_id: string | null
+          brand: string | null
           category: string | null
           cost: number
           created_at: string
@@ -1163,9 +1202,12 @@ export type Database = {
           item_type: string
           location: string | null
           minimum_quantity: number
+          model: string | null
           name: string
           organization_id: string
+          part_type: string | null
           price: number
+          quality: string | null
           quantity: number
           sku: string | null
           supplier: string | null
@@ -1200,6 +1242,7 @@ export type Database = {
           number: number
           organization_id: string
           payment_method: string | null
+          service_order_id: string | null
           sold_at: string
           subtotal: number
           total: number
@@ -1212,9 +1255,34 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_pos_sale_compat: {
+        Args: {
+          _customer_id: string
+          _department: string
+          _discount: number
+          _items: Json
+          _notes: string
+          _organization_id: string
+          _payment_method: string
+          _sale_type: string
+        }
+        Returns: string
+      }
+      delete_sale_record: { Args: { _sale_id: string }; Returns: boolean }
       ensure_user_organization: { Args: never; Returns: string }
       is_org_member: { Args: { _organization_id: string }; Returns: boolean }
       is_platform_owner: { Args: never; Returns: boolean }
+      issue_service_order_warranty: {
+        Args: {
+          _coverage: string
+          _expires_at: string
+          _order_id: string
+          _organization_id: string
+          _starts_at: string
+          _terms?: string
+        }
+        Returns: Json
+      }
       move_inventory: {
         Args: {
           _inventory_item_id: string
@@ -1226,6 +1294,7 @@ export type Database = {
         Returns: {
           active: boolean
           branch_id: string | null
+          brand: string | null
           category: string | null
           cost: number
           created_at: string
@@ -1233,9 +1302,12 @@ export type Database = {
           item_type: string
           location: string | null
           minimum_quantity: number
+          model: string | null
           name: string
           organization_id: string
+          part_type: string | null
           price: number
+          quality: string | null
           quantity: number
           sku: string | null
           supplier: string | null
@@ -1283,6 +1355,38 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      sync_sale_income: {
+        Args: {
+          _amount: number
+          _department: string
+          _description: string
+          _organization_id: string
+          _payment_method: string
+          _sale_id: string
+        }
+        Returns: undefined
+      }
+      update_inventory_item_metadata: {
+        Args: {
+          _brand: string
+          _inventory_item_id: string
+          _item_type: string
+          _model: string
+          _organization_id: string
+          _part_type: string
+          _quality: string
+        }
+        Returns: boolean
+      }
+      update_sale_record: {
+        Args: {
+          _notes: string
+          _payment_method: string
+          _sale_id: string
+          _total: number
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "owner" | "admin" | "attendant" | "technician" | "finance"
@@ -1304,6 +1408,8 @@ export type Database = {
         | "cancelled"
         | "no_repair"
         | "warranty_return"
+        | "in_progress"
+        | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1450,6 +1556,8 @@ export const Constants = {
         "cancelled",
         "no_repair",
         "warranty_return",
+        "in_progress",
+        "completed",
       ],
     },
   },

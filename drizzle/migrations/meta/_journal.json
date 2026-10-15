@@ -8,6 +8,41 @@
       "when": 1791646702173,
       "tag": "0000_secure_subscription_checkout",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792025404842,
+      "tag": "0001_inventory_item_metadata",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792025417718,
+      "tag": "0002_service_order_status_compatibility",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792025460845,
+      "tag": "0003_warranty_sales_and_inventory_reliability",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792025524457,
+      "tag": "0004_finance_warranty_schema_compatibility",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792025575781,
+      "tag": "0005_fix_consume_inventory_generated_total",
+      "breakpoints": true
     }
   ]
 }
