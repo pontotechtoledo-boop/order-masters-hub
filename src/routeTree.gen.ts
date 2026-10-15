@@ -17,6 +17,7 @@ import { Route as PlanosRouteImport } from './routes/planos'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAssinaturaRouteImport } from './routes/_authenticated/assinatura'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as OrcamentoTokenRouteImport } from './routes/orcamento.$token'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -58,6 +59,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const OrcamentoTokenRoute = OrcamentoTokenRouteImport.update({
+  id: '/orcamento/$token',
+  path: '/orcamento/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/assinatura': typeof AuthenticatedAssinaturaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/orcamento/$token': typeof OrcamentoTokenRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/assinatura': typeof AuthenticatedAssinaturaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/orcamento/$token': typeof OrcamentoTokenRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/assinatura': typeof AuthenticatedAssinaturaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/orcamento/$token': typeof OrcamentoTokenRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/assinatura'
     | '/dashboard'
+    | '/orcamento/$token'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/assinatura'
     | '/dashboard'
+    | '/orcamento/$token'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/assinatura'
     | '/_authenticated/dashboard'
+    | '/orcamento/$token'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -138,6 +150,7 @@ export interface RootRouteChildren {
   CadastroRoute: typeof CadastroRoute
   PlanosRoute: typeof PlanosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  OrcamentoTokenRoute: typeof OrcamentoTokenRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -199,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/orcamento/$token': {
+      id: '/orcamento/$token'
+      path: '/orcamento/$token'
+      fullPath: '/orcamento/$token'
+      preLoaderRoute: typeof OrcamentoTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -229,6 +249,7 @@ const rootRouteChildren: RootRouteChildren = {
   CadastroRoute: CadastroRoute,
   PlanosRoute: PlanosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  OrcamentoTokenRoute: OrcamentoTokenRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport

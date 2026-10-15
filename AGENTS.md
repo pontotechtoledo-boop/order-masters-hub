@@ -18,3 +18,6 @@
 - Reuse operational-list helpers for initial limits and customer/order searches so the three operational lists follow the same rules.
 - Use warranties.order_number for the public number and retain warranties.code as the unique authenticity identifier; different organizations can have the same OS number.
 - Persist service-order edits through edit_service_order so equipment, totals and existing financial income update atomically.
+- Store order photos in private storage with organization/order-scoped metadata and refresh signed URLs when opening documents to preserve confidentiality and printable access.
+- Issue immutable quote snapshots through authenticated RPCs and accept decisions through random expiring capability tokens with locked transactional order validation to avoid approving changed amounts.
+- Share paper-size settings across OS and warranty printing so standard and thermal printers use the same document content.
