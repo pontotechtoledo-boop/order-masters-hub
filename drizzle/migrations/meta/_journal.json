@@ -36,6 +36,13 @@
       "when": 1792025524457,
       "tag": "0004_finance_warranty_schema_compatibility",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792025575781,
+      "tag": "0005_fix_consume_inventory_generated_total",
+      "breakpoints": true
     }
   ]
 }
