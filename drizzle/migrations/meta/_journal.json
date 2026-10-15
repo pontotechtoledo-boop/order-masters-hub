@@ -29,6 +29,13 @@
       "when": 1792025460845,
       "tag": "0003_warranty_sales_and_inventory_reliability",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792025524457,
+      "tag": "0004_finance_warranty_schema_compatibility",
+      "breakpoints": true
     }
   ]
 }

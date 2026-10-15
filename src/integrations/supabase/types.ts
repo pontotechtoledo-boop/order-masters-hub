@@ -168,16 +168,19 @@ export type Database = {
           branch_id: string | null
           category: string
           created_at: string
+          created_by: string | null
           department: string
           description: string
           due_date: string | null
           entry_date: string
           entry_type: Database["public"]["Enums"]["financial_type"]
           id: string
+          notes: string | null
           order_id: string | null
           organization_id: string
           paid_at: string | null
           payment_method: string | null
+          sale_id: string | null
           status: Database["public"]["Enums"]["financial_status"]
           updated_at: string
         }
@@ -186,16 +189,19 @@ export type Database = {
           branch_id?: string | null
           category: string
           created_at?: string
+          created_by?: string | null
           department?: string
           description: string
           due_date?: string | null
           entry_date?: string
           entry_type: Database["public"]["Enums"]["financial_type"]
           id?: string
+          notes?: string | null
           order_id?: string | null
           organization_id: string
           paid_at?: string | null
           payment_method?: string | null
+          sale_id?: string | null
           status?: Database["public"]["Enums"]["financial_status"]
           updated_at?: string
         }
@@ -204,16 +210,19 @@ export type Database = {
           branch_id?: string | null
           category?: string
           created_at?: string
+          created_by?: string | null
           department?: string
           description?: string
           due_date?: string | null
           entry_date?: string
           entry_type?: Database["public"]["Enums"]["financial_type"]
           id?: string
+          notes?: string | null
           order_id?: string | null
           organization_id?: string
           paid_at?: string | null
           payment_method?: string | null
+          sale_id?: string | null
           status?: Database["public"]["Enums"]["financial_status"]
           updated_at?: string
         }
@@ -237,6 +246,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_entries_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
             referencedColumns: ["id"]
           },
         ]
@@ -1239,6 +1255,19 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_pos_sale_compat: {
+        Args: {
+          _customer_id: string
+          _department: string
+          _discount: number
+          _items: Json
+          _notes: string
+          _organization_id: string
+          _payment_method: string
+          _sale_type: string
+        }
+        Returns: string
+      }
       delete_sale_record: { Args: { _sale_id: string }; Returns: boolean }
       ensure_user_organization: { Args: never; Returns: string }
       is_org_member: { Args: { _organization_id: string }; Returns: boolean }
@@ -1325,6 +1354,17 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      sync_sale_income: {
+        Args: {
+          _amount: number
+          _department: string
+          _description: string
+          _organization_id: string
+          _payment_method: string
+          _sale_id: string
+        }
+        Returns: undefined
       }
       update_inventory_item_metadata: {
         Args: {
