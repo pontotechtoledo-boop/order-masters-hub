@@ -245,6 +245,7 @@ export type Database = {
         Row: {
           active: boolean
           branch_id: string | null
+          brand: string | null
           category: string | null
           cost: number
           created_at: string
@@ -252,9 +253,12 @@ export type Database = {
           item_type: string
           location: string | null
           minimum_quantity: number
+          model: string | null
           name: string
           organization_id: string
+          part_type: string | null
           price: number
+          quality: string | null
           quantity: number
           sku: string | null
           supplier: string | null
@@ -263,6 +267,7 @@ export type Database = {
         Insert: {
           active?: boolean
           branch_id?: string | null
+          brand?: string | null
           category?: string | null
           cost?: number
           created_at?: string
@@ -270,9 +275,12 @@ export type Database = {
           item_type?: string
           location?: string | null
           minimum_quantity?: number
+          model?: string | null
           name: string
           organization_id: string
+          part_type?: string | null
           price?: number
+          quality?: string | null
           quantity?: number
           sku?: string | null
           supplier?: string | null
@@ -281,6 +289,7 @@ export type Database = {
         Update: {
           active?: boolean
           branch_id?: string | null
+          brand?: string | null
           category?: string | null
           cost?: number
           created_at?: string
@@ -288,9 +297,12 @@ export type Database = {
           item_type?: string
           location?: string | null
           minimum_quantity?: number
+          model?: string | null
           name?: string
           organization_id?: string
+          part_type?: string | null
           price?: number
+          quality?: string | null
           quantity?: number
           sku?: string | null
           supplier?: string | null
@@ -1156,6 +1168,7 @@ export type Database = {
         Returns: {
           active: boolean
           branch_id: string | null
+          brand: string | null
           category: string | null
           cost: number
           created_at: string
@@ -1163,9 +1176,12 @@ export type Database = {
           item_type: string
           location: string | null
           minimum_quantity: number
+          model: string | null
           name: string
           organization_id: string
+          part_type: string | null
           price: number
+          quality: string | null
           quantity: number
           sku: string | null
           supplier: string | null
@@ -1226,6 +1242,7 @@ export type Database = {
         Returns: {
           active: boolean
           branch_id: string | null
+          brand: string | null
           category: string | null
           cost: number
           created_at: string
@@ -1233,9 +1250,12 @@ export type Database = {
           item_type: string
           location: string | null
           minimum_quantity: number
+          model: string | null
           name: string
           organization_id: string
+          part_type: string | null
           price: number
+          quality: string | null
           quantity: number
           sku: string | null
           supplier: string | null

@@ -8,6 +8,13 @@
       "when": 1791646702173,
       "tag": "0000_secure_subscription_checkout",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792025404842,
+      "tag": "0001_inventory_item_metadata",
+      "breakpoints": true
     }
   ]
 }
