@@ -43,6 +43,13 @@
       "when": 1792025575781,
       "tag": "0005_fix_consume_inventory_generated_total",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792026210650,
+      "tag": "0006_prevent_duplicate_customer_document",
+      "breakpoints": true
     }
   ]
 }
