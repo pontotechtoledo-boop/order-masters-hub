@@ -50,6 +50,13 @@
       "when": 1792026210650,
       "tag": "0006_prevent_duplicate_customer_document",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792031768796,
+      "tag": "0007_warranty_order_number_and_safe_order_edit",
+      "breakpoints": true
     }
   ]
 }
