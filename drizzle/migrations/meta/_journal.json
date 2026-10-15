@@ -15,6 +15,13 @@
       "when": 1792025404842,
       "tag": "0001_inventory_item_metadata",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792025417718,
+      "tag": "0002_service_order_status_compatibility",
+      "breakpoints": true
     }
   ]
 }
