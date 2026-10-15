@@ -1,5 +1,13 @@
 # Roadmap PontoTech Toledo
 
+## Fotos, orçamento e ajustes atuais
+- [ ] Seleção de garantia com cinco OS recentes e busca por número, nome e CPF
+- [ ] Persistir fotos privadas e incluí-las nas miniaturas da impressão
+- [ ] Oferecer formatos A4, térmica 80 mm e 58 mm para OS e garantia
+- [ ] Implementar orçamento por link com aprovação/recusa registrada
+- [ ] Fechar menu no celular ao navegar, corrigir margens e simplificar Administração
+- [ ] Validar gravação, recarga, decisão do cliente e impressão
+
 ## Listas, numeração e revisão de edição
 - [x] Limitar garantias, histórico de vendas e aparelhos em loja a cinco sem filtros
 - [x] Pesquisar garantias e aparelhos por número da OS, nome e CPF; vendas por datas
