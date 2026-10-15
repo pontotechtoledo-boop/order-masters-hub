@@ -10,7 +10,7 @@ type Entry = {id:string;entry_type:string;department:string;category:string;desc
 type Company = {name:string;document:string;phone:string;address:string;email:string;logoUrl:string};
 type Period = {from:string;to:string};
 const money=(n:number)=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-const key=(value:string)=>{if(/^\d{4}-\d{2}-\d{2}$/.test(value||""))return value;const d=new Date(value);if(Number.isNaN(d.getTime()))return "";return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const key=(value:string)=>{if(/^\d{4}-\d{2}-\d{2}$/.test(value||""))return value;if(/^\d{4}-\d{2}-\d{2}[T ]00:00(:00(\.0+)?)?(Z|[+-]00(:?00)?)?$/.test(value||""))return value.slice(0,10);const d=new Date(value);if(Number.isNaN(d.getTime()))return "";return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const safe=(v:string)=>String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]||c));
 const categories=[{value:"parts",label:"Compra de peças"},{value:"store",label:"Compra de produtos da loja"},{value:"supplier",label:"Fornecedor"},{value:"unexpected",label:"Imprevistos"},{value:"loss",label:"Prejuízos"},{value:"other",label:"Outros"}];
