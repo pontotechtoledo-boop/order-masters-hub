@@ -1092,6 +1092,7 @@ export type Database = {
           expires_at: string
           id: string
           order_id: string
+          order_number: number | null
           organization_id: string
           sent_at: string | null
           starts_at: string
@@ -1106,6 +1107,7 @@ export type Database = {
           expires_at: string
           id?: string
           order_id: string
+          order_number?: number | null
           organization_id: string
           sent_at?: string | null
           starts_at?: string
@@ -1120,6 +1122,7 @@ export type Database = {
           expires_at?: string
           id?: string
           order_id?: string
+          order_number?: number | null
           organization_id?: string
           sent_at?: string | null
           starts_at?: string
@@ -1269,6 +1272,10 @@ export type Database = {
         Returns: string
       }
       delete_sale_record: { Args: { _sale_id: string }; Returns: boolean }
+      edit_service_order: {
+        Args: { _changes: Json; _order_id: string }
+        Returns: Json
+      }
       ensure_user_organization: { Args: never; Returns: string }
       is_org_member: { Args: { _organization_id: string }; Returns: boolean }
       is_platform_owner: { Args: never; Returns: boolean }
