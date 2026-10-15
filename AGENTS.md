@@ -15,3 +15,6 @@
 - Resolve checkout through authenticated server-created transactions bound to the organization's authorized billing manager; never trust checkout custom data supplied directly by the browser.
 - Reuse the subscription page in the dashboard and dedicated authenticated billing route so both entry points share checkout and status behavior.
 - Route all dashboard section selections through one navigation handler so sidebar expansion and scroll reset stay consistent across menus and quick actions.
+- Reuse operational-list helpers for initial limits and customer/order searches so the three operational lists follow the same rules.
+- Use warranties.order_number for the public number and retain warranties.code as the unique authenticity identifier; different organizations can have the same OS number.
+- Persist service-order edits through edit_service_order so equipment, totals and existing financial income update atomically.
