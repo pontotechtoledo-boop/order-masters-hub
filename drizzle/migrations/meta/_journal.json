@@ -22,6 +22,13 @@
       "when": 1792025417718,
       "tag": "0002_service_order_status_compatibility",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792025460845,
+      "tag": "0003_warranty_sales_and_inventory_reliability",
+      "breakpoints": true
     }
   ]
 }

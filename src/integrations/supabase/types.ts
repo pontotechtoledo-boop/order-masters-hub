@@ -652,6 +652,7 @@ export type Database = {
           number: number
           organization_id: string
           payment_method: string | null
+          service_order_id: string | null
           sold_at: string
           subtotal: number
           total: number
@@ -668,6 +669,7 @@ export type Database = {
           number?: never
           organization_id: string
           payment_method?: string | null
+          service_order_id?: string | null
           sold_at?: string
           subtotal?: number
           total?: number
@@ -684,6 +686,7 @@ export type Database = {
           number?: never
           organization_id?: string
           payment_method?: string | null
+          service_order_id?: string | null
           sold_at?: string
           subtotal?: number
           total?: number
@@ -702,6 +705,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -1216,6 +1226,7 @@ export type Database = {
           number: number
           organization_id: string
           payment_method: string | null
+          service_order_id: string | null
           sold_at: string
           subtotal: number
           total: number
@@ -1228,9 +1239,21 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      delete_sale_record: { Args: { _sale_id: string }; Returns: boolean }
       ensure_user_organization: { Args: never; Returns: string }
       is_org_member: { Args: { _organization_id: string }; Returns: boolean }
       is_platform_owner: { Args: never; Returns: boolean }
+      issue_service_order_warranty: {
+        Args: {
+          _coverage: string
+          _expires_at: string
+          _order_id: string
+          _organization_id: string
+          _starts_at: string
+          _terms?: string
+        }
+        Returns: Json
+      }
       move_inventory: {
         Args: {
           _inventory_item_id: string
@@ -1302,6 +1325,27 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      update_inventory_item_metadata: {
+        Args: {
+          _brand: string
+          _inventory_item_id: string
+          _item_type: string
+          _model: string
+          _organization_id: string
+          _part_type: string
+          _quality: string
+        }
+        Returns: boolean
+      }
+      update_sale_record: {
+        Args: {
+          _notes: string
+          _payment_method: string
+          _sale_id: string
+          _total: number
+        }
+        Returns: boolean
       }
     }
     Enums: {
