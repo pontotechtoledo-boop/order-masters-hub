@@ -1,5 +1,11 @@
 # Roadmap PontoTech Toledo
 
+## Listas, numeração e revisão de edição
+- [ ] Limitar garantias, histórico de vendas e aparelhos em loja a cinco sem filtros
+- [ ] Pesquisar garantias e aparelhos por número da OS, nome e CPF; vendas por datas
+- [ ] Vincular automaticamente o número da garantia à OS no banco e na emissão
+- [ ] Revisar edição de OS, garantias e clientes e validar os fluxos
+
 ## Ajustes de navegação e garantia
 - [x] Remover cabeçalhos repetidos e manter boas-vindas somente na Visão geral
 - [x] Corrigir corte horizontal da janela de garantia e manter um botão de emissão na aba
