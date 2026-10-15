@@ -464,6 +464,108 @@ export type Database = {
           },
         ]
       }
+      order_photos: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          organization_id: string
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          organization_id: string
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          organization_id?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_photos_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_photos_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_quotes: {
+        Row: {
+          amount: number
+          company_name: string
+          created_at: string
+          decided_at: string | null
+          description: string
+          device: string
+          expires_at: string
+          id: string
+          order_id: string
+          order_number: number
+          organization_id: string
+          status: string
+          token: string
+        }
+        Insert: {
+          amount: number
+          company_name: string
+          created_at?: string
+          decided_at?: string | null
+          description: string
+          device: string
+          expires_at?: string
+          id?: string
+          order_id: string
+          order_number: number
+          organization_id: string
+          status?: string
+          token?: string
+        }
+        Update: {
+          amount?: number
+          company_name?: string
+          created_at?: string
+          decided_at?: string | null
+          description?: string
+          device?: string
+          expires_at?: string
+          id?: string
+          order_id?: string
+          order_number?: number
+          organization_id?: string
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_quotes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_quotes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           active: boolean
@@ -1223,6 +1325,30 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_order_quote: {
+        Args: { _order_id: string }
+        Returns: {
+          amount: number
+          company_name: string
+          created_at: string
+          decided_at: string | null
+          description: string
+          device: string
+          expires_at: string
+          id: string
+          order_id: string
+          order_number: number
+          organization_id: string
+          status: string
+          token: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_pos_sale: {
         Args: {
           _customer_id: string
@@ -1270,6 +1396,10 @@ export type Database = {
           _sale_type: string
         }
         Returns: string
+      }
+      decide_order_quote: {
+        Args: { _decision: string; _token: string }
+        Returns: Json
       }
       delete_sale_record: { Args: { _sale_id: string }; Returns: boolean }
       edit_service_order: {
@@ -1337,6 +1467,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      read_order_quote: { Args: { _token: string }; Returns: Json }
       reserve_subscription_checkout: {
         Args: {
           _environment: string
