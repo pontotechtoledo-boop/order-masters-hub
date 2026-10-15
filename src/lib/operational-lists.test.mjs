@@ -21,4 +21,6 @@ test("consulta por OS, nome ou CPF", () => {
   expect(matchesOrderSearch("joao", "OS-123", "João Silva", "123.456.789-09")).toBe(true);
   expect(matchesOrderSearch("12345678909", "OS-123", "João Silva", "123.456.789-09")).toBe(true);
   expect(matchesOrderSearch("999", "OS-123", "João Silva", "123.456.789-09")).toBe(false);
+  expect(matchesOrderSearch("OS-8", "OS-13", "Ana", "13366851902")).toBe(false);
+  expect(matchesOrderSearch("OS-8", "OS-8", "Ana", "13366851902")).toBe(true);
 });

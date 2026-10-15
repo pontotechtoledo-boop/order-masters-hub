@@ -10,6 +10,7 @@ export function matchesOrderSearch(query: string, number: string, name: string, 
   if (!text) return true;
   if (/^(?:os\s*[-#]?\s*|#)?\d+$/i.test(text)) {
     const digits = text.replace(/\D/g, "");
+    if (/^(?:os|#)/i.test(text)) return Number(number.replace(/\D/g, "")) === Number(digits);
     return Number(number.replace(/\D/g, "")) === Number(digits) || document.replace(/\D/g, "").includes(digits);
   }
   const digits = text.replace(/\D/g, "");
