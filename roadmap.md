@@ -1,5 +1,11 @@
 # Roadmap PontoTech Toledo
 
+## Ajustes de navegação e garantia
+- [x] Remover cabeçalhos repetidos e manter boas-vindas somente na Visão geral
+- [x] Corrigir corte horizontal da janela de garantia e manter um botão de emissão na aba
+- [x] Expandir o menu e voltar ao topo ao selecionar abas ou cartões
+- [x] Validar os ajustes no computador e celular
+
 - [x] Ativar dados e acesso seguro
 - [x] Criar estrutura visual e navegação responsiva
 - [x] Implementar painel operacional
