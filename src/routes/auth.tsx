@@ -4,6 +4,8 @@ import { ArrowRight, CheckCircle2, ClipboardCheck, Eye, EyeOff, LockKeyhole, Mai
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { signInWithIdentifier } from "@/utils/login.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [
@@ -20,9 +22,9 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const [identifier,setIdentifier]=useState(""),[password,setPassword]=useState(""),[show,setShow]=useState(false),[loading,setLoading]=useState(false),[message,setMessage]=useState("");
-  const resolveEmail=(value:string)=>{const normalized=value.trim().toLocaleUpperCase("pt-BR");const usernames:Record<string,string>={"MT6 CELULARES":"mt6celular1543@gmail.com","PONTO TECH ASSISTENCIA TECNICA":"pontotechtoledo@gmail.com"};return usernames[normalized]??value.trim()};
-  const submit=async(e:React.FormEvent)=>{e.preventDefault();setLoading(true);setMessage("");const loginEmail=resolveEmail(identifier);const {error}=await supabase.auth.signInWithPassword({email:loginEmail,password});setLoading(false);if(error){setMessage("Usuário/e-mail ou senha inválidos.");return}navigate({to:"/dashboard",replace:true})};
-  const forgot=async()=>{if(!identifier){setMessage("Digite seu e-mail para recuperar a senha.");return}const recoveryEmail=resolveEmail(identifier);if(!recoveryEmail.includes("@")){setMessage("Para recuperar a senha, informe o e-mail cadastrado.");return}const {error}=await supabase.auth.resetPasswordForEmail(recoveryEmail,{redirectTo:`${window.location.origin}/reset-password`});setMessage(error?"Não foi possível enviar o e-mail.":"Se o e-mail estiver cadastrado, você receberá as instruções.")};
+  const signIn=useServerFn(signInWithIdentifier);
+  const submit=async(e:React.FormEvent)=>{e.preventDefault();setLoading(true);setMessage("");try{const r=await signIn({data:{identifier,password}});if(!r.ok){setMessage("Usuário/e-mail ou senha inválidos.");return}const {error}=await supabase.auth.setSession({access_token:r.access_token,refresh_token:r.refresh_token});if(error){setMessage("Não foi possível entrar. Tente novamente.");return}navigate({to:"/dashboard",replace:true})}catch{setMessage("Não foi possível entrar. Tente novamente.")}finally{setLoading(false)}};
+  const forgot=async()=>{if(!identifier){setMessage("Digite seu e-mail para recuperar a senha.");return}const recoveryEmail=identifier.trim();if(!recoveryEmail.includes("@")){setMessage("Para recuperar a senha, informe o e-mail cadastrado.");return}const {error}=await supabase.auth.resetPasswordForEmail(recoveryEmail,{redirectTo:`${window.location.origin}/reset-password`});setMessage(error?"Não foi possível enviar o e-mail.":"Se o e-mail estiver cadastrado, você receberá as instruções.")};
   return <main className="min-h-screen bg-background lg:grid lg:grid-cols-[minmax(30rem,0.92fr)_minmax(34rem,1.08fr)]">
     <section className="flex min-h-screen items-center px-6 py-10 sm:px-12 lg:px-[clamp(3rem,7vw,8rem)]">
       <div className="mx-auto w-full max-w-md lg:mx-0">

@@ -59,6 +59,7 @@ export function SubscriptionPage({ organizationId, embedded = false }: { organiz
       {sub?.cancel_at_period_end && <p role="status" className="border-l-4 border-primary bg-accent p-4 text-sm">Cancelamento agendado. Seu acesso permanece até {date(sub.current_period_end)}; não haverá renovação.</p>}
       {sub?.status === "pending" && <p role="status" className="bg-warning-soft p-4 text-sm text-warning">Aguardando a confirmação oficial do pagamento. A situação será atualizada automaticamente.</p>}
       {sub?.status === "past_due" && <p role="status" className="bg-warning-soft p-4 text-sm text-warning">Regularize seu pagamento na gestão da assinatura.{sub.first_failed_at && ` Prazo de tolerância: ${date(new Date(Date.parse(sub.first_failed_at) + 7 * 86400000).toISOString())}.`}</p>}
+      {actionError && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{actionError}</p>}
       <section>
         <div className="mb-4"><h2 className="font-display text-lg font-semibold">{existing ? "Ciclos disponíveis" : "Escolha seu plano"}</h2><p className="mt-1 text-sm text-muted-foreground">Os mesmos recursos em todos os ciclos. Uma assinatura por empresa.</p></div>
         <div className="grid gap-4 md:grid-cols-3">{subscriptionPlans.map(plan => <article key={plan.id} className={`flex flex-col rounded-lg border bg-card p-5 ${plan.id === "pontotech_quarterly" ? "border-primary shadow-brand" : "shadow-card"}`}>
@@ -71,7 +72,6 @@ export function SubscriptionPage({ organizationId, embedded = false }: { organiz
       </section>
       {existing && data?.canManage && <Button onClick={manage} disabled={portalLoading}><ExternalLink />{portalLoading ? "Abrindo…" : "Gerenciar assinatura e cobranças"}</Button>}
       {!data?.canManage && <p className="text-sm text-muted-foreground">A contratação e a gestão ficam disponíveis para o proprietário ou administrador da empresa.</p>}
-      {actionError && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{actionError}</p>}
       <footer className="flex flex-wrap items-start gap-2 border-t pt-5 text-xs leading-5 text-muted-foreground"><ShieldCheck className="mt-0.5 size-4 shrink-0" /><p>Pagamento seguro pelo Paddle. As formas disponíveis aparecem no pagamento.<br />Renovação automática. Ao cancelar, seu acesso permanece até o fim do período pago.</p></footer>
     </>}
   </div>;
