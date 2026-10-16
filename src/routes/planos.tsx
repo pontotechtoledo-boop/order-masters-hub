@@ -33,7 +33,7 @@ function LandingPage() {
     { name: "Anual", price: "R$ 299,90", period: "/ano", detail: "Melhor custo no longo prazo", featured: true },
   ];
 
-  return <main className="min-h-screen overflow-hidden bg-background text-foreground">
+  return <main className="min-h-screen overflow-x-clip bg-background text-foreground">
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <a href="/planos" className="flex items-center gap-3" aria-label="Service Pro OS - início">
