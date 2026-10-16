@@ -64,6 +64,13 @@
       "when": 1792034143424,
       "tag": "0008_order_photos_and_quote_approval",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792114459103,
+      "tag": "0009_expired_trial_write_guard",
+      "breakpoints": true
     }
   ]
 }

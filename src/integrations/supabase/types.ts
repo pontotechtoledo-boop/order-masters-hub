@@ -1457,6 +1457,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      organization_has_write_access: {
+        Args: { _org: string }
+        Returns: boolean
+      }
       process_subscription_payment: {
         Args: {
           _environment: string
