@@ -21,7 +21,7 @@ export const signInWithIdentifier = createServerFn({ method: "POST" })
     const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
     const client = createClient(process.env["SUPABASE_URL"]!, key, {
       auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-      global: key.startsWith("sb_") ? { fetch: (url, init) => { const h = new Headers(init?.headers); if (h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization"); h.set("apikey", key); return fetch(url, { ...init, headers: h }); } } : undefined,
+      global: key.startsWith("sb_") ? { fetch: (url, init) => { const h = new Headers(init?.headers); if (h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization"); h.set("apikey", key); return fetch(url, { ...init, headers: h }); } } : {},
     });
     const { data: session, error } = await client.auth.signInWithPassword({ email, password: data.password });
     if (error || !session.session) return fail;
