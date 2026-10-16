@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 // Substituir pelos dados oficiais da empresa assim que forem enviados.
 export const SELLER = {
   legalName: "[RAZÃO SOCIAL DA EMPRESA]",
-  tradeName: "PontoTech Toledo",
+  tradeName: "Service Pro OS",
   document: "[CNPJ/CPF]",
   address: "[ENDEREÇO COMPLETO]",
   email: "pontotechtoledo@gmail.com",

@@ -6,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [
-    { title: "Redefinir senha | PontoTech" },
-    { name: "description", content: "Defina uma nova senha para seu acesso ao PontoTech." },
-    { property: "og:title", content: "Redefinir senha | PontoTech" },
+    { title: "Redefinir senha | Service Pro OS" },
+    { name: "description", content: "Defina uma nova senha para seu acesso ao Service Pro OS." },
+    { property: "og:title", content: "Redefinir senha | Service Pro OS" },
     { property: "og:description", content: "Recupere seu acesso ao sistema." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

@@ -3,9 +3,9 @@ import { LegalPage, SELLER } from "@/components/legal-page";
 
 export const Route = createFileRoute("/privacidade")({
   head: () => ({ meta: [
-    { title: "Política de Privacidade — PontoTech Toledo" },
-    { name: "description", content: "Como o PontoTech Toledo coleta, usa e protege dados pessoais." },
-    { property: "og:title", content: "Política de Privacidade — PontoTech Toledo" },
+    { title: "Política de Privacidade — Service Pro OS" },
+    { name: "description", content: "Como o Service Pro OS coleta, usa e protege dados pessoais." },
+    { property: "og:title", content: "Política de Privacidade — Service Pro OS" },
     { property: "og:description", content: "Tratamento de dados pessoais conforme a LGPD." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

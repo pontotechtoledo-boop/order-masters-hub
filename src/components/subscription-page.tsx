@@ -56,7 +56,7 @@ export function SubscriptionPage({ organizationId, embedded = false }: { organiz
   return <div className="space-y-6">
     <PaymentTestModeBanner />
     <header className="flex flex-wrap items-start justify-between gap-3">
-      <div><p className="mb-2 text-xs font-semibold text-primary">PontoTech Toledo · {data?.organization.name ?? "Sua empresa"}</p>{!embedded && <h1 className="font-display text-2xl font-bold">Minha assinatura</h1>}<p className="mt-2 text-sm text-muted-foreground">{existing ? "Seu plano, vencimento e cobranças." : "Escolha o ciclo para continuar com sua assistência."}</p></div>
+      <div><p className="mb-2 text-xs font-semibold text-primary">Service Pro OS · {data?.organization.name ?? "Sua empresa"}</p>{!embedded && <h1 className="font-display text-2xl font-bold">Minha assinatura</h1>}<p className="mt-2 text-sm text-muted-foreground">{existing ? "Seu plano, vencimento e cobranças." : "Escolha o ciclo para continuar com sua assistência."}</p></div>
       <Button variant="ghost" size="icon" aria-label="Atualizar assinatura" title="Atualizar assinatura" onClick={() => refetch()} disabled={isFetching}><RefreshCw className={isFetching ? "animate-spin" : ""} /></Button>
     </header>
     {isPending ? <p className="flex items-center gap-2 py-10 text-muted-foreground"><LoaderCircle className="size-4 animate-spin" /> Consultando assinatura…</p> : error ? <div role="alert" className="border-l-4 border-destructive bg-destructive/5 p-4"><p className="text-sm text-destructive">{error.message}</p><Button variant="outline" className="mt-3" onClick={() => refetch()}>Tentar novamente</Button></div> : <>
