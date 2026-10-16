@@ -40,7 +40,12 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
     try {
       const response = await gatewayFetch(data.environment, "/transactions", { method: "POST", body: JSON.stringify({ items: [{ price_id: price.id, quantity: 1 }], collection_mode: "automatic", custom_data: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId } }) });
       const result = await response.json() as { data?: { id: string }; error?: { detail?: string } };
-      if (!response.ok || !result.data?.id) throw new Error("Não foi possível preparar o pagamento. Tente novamente.");
+      if (!response.ok || !result.data?.id) {
+        const code = (result as { error?: { code?: string } }).error?.code;
+        console.error("Paddle transaction failed", response.status, code);
+        if (code === "transaction_checkout_not_enabled") throw new Error("Os pagamentos ainda estão em fase de liberação. Em breve a contratação estará disponível.");
+        throw new Error("Não foi possível preparar o pagamento. Tente novamente.");
+      }
       const transactionId = result.data.id;
       const { error: saveError } = await supabaseAdmin.from("subscription_checkouts").update({ paddle_transaction_id: transactionId }).eq("id", intent.id);
       if (saveError) throw new Error("Não foi possível vincular o pagamento à empresa.");
