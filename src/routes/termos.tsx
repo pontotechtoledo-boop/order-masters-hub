@@ -3,9 +3,9 @@ import { LegalPage, SELLER } from "@/components/legal-page";
 
 export const Route = createFileRoute("/termos")({
   head: () => ({ meta: [
-    { title: "Termos de Uso — PontoTech Toledo" },
-    { name: "description", content: "Termos de uso do sistema PontoTech Toledo para assistências técnicas." },
-    { property: "og:title", content: "Termos de Uso — PontoTech Toledo" },
+    { title: "Termos de Uso — Service Pro OS" },
+    { name: "description", content: "Termos de uso do sistema Service Pro OS para assistências técnicas." },
+    { property: "og:title", content: "Termos de Uso — Service Pro OS" },
     { property: "og:description", content: "Condições para uso do sistema de ordens de serviço e garantias." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

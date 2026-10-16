@@ -3,9 +3,9 @@ import { LegalPage, SELLER } from "@/components/legal-page";
 
 export const Route = createFileRoute("/reembolso")({
   head: () => ({ meta: [
-    { title: "Política de Reembolso — PontoTech Toledo" },
-    { name: "description", content: "Prazo de 14 dias para reembolso das assinaturas do PontoTech Toledo." },
-    { property: "og:title", content: "Política de Reembolso — PontoTech Toledo" },
+    { title: "Política de Reembolso — Service Pro OS" },
+    { name: "description", content: "Prazo de 14 dias para reembolso das assinaturas do Service Pro OS." },
+    { property: "og:title", content: "Política de Reembolso — Service Pro OS" },
     { property: "og:description", content: "Como pedir reembolso da sua assinatura." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

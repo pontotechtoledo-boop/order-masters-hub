@@ -8,9 +8,9 @@ import { Check, X, Wrench } from 'lucide-react';
 export const Route = createFileRoute('/orcamento/$token')({
   loader: ({ params }) => publicQuote({ data: { token: params.token } }),
   head: () => ({ meta: [
-    { title: 'Orçamento de serviço | PontoTech Toledo' },
+    { title: 'Orçamento de serviço | Service Pro OS' },
     { name: 'description', content: 'Consulte e responda ao orçamento da sua assistência técnica.' },
-    { property: 'og:title', content: 'Orçamento de serviço | PontoTech Toledo' },
+    { property: 'og:title', content: 'Orçamento de serviço | Service Pro OS' },
     { property: 'og:description', content: 'Consulte e responda ao orçamento da sua assistência técnica.' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary' },
