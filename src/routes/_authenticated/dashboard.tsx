@@ -1,6 +1,6 @@
 // @ts-nocheck -- typed DB client lags behind newer tables; runtime behavior unchanged
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Bell, Boxes, Building2, CalendarDays, Check, CircleDollarSign, Receipt,
@@ -132,7 +132,7 @@ function Index(){
   const banner=<>{trialDays!==null&&<div className="border-b bg-accent px-4 py-1.5 text-center text-xs text-accent-foreground"><b>Versão trial</b> · {trialDays} {trialDays===1?"dia restante":"dias restantes"}</div>}{pastDue&&<div role="alert" className="border-b bg-warning-soft px-4 py-1.5 text-center text-xs text-warning"><b>Pagamento pendente</b> · regularize em <a className="underline" href="/assinatura">Minha assinatura</a> para não perder o acesso.</div>}{readOnly&&<div role="alert" className="border-b bg-destructive/10 px-4 py-1.5 text-center text-xs text-destructive"><b>Somente consulta</b> · sua assinatura venceu. Você pode ver e exportar seus dados; para cadastrar ou alterar, <a className="underline" href="/assinatura">renove a assinatura</a>.</div>}</>;
   return <DashboardApp banner={banner}/>;
 }
-function DashboardApp({banner}:{banner?:React.ReactNode}){
+function DashboardApp({banner}:{banner?:ReactNode}){
   const [companyName,setCompanyName]=useState("Sua empresa");
   const [company,setCompany]=useState<CompanySettings>({name:"Sua empresa",document:"",email:"",phone:"",address:"",logoUrl:""});
   const [organizationId,setOrganizationId]=useState<string|null>(null);
