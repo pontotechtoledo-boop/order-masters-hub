@@ -7,7 +7,7 @@ import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { usePaddleCheckout } from "@/hooks/use-paddle-checkout";
 import { getPaddleEnvironment } from "@/lib/paddle";
 import { formatPlanPrice, subscriptionPlans, type PlanId } from "@/lib/subscriptions";
-import { createBillingPortal, getBillingOverview } from "@/utils/subscriptions.functions";
+import { changeSubscriptionPlan, createBillingPortal, getBillingOverview } from "@/utils/subscriptions.functions";
 
 export const billingQueryOptions = (organizationId?: string) => ({
   queryKey: ["subscription", organizationId, getPaddleEnvironment()],
@@ -23,6 +23,16 @@ export function SubscriptionPage({ organizationId, embedded = false }: { organiz
   const [actionError, setActionError] = useState("");
   const [selected, setSelected] = useState<PlanId | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
+  const change = useServerFn(changeSubscriptionPlan);
+  const [changing, setChanging] = useState<PlanId | null>(null);
+  const [notice, setNotice] = useState("");
+  const switchPlan = async (id: PlanId) => {
+    if (!data) return;
+    setActionError(""); setNotice(""); setChanging(id);
+    try { await change({ data: { organizationId: data.organization.id, priceId: id, environment: getPaddleEnvironment() } }); setNotice("Plano alterado. O novo valor passa a valer na próxima renovação, sem cobrança extra agora."); refetch(); }
+    catch (error) { setActionError(error instanceof Error ? error.message : "Não foi possível alterar o plano."); }
+    finally { setChanging(null); }
+  };
   const sub = data?.subscription;
   const trialDays = data?.organization.trial_ends_at ? Math.max(0, Math.ceil((Date.parse(data.organization.trial_ends_at) - Date.now()) / 86400000)) : 0;
   const existing = Boolean(sub && (["active", "trialing", "past_due", "paused", "pending"].includes(sub.status) || data?.paidAccess));
@@ -59,6 +69,7 @@ export function SubscriptionPage({ organizationId, embedded = false }: { organiz
       {sub?.cancel_at_period_end && <p role="status" className="border-l-4 border-primary bg-accent p-4 text-sm">Cancelamento agendado. Seu acesso permanece até {date(sub.current_period_end)}; não haverá renovação.</p>}
       {sub?.status === "pending" && <p role="status" className="bg-warning-soft p-4 text-sm text-warning">Aguardando a confirmação oficial do pagamento. A situação será atualizada automaticamente.</p>}
       {sub?.status === "past_due" && <p role="status" className="bg-warning-soft p-4 text-sm text-warning">Regularize seu pagamento na gestão da assinatura.{sub.first_failed_at && ` Prazo de tolerância: ${date(new Date(Date.parse(sub.first_failed_at) + 7 * 86400000).toISOString())}.`}</p>}
+      {notice && <p role="status" className="rounded-md border border-primary/30 bg-accent p-4 text-sm">{notice}</p>}
       {actionError && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{actionError}</p>}
       <section>
         <div className="mb-4"><h2 className="font-display text-lg font-semibold">{existing ? "Ciclos disponíveis" : "Escolha seu plano"}</h2><p className="mt-1 text-sm text-muted-foreground">Os mesmos recursos em todos os ciclos. Uma assinatura por empresa.</p></div>
@@ -68,11 +79,12 @@ export function SubscriptionPage({ organizationId, embedded = false }: { organiz
           <ul className="my-6 space-y-3 text-sm">{["Ordens de serviço e garantias", "Clientes e equipamentos", "Estoque e financeiro", "Dados da sua empresa"].map(item => <li key={item} className="flex items-center gap-2"><Check className="size-4 shrink-0 text-success" />{item}</li>)}</ul>
           <p className="mb-4 text-xs text-muted-foreground">{plan.renewal} · Tributos incluídos</p>
           {!existing && <Button className="mt-auto w-full" variant={plan.id === "pontotech_quarterly" ? "default" : "outline"} disabled={loading || !data?.canManage} onClick={() => buy(plan.id)}>{loading && selected === plan.id ? <><LoaderCircle className="animate-spin" />Preparando…</> : <><CreditCard />Contratar {plan.name.toLowerCase()}</>}</Button>}
+          {existing && data?.canManage && ["active", "trialing"].includes(sub?.status ?? "") && !sub?.cancel_at_period_end && currentPlan?.id !== plan.id && <Button className="mt-auto w-full" variant="outline" disabled={changing !== null} onClick={() => switchPlan(plan.id)}>{changing === plan.id ? <><LoaderCircle className="animate-spin" />Alterando…</> : <>Mudar para {plan.name.toLowerCase()}</>}</Button>}
         </article>)}</div>
       </section>
       {existing && data?.canManage && <Button onClick={manage} disabled={portalLoading}><ExternalLink />{portalLoading ? "Abrindo…" : "Gerenciar assinatura e cobranças"}</Button>}
       {!data?.canManage && <p className="text-sm text-muted-foreground">A contratação e a gestão ficam disponíveis para o proprietário ou administrador da empresa.</p>}
-      <footer className="flex flex-wrap items-start gap-2 border-t pt-5 text-xs leading-5 text-muted-foreground"><ShieldCheck className="mt-0.5 size-4 shrink-0" /><p>Pagamento seguro pelo Paddle. As formas disponíveis aparecem no pagamento.<br />Renovação automática. Ao cancelar, seu acesso permanece até o fim do período pago.</p></footer>
+      <footer className="flex flex-wrap items-start gap-2 border-t pt-5 text-xs leading-5 text-muted-foreground"><ShieldCheck className="mt-0.5 size-4 shrink-0" /><p>Pagamento seguro pelo Paddle. As formas disponíveis aparecem no pagamento.<br />Renovação automática. Ao cancelar, seu acesso permanece até o fim do período pago. Troca de plano vale na próxima renovação.<br /><a className="underline" href="/termos">Termos</a> · <a className="underline" href="/privacidade">Privacidade</a> · <a className="underline" href="/reembolso">Reembolso</a></p></footer>
     </>}
   </div>;
 }

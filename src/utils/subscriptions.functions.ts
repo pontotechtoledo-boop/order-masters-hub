@@ -70,3 +70,22 @@ export const createBillingPortal = createServerFn({ method: "POST" })
     if (!response.ok || !url || !url.startsWith("https://")) throw new Error("Não foi possível abrir a gestão de cobrança.");
     return { url };
   });
+export const changeSubscriptionPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(value => input.extend({ organizationId: z.string().uuid(), priceId: z.string() }).parse(value))
+  .handler(async ({ data, context }) => {
+    findPlan(data.priceId);
+    const { data: member } = await context.supabase.from("organization_members").select("role").eq("organization_id", data.organizationId).eq("user_id", context.userId).eq("active", true).maybeSingle();
+    if (!member || !["owner", "admin"].includes(member.role)) throw new Error("Somente o proprietário ou administrador pode alterar o plano.");
+    const { data: subscription } = await context.supabase.from("subscriptions").select("paddle_subscription_id,price_id,status").eq("organization_id", data.organizationId).eq("environment", data.environment).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (!subscription || !["active", "trialing"].includes(subscription.status)) throw new Error("Só é possível trocar de plano com a assinatura ativa.");
+    if (subscription.price_id === data.priceId) throw new Error("Este já é o seu plano.");
+    const catalogResponse = await gatewayFetch(data.environment, `/prices?external_id=${encodeURIComponent(data.priceId)}`);
+    type CatalogPrice = Parameters<typeof matchesCatalogPrice>[0] & { id: string };
+    const catalog = await catalogResponse.json() as { data?: CatalogPrice[] };
+    const price = catalog.data?.find(price => matchesCatalogPrice(price, data.priceId));
+    if (!catalogResponse.ok || !price) throw new Error("O preço deste plano ainda não está disponível neste ambiente.");
+    const response = await gatewayFetch(data.environment, `/subscriptions/${subscription.paddle_subscription_id}`, { method: "PATCH", body: JSON.stringify({ items: [{ price_id: price.id, quantity: 1 }], proration_billing_mode: "do_not_bill" }) });
+    if (!response.ok) { console.error("Plan change failed", response.status, await response.text()); throw new Error("Não foi possível alterar o plano. Tente novamente."); }
+    return { ok: true };
+  });
