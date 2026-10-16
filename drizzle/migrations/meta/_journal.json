@@ -71,6 +71,13 @@
       "when": 1792114459103,
       "tag": "0009_expired_trial_write_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792115802817,
+      "tag": "0010_usernames_and_three_day_trial",
+      "breakpoints": true
     }
   ]
 }
