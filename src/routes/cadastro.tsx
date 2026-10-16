@@ -21,6 +21,7 @@ function SignupPage() {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -40,13 +41,25 @@ function SignupPage() {
       setMessage("As senhas não coincidem.");
       return;
     }
+    const cleanUsername = username.trim().replace(/\s+/g, " ");
+    if (cleanUsername.length < 3 || cleanUsername.includes("@")) {
+      setMessage("O nome de usuário precisa ter pelo menos 3 caracteres e não pode conter @.");
+      return;
+    }
     setLoading(true);
+    const { data: available } = await supabase.rpc("username_available", { _username: cleanUsername });
+    if (available === false) {
+      setLoading(false);
+      setMessage("Este nome de usuário já está em uso. Escolha outro.");
+      return;
+    }
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
       options: {
         data: {
           full_name: fullName.trim(),
+          username: cleanUsername,
           company_name: companyName.trim(),
         },
         emailRedirectTo: `${window.location.origin}/dashboard`,
@@ -91,6 +104,10 @@ function SignupPage() {
         </label>
         <label className="grid gap-2 text-sm font-medium">Nome da empresa
           <div className="relative"><Building2 className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input className="pl-10" autoComplete="organization" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Nome da sua assistência" required /></div>
+        </label>
+        <label className="grid gap-2 text-sm font-medium">Nome de usuário
+          <div className="relative"><UserRound className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input className="pl-10" autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Usado para entrar no sistema" required /></div>
+          <span className="text-xs font-normal text-muted-foreground">Você poderá entrar com este usuário ou com seu e-mail.</span>
         </label>
         <label className="grid gap-2 text-sm font-medium">E-mail
           <div className="relative"><Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input className="pl-10" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="voce@empresa.com.br" required /></div>
