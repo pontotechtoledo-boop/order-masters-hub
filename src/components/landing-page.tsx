@@ -6,18 +6,35 @@ export function LandingPage() {
   const goToLogin = () => { window.location.href = "/auth"; };
 
   const features = [
-    { icon: ClipboardList, title: "Ordens de serviço", description: "Acompanhe cada aparelho, do recebimento à entrega, com histórico organizado." },
-    { icon: Package, title: "Estoque sob controle", description: "Registre peças, produtos, entradas, saídas e movimentações." },
-    { icon: CircleDollarSign, title: "Financeiro e vendas", description: "Visualize vendas, despesas e movimentações para entender melhor os resultados." },
-    { icon: ShieldCheck, title: "Garantias organizadas", description: "Emita garantias vinculadas às ordens e consulte o histórico quando precisar." },
-    { icon: Users, title: "Clientes centralizados", description: "Mantenha contatos e atendimentos em um só lugar." },
-    { icon: BarChart3, title: "Visão do negócio", description: "Consulte indicadores e relatórios para acompanhar a operação." },
+    { icon: ClipboardList, title: "Do balcão à entrega, sem perder o histórico", description: "Registre o defeito, o checklist e as fotos do aparelho. Consulte a OS por número, nome ou CPF e acompanhe cada etapa do atendimento." },
+    { icon: ShieldCheck, title: "Uma garantia ligada ao serviço realizado", description: "Emita o termo com o mesmo número da OS, defina cobertura e validade e consulte o documento quando o cliente voltar." },
+    { icon: Smartphone, title: "Cliente informado pelo seu WhatsApp", description: "Prepare avisos de recebimento e finalização, baixe a OS ou a garantia em PDF e compartilhe pelo seu WhatsApp. Você confirma o envio e anexa o arquivo." },
+    { icon: Check, title: "Orçamento com decisão registrada", description: "Gere um link para o cliente conferir o orçamento e aprovar ou recusar. A decisão fica registrada no atendimento." },
+    { icon: Package, title: "Peças e produtos sob controle", description: "Registre entradas e saídas, acompanhe as peças usadas nas ordens e as baixas nas vendas. Consulte também os aparelhos que estão em loja." },
+    { icon: CircleDollarSign, title: "Serviços, vendas e despesas no mesmo lugar", description: "Registre vendas no PDV e despesas da empresa. As receitas dos serviços finalizados se conectam ao financeiro, sem espalhar o controle em várias planilhas." },
+    { icon: BarChart3, title: "Veja o resultado, não só o faturamento", description: "Filtre por data e acompanhe receitas, custos de peças e produtos, despesas e lucro líquido no relatório gerencial." },
+    { icon: Users, title: "Histórico do cliente sempre à mão", description: "Centralize contatos e atendimentos. Pesquise por nome ou documento para identificar o cliente e encontrar suas ordens e garantias." },
+    { icon: Wrench, title: "Documentos com a identidade da sua empresa", description: "Use os dados e o logo da sua assistência na OS e na garantia. Imprima em A4 ou em formato térmico de 80 mm e 58 mm, com fotos na OS." },
+  ];
+
+  const included = [
+    "Ordens de serviço com checklist e fotos",
+    "Clientes e histórico de atendimentos",
+    "Garantias vinculadas à OS",
+    "Orçamentos por link com aprovação ou recusa",
+    "OS e garantia em PDF e impressão A4/térmica",
+    "Avisos para compartilhar pelo seu WhatsApp",
+    "Estoque de peças e produtos com movimentações",
+    "PDV e histórico de vendas",
+    "Controle de receitas e despesas",
+    "Relatórios por período com lucro líquido",
+    "Dados e logo da sua empresa nos documentos",
   ];
 
   const plans = [
-    { name: "Mensal", price: "R$ 29,90", period: "/mês", detail: "Flexibilidade para começar", featured: false },
-    { name: "Trimestral", price: "R$ 69,90", period: "/trimestre", detail: "Pague a cada 3 meses", featured: false },
-    { name: "Anual", price: "R$ 299,90", period: "/ano", detail: "Melhor custo no longo prazo", featured: true },
+    { name: "Mensal", price: "R$ 29,90", period: "/mês", detail: "Comece com um compromisso mensal", equivalent: "Cobrança automática a cada mês", featured: false },
+    { name: "Trimestral", price: "R$ 69,90", period: "/trimestre", detail: "O menor valor equivalente por mês", equivalent: "Equivale a R$ 23,30/mês · cobrança a cada 3 meses", featured: true },
+    { name: "Anual", price: "R$ 299,90", period: "/ano", detail: "Um ano de gestão em uma assinatura", equivalent: "Equivale a cerca de R$ 24,99/mês · cobrança anual", featured: false },
   ];
 
   return <main className="min-h-screen overflow-x-clip bg-background text-foreground">
@@ -44,8 +61,8 @@ export function LandingPage() {
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
         <div>
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-sm font-semibold text-primary"><Clock3 className="size-4" /> 3 dias grátis para experimentar</div>
-          <h1 className="max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">Sua assistência técnica merece <span className="text-primary">mais controle.</span></h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">Organize ordens de serviço, clientes, estoque, garantias e financeiro em um único sistema. Menos planilhas e retrabalho. Mais clareza para cuidar do seu negócio.</p>
+          <h1 className="max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">Service Pro OS: <span className="text-primary">gestão para assistência técnica.</span></h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">Do aparelho recebido ao serviço finalizado: registre o atendimento, envie o orçamento para aprovação, emita a garantia e acompanhe o resultado financeiro. Mais organização no balcão e mais clareza para decidir.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button size="lg" className="h-12 gap-2 px-6 shadow-brand" onClick={goToSignup}>Começar teste grátis <ArrowRight className="size-4" /></Button>
             <Button size="lg" variant="outline" className="h-12 px-6" onClick={() => document.getElementById("recursos")?.scrollIntoView({ behavior: "smooth" })}>Conhecer recursos</Button>
@@ -74,7 +91,7 @@ export function LandingPage() {
 
     <section id="recursos" className="scroll-mt-24 border-y bg-muted/30 py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Recursos</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Tudo conectado à rotina da sua assistência</h2><p className="mt-4 leading-7 text-muted-foreground">Ferramentas para acompanhar o serviço e administrar o negócio com mais tranquilidade.</p></div>
+        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Recursos</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Tudo conectado à rotina da sua assistência</h2><p className="mt-4 leading-7 text-muted-foreground">Menos informações perdidas em papel e conversas soltas. Cada etapa conectada ao cliente, ao aparelho e ao resultado da sua empresa.</p></div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => <article key={feature.title} className="rounded-2xl border bg-card p-6 transition duration-200 hover:-translate-y-1 hover:shadow-lg"><span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary"><feature.icon className="size-5" /></span><h3 className="mt-5 font-display text-lg font-bold">{feature.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{feature.description}</p></article>)}
         </div>
@@ -94,19 +111,26 @@ export function LandingPage() {
 
     <section id="planos" className="scroll-mt-24 border-y bg-muted/30 py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Planos</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Escolha como continuar</h2><p className="mt-4 text-muted-foreground">Experimente por 3 dias grátis e escolha o ciclo ideal para sua empresa.</p></div>
+        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Planos</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Todos os recursos. Você escolhe o ciclo.</h2><p className="mt-4 text-muted-foreground">Teste por 3 dias grátis. Os três planos incluem os mesmos recursos para sua empresa; o que muda é o período de cobrança.</p></div>
         <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
           {plans.map((plan) => <article key={plan.name} className={`relative flex flex-col rounded-2xl border bg-card p-6 ${plan.featured ? "border-primary shadow-xl ring-1 ring-primary/20" : ""}`}>
-            {plan.featured && <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">Melhor custo-benefício</span>}
+            {plan.featured && <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">Menor valor por mês</span>}
             <h3 className="font-display text-xl font-bold">{plan.name}</h3><p className="mt-2 text-sm text-muted-foreground">{plan.detail}</p>
             <p className="mt-6"><span className="font-display text-3xl font-extrabold">{plan.price}</span><span className="text-sm text-muted-foreground">{plan.period}</span></p>
-            <ul className="mt-6 grid gap-3 text-sm text-muted-foreground"><li className="flex gap-2"><Check className="size-4 shrink-0 text-primary" /> Acesso ao sistema</li><li className="flex gap-2"><Check className="size-4 shrink-0 text-primary" /> Módulos de gestão</li><li className="flex gap-2"><Check className="size-4 shrink-0 text-primary" /> Histórico e relatórios</li></ul>
-            <Button variant={plan.featured ? "default" : "outline"} className="mt-7 w-full gap-2" onClick={goToSignup}>Começar teste grátis <ArrowRight className="size-4" /></Button>
+            <p className="mt-3 text-xs leading-5 text-muted-foreground">{plan.equivalent}</p><p className="mt-6 font-semibold">Incluído neste plano</p><ul className="mt-4 grid gap-3 text-sm text-muted-foreground">{included.map((benefit) => <li key={benefit} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-primary" /><span>{benefit}</span></li>)}</ul><div className="h-7" />
+            <Button variant={plan.featured ? "default" : "outline"} className="mt-auto w-full gap-2 self-end" onClick={goToSignup}>Começar teste grátis <ArrowRight className="size-4" /></Button>
           </article>)}
         </div>
-        <p className="mt-6 text-center text-xs text-muted-foreground">Os valores e a contratação serão confirmados na etapa de assinatura.</p>
+        <p className="mt-6 text-center text-xs text-muted-foreground">Renovação automática conforme o ciclo contratado. Você pode cancelar a renovação e manter o acesso até o fim do período pago. Consulte os termos e a política de reembolso de 14 dias.</p>
       </div>
     </section>
+
+    <section className="py-16 sm:py-20"><div className="mx-auto max-w-3xl px-5 sm:px-8"><h2 className="font-display text-3xl font-extrabold">Antes de começar</h2><div className="mt-8 divide-y border-y">{[
+      { question: "O que acontece depois dos 3 dias grátis?", answer: "Para continuar usando após o teste, escolha uma assinatura mensal, trimestral ou anual. O acesso é liberado quando o pagamento é confirmado." },
+      { question: "Preciso do plano anual para ter todos os recursos?", answer: "Não. Mensal, trimestral e anual incluem os mesmos recursos. Escolha o ciclo de cobrança que faz mais sentido para sua empresa." },
+      { question: "O sistema envia mensagens automaticamente no WhatsApp?", answer: "Não. Ele prepara o aviso e o PDF da OS ou da garantia. Você abre seu WhatsApp, confirma o destinatário e compartilha ou anexa o documento." },
+      { question: "Posso cancelar a renovação?", answer: "Sim. Gerencie a assinatura dentro do sistema. Ao cancelar a renovação, o acesso permanece até o fim do período já pago. Para pedidos de reembolso, consulte a política de 14 dias." },
+    ].map((item) => <details key={item.question} className="py-5"><summary className="cursor-pointer font-semibold">{item.question}</summary><p className="mt-3 text-sm leading-7 text-muted-foreground">{item.answer}</p></details>)}</div></div></section>
 
     <section className="py-16 sm:py-20"><div className="mx-auto max-w-4xl px-5 text-center sm:px-8"><span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary"><Wrench className="size-7" /></span><h2 className="mt-5 font-display text-3xl font-extrabold sm:text-4xl">Pronto para organizar sua assistência?</h2><p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">Comece com 3 dias grátis e descubra como o Service Pro OS pode simplificar sua rotina.</p><Button size="lg" className="mt-7 gap-2" onClick={goToSignup}>Iniciar teste grátis <ArrowRight className="size-4" /></Button><p className="mt-3 text-xs text-muted-foreground">Já tem conta? <button className="font-semibold text-primary underline-offset-4 hover:underline" onClick={goToLogin}>Entre aqui</button></p></div></section>
 
