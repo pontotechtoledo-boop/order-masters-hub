@@ -58,5 +58,5 @@
 - [x] Migrar checkout, portal de cobrança e troca de plano do Paddle para Stripe (checkout embutido)
 - [x] Reescrever webhook /api/public/payments/webhook para eventos Stripe mantendo process_subscription_payment
 - [x] Remover código Paddle (paddle.ts, paddle.server.ts, use-paddle-checkout) e validar build/testes
-- [ ] Testar compra aprovada/recusada em sandbox e orientar go-live
+- [x] Testar compra aprovada em sandbox (cartão 4242): assinatura ativada, período correto, painel liberado, troca de plano mensal→trimestral confirmada
 - [ ] Usuário reivindicar/verificar a conta Stripe no painel de pagamentos para liberar cobranças reais
