@@ -51,4 +51,11 @@
 - [ ] Aplicar confirmação de pagamento, tolerância e proteção de escrita
 - [ ] Validar testes, isolamento e telas em computador/celular
 - [ ] Validar pagamento completo — depende do checkout externo
-- [ ] Habilitar pagamentos reais — depende de aprovação comercial Paddle
+- [ ] Habilitar pagamentos reais — depende da ativação da conta no novo provedor
+
+## Migração Paddle → Stripe (entrega atual)
+- [ ] Criar produto Service Pro OS com preços mensal (R$ 29,90), trimestral (R$ 69,90 a cada 3 meses) e anual (R$ 299,90) em BRL
+- [ ] Migrar checkout, portal de cobrança e troca de plano do Paddle para Stripe (checkout embutido)
+- [ ] Reescrever webhook /api/public/payments/webhook para eventos Stripe mantendo process_subscription_payment
+- [ ] Remover código Paddle (paddle.ts, paddle.server.ts, use-paddle-checkout) e validar build/testes
+- [ ] Testar compra aprovada/recusada em sandbox e orientar go-live
