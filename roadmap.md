@@ -1,9 +1,9 @@
 # Roadmap PontoTech Toledo
 
 ## Informações comerciais e identidade do site
-- [ ] Detalhar benefícios reais e recursos incluídos nos três planos sem mudar o design
-- [ ] Renomear o título interno de Plataforma para Assinaturas/Administração
-- [ ] Substituir o favicon por uma chave técnica e validar páginas e navegação
+- [x] Detalhar benefícios reais e recursos incluídos nos três planos sem mudar o design
+- [x] Renomear o título interno de Plataforma para Assinaturas/Administração
+- [x] Substituir o favicon por uma chave técnica e validar páginas e navegação
 
 ## Avisos e documentos pelo WhatsApp
 - [x] Gerar PDF da OS e da garantia para baixar e compartilhar com aviso pelo WhatsApp pessoal
@@ -69,4 +69,4 @@
 - [x] Reescrever webhook /api/public/payments/webhook para eventos Stripe mantendo process_subscription_payment
 - [x] Remover código Paddle (paddle.ts, paddle.server.ts, use-paddle-checkout) e validar build/testes
 - [x] Testar compra aprovada em sandbox (cartão 4242): assinatura ativada, período correto, painel liberado, troca de plano mensal→trimestral confirmada
-- [ ] Usuário reivindicar/verificar a conta Stripe no painel de pagamentos para liberar cobranças reais
+- [ ] Usuário concluir formulário de ativação no Stripe; depois instalar o aplicativo Lovable na conta real e concluir a conferência de pagamentos
