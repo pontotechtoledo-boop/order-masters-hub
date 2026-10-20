@@ -21,3 +21,4 @@
 - Store order photos in private storage with organization/order-scoped metadata and refresh signed URLs when opening documents to preserve confidentiality and printable access.
 - Issue immutable quote snapshots through authenticated RPCs and accept decisions through random expiring capability tokens with locked transactional order validation to avoid approving changed amounts.
 - Share paper-size settings across OS and warranty printing so standard and thermal printers use the same document content.
+- Generate shareable order and warranty PDFs on demand in the browser with private photos; use native file sharing or downloads and recipient-specific WhatsApp notices, never claim wa.me attaches files or confirms delivery.
