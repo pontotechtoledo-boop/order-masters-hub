@@ -46,7 +46,7 @@ export function DocumentWhatsAppPanel({ active, title, body, company, phone, mes
       <Button variant="outline" onClick={download}><Download/>Baixar PDF</Button>
       <Button variant="outline" onClick={() => {
         try {
-          const popup = window.open(whatsappLink(phone, message), '_blank', 'noopener,noreferrer');
+          window.open(whatsappLink(phone, message), '_blank', 'noopener,noreferrer');
           setNotice('Conversa do cliente aberta com o aviso. O PDF deve ser anexado no WhatsApp; o envio não é automático.');
         } catch (e) { setError(e instanceof Error ? e.message : 'Não foi possível abrir o WhatsApp.'); }
       }}><MessageCircle/>Enviar aviso</Button>

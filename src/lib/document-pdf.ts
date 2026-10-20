@@ -52,8 +52,10 @@ export async function createDocumentPdf(title: string, body: string, company: Co
         const startY = y;
         let endY = y;
         for (let j = i; j < Math.min(i + 3, images.length); j++) {
+          const photo = images[j];
+          if (!photo) continue;
           y = startY;
-          await image(images[j].src, 54, 30, margin + (j - i) * 60);
+          await image(photo.src, 54, 30, margin + (j - i) * 60);
           endY = Math.max(endY, y);
         }
         y = endY;
