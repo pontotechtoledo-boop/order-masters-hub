@@ -1,5 +1,10 @@
 # Roadmap PontoTech Toledo
 
+## Avisos e documentos pelo WhatsApp
+- [ ] Gerar PDF da OS e da garantia para baixar e compartilhar com aviso pelo WhatsApp pessoal
+- [ ] Oferecer envio opcional de recebimento e finalização, preservando os status e aprovação de orçamento
+- [ ] Validar geração, download e seleção do telefone em sessão autenticada
+
 ## Fotos, orçamento e ajustes atuais
 - [x] Seleção de garantia com cinco OS recentes e busca por número, nome e CPF
 - [x] Persistir fotos privadas e incluí-las nas miniaturas da impressão
