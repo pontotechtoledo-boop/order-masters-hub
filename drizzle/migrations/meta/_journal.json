@@ -92,6 +92,13 @@
       "when": 1792515332099,
       "tag": "0012_stripe_subscription_processing",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792516001063,
+      "tag": "0013_deprecate_paddle_columns",
+      "breakpoints": true
     }
   ]
 }
