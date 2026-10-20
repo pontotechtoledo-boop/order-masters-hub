@@ -1103,8 +1103,8 @@ export type Database = {
           id: string
           last_event_at: string | null
           organization_id: string
-          paddle_customer_id: string
-          paddle_subscription_id: string
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
           payment_confirmed_at: string | null
           price_id: string
           product_id: string
@@ -1124,8 +1124,8 @@ export type Database = {
           id?: string
           last_event_at?: string | null
           organization_id: string
-          paddle_customer_id: string
-          paddle_subscription_id: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           payment_confirmed_at?: string | null
           price_id: string
           product_id: string
@@ -1145,8 +1145,8 @@ export type Database = {
           id?: string
           last_event_at?: string | null
           organization_id?: string
-          paddle_customer_id?: string
-          paddle_subscription_id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           payment_confirmed_at?: string | null
           price_id?: string
           product_id?: string
