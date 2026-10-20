@@ -17,7 +17,7 @@ export function DocumentWhatsAppPanel({ active, title, body, company, phone, mes
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [canShare, setCanShare] = useState(false);
-  useEffect(() => { setFile(undefined); setError(''); setNotice(''); setCanShare(false); }, [active, title]);
+  useEffect(() => { setFile(undefined); setError(''); setNotice(''); setCanShare(false); }, [active, title, body, company.name, company.document, company.phone, company.address, company.email, company.logoUrl]);
   const download = () => {
     if (!file) return;
     const url = URL.createObjectURL(file);
