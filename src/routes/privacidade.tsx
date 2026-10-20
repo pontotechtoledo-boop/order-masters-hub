@@ -24,7 +24,7 @@ function Privacy() {
     </ul>
     <h2>Compartilhamento</h2><ul>
       <li>Prestadores de serviço de hospedagem, banco de dados e e-mail;</li>
-      <li>Paddle, como Merchant of Record, para venda, gestão de assinaturas, pagamentos, tributos e faturas;</li>
+      <li>Stripe, para processamento de pagamentos, gestão de assinaturas, cobranças e faturas;</li>
       <li>Assessores profissionais (contábil e jurídico);</li>
       <li>Autoridades, quando a lei exigir.</li>
     </ul>

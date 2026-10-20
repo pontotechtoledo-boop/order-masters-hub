@@ -16,8 +16,7 @@ export const Route = createFileRoute("/reembolso")({
 function Refund() {
   return <LegalPage title="Política de Reembolso">
     <p>Oferecemos garantia de satisfação de <b>14 dias</b>. Se você não ficar satisfeito, pode pedir o reembolso integral em até 14 dias da data da compra ou da renovação.</p>
-    <h2>Como pedir</h2><p>Os reembolsos são processados pela Paddle, nossa revendedora e Merchant of Record. Acesse <a className="underline" href="https://paddle.net" target="_blank" rel="noreferrer">paddle.net</a> com o e-mail da compra ou fale com nosso suporte em {SELLER.email}.</p>
+    <h2>Como pedir</h2><p>Fale com nosso suporte em {SELLER.email} informando o e-mail da compra. Os reembolsos são devolvidos pelo mesmo meio de pagamento usado na contratação, processados pelo Stripe, em até 10 dias úteis após a aprovação.</p>
     <h2>Depois do reembolso</h2><p>A assinatura é encerrada e seus dados continuam disponíveis para consulta e exportação.</p>
-    <p>Esta política também segue a <a className="underline" href="https://www.paddle.com/legal/refund-policy" target="_blank" rel="noreferrer">Política de Reembolso da Paddle</a>.</p>
   </LegalPage>;
 }

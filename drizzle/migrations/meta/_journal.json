@@ -85,6 +85,13 @@
       "when": 1792116970597,
       "tag": "0011_subscription_plan_change_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792515332099,
+      "tag": "0012_stripe_subscription_processing",
+      "breakpoints": true
     }
   ]
 }

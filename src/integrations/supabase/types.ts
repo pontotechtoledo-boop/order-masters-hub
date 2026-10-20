@@ -1020,6 +1020,7 @@ export type Database = {
           created_at: string
           environment: string
           expires_at: string
+          gateway_session_id: string | null
           id: string
           organization_id: string
           paddle_transaction_id: string | null
@@ -1031,6 +1032,7 @@ export type Database = {
           created_at?: string
           environment: string
           expires_at?: string
+          gateway_session_id?: string | null
           id?: string
           organization_id: string
           paddle_transaction_id?: string | null
@@ -1042,6 +1044,7 @@ export type Database = {
           created_at?: string
           environment?: string
           expires_at?: string
+          gateway_session_id?: string | null
           id?: string
           organization_id?: string
           paddle_transaction_id?: string | null
@@ -1095,6 +1098,8 @@ export type Database = {
           current_period_start: string | null
           environment: string
           first_failed_at: string | null
+          gateway_customer_id: string | null
+          gateway_subscription_id: string | null
           id: string
           last_event_at: string | null
           organization_id: string
@@ -1114,6 +1119,8 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           first_failed_at?: string | null
+          gateway_customer_id?: string | null
+          gateway_subscription_id?: string | null
           id?: string
           last_event_at?: string | null
           organization_id: string
@@ -1133,6 +1140,8 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           first_failed_at?: string | null
+          gateway_customer_id?: string | null
+          gateway_subscription_id?: string | null
           id?: string
           last_event_at?: string | null
           organization_id?: string
@@ -1486,6 +1495,7 @@ export type Database = {
           created_at: string
           environment: string
           expires_at: string
+          gateway_session_id: string | null
           id: string
           organization_id: string
           paddle_transaction_id: string | null
