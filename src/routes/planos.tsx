@@ -14,7 +14,7 @@ export const Route = createFileRoute("/planos")({
   component: LandingPage,
 });
 
-function LandingPage() {
+export function LandingPage() {
   const goToSignup = () => { window.location.href = "/cadastro"; };
   const goToLogin = () => { window.location.href = "/auth"; };
 
