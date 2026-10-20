@@ -51,20 +51,26 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
         if (existing.status === "open" && existing.client_secret) return { clientSecret: existing.client_secret };
       }
 
-      const session = await stripe.checkout.sessions.create({
-        line_items: [{ price: stripePrice.id, quantity: 1 }],
-        mode: "subscription",
-        ui_mode: "embedded_page",
-        return_url: data.returnUrl,
-        locale: "pt-BR",
-        automatic_tax: { enabled: true },
-        metadata: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId },
-        subscription_data: { metadata: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId } },
-      });
-      if (!session.client_secret) throw new Error("Não foi possível preparar o pagamento. Tente novamente.");
-      const { error: saveError } = await supabaseAdmin.from("subscription_checkouts").update({ gateway_session_id: session.id }).eq("id", intent.id);
-      if (saveError) throw new Error("Não foi possível vincular o pagamento à empresa.");
-      return { clientSecret: session.client_secret };
+      try {
+        const session = await stripe.checkout.sessions.create({
+          line_items: [{ price: stripePrice.id, quantity: 1 }],
+          mode: "subscription",
+          ui_mode: "embedded_page",
+          return_url: data.returnUrl,
+          locale: "pt-BR",
+          automatic_tax: { enabled: true },
+          metadata: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId },
+          subscription_data: { metadata: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId } },
+        });
+        if (!session.client_secret) throw new Error("Não foi possível preparar o pagamento. Tente novamente.");
+        const { error: saveError } = await supabaseAdmin.from("subscription_checkouts").update({ gateway_session_id: session.id }).eq("id", intent.id);
+        if (saveError) throw new Error("Não foi possível vincular o pagamento à empresa.");
+        return { clientSecret: session.client_secret };
+      } catch (error) {
+        // Libera a contratação para uma nova tentativa imediata.
+        await supabaseAdmin.from("subscription_checkouts").update({ status: "failed" }).eq("id", intent.id).is("gateway_session_id", null);
+        throw error;
+      }
     } catch (error) {
       return { error: error instanceof Error && !("type" in error) ? error.message : getStripeErrorMessage(error) };
     }
