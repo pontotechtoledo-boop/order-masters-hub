@@ -16,7 +16,3 @@ export function hasPaidAccess(subscription: { status: string; current_period_end
   if (subscription.status === "canceled") return Boolean(subscription.current_period_end && Date.parse(subscription.current_period_end) > now);
   return ["active", "trialing"].includes(subscription.status) && (!subscription.current_period_end || Date.parse(subscription.current_period_end) > now);
 }
-export function matchesCatalogPrice(price: { status: string; tax_mode: string; unit_price: { amount: string; currency_code: string }; billing_cycle: { interval: string; frequency: number } | null }, id: string) {
-  const plan = findPlan(id);
-  return price.status === "active" && price.tax_mode === "internal" && price.unit_price.currency_code === "BRL" && Number(price.unit_price.amount) === plan.amount && price.billing_cycle?.interval === plan.interval && price.billing_cycle.frequency === plan.frequency;
-}
