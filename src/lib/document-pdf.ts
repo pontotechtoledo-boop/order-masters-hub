@@ -61,6 +61,7 @@ export async function createDocumentPdf(title: string, body: string, company: Co
         y = endY;
       }
     } else {
+      for (const br of Array.from(node.querySelectorAll('br'))) br.replaceWith(content.createTextNode(' '));
       const value = Array.from(node.childNodes).map(child => child instanceof HTMLElement ? child.innerText || child.textContent || '' : child.textContent || '').join(' ');
       text(value, node.tagName === 'H1' ? 16 : node.tagName === 'H2' ? 11 : 10, /^H[12]$/.test(node.tagName) || node.classList.contains('total'));
     }
