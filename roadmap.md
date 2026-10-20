@@ -1,5 +1,10 @@
 # Roadmap PontoTech Toledo
 
+## Informações comerciais e identidade do site
+- [ ] Detalhar benefícios reais e recursos incluídos nos três planos sem mudar o design
+- [ ] Renomear o título interno de Plataforma para Assinaturas/Administração
+- [ ] Substituir o favicon por uma chave técnica e validar páginas e navegação
+
 ## Avisos e documentos pelo WhatsApp
 - [x] Gerar PDF da OS e da garantia para baixar e compartilhar com aviso pelo WhatsApp pessoal
 - [x] Oferecer envio opcional de recebimento e finalização, preservando os status e aprovação de orçamento
