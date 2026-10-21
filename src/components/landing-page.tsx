@@ -50,6 +50,7 @@ export function LandingPage() {
         <nav className="hidden items-center gap-7 text-sm font-medium md:flex">
           <a href="#recursos" className="text-muted-foreground transition hover:text-foreground">Recursos</a>
           <a href="#como-funciona" className="text-muted-foreground transition hover:text-foreground">Como funciona</a>
+          <a href="#por-dentro" className="text-muted-foreground transition hover:text-foreground">Por dentro</a>
           <a href="#planos" className="text-muted-foreground transition hover:text-foreground">Planos</a>
         </nav>
         <div className="flex items-center gap-2">
