@@ -64,9 +64,9 @@
 - [ ] Habilitar pagamentos reais — depende da ativação da conta no novo provedor
 
 ## Fluxo da OS e vitrine na landing (entrega atual)
-- [ ] Transformar "Nova ordem" em fluxo de 3 passos: Cliente → Aparelho e defeito → Peças, valores e conclusão
-- [ ] Capturar telas reais (visão geral, nova OS, garantia) e criar seção "Por dentro do sistema" na landing
-- [ ] Validar build, testes e navegação no computador e celular
+- [x] Transformar "Nova ordem" em fluxo de 3 passos: Cliente → Aparelho e defeito → Peças, valores e conclusão
+- [x] Capturar telas reais (visão geral, nova OS, garantia) e criar seção "Por dentro do sistema" na landing
+- [x] Validar build, testes e navegação no computador e celular
 
 ## Migração Paddle → Stripe (entrega atual)
 - [x] Criar produto Service Pro OS com preços mensal (R$ 29,90), trimestral (R$ 69,90 a cada 3 meses) e anual (R$ 299,90) em BRL
