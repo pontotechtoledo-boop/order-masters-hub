@@ -1,5 +1,8 @@
 import { ArrowRight, BarChart3, Check, CircleDollarSign, ClipboardList, Clock3, Package, ShieldCheck, Smartphone, TrendingUp, Users, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import screenVisaoGeral from "@/assets/screen-visao-geral.png";
+import screenNovaOs from "@/assets/screen-nova-os.png";
+import screenGarantia from "@/assets/screen-garantia.png";
 
 export function LandingPage() {
   const goToSignup = () => { window.location.href = "/cadastro"; };
@@ -47,6 +50,7 @@ export function LandingPage() {
         <nav className="hidden items-center gap-7 text-sm font-medium md:flex">
           <a href="#recursos" className="text-muted-foreground transition hover:text-foreground">Recursos</a>
           <a href="#como-funciona" className="text-muted-foreground transition hover:text-foreground">Como funciona</a>
+          <a href="#por-dentro" className="text-muted-foreground transition hover:text-foreground">Por dentro</a>
           <a href="#planos" className="text-muted-foreground transition hover:text-foreground">Planos</a>
         </nav>
         <div className="flex items-center gap-2">
@@ -105,6 +109,22 @@ export function LandingPage() {
           <div className="grid gap-4 sm:grid-cols-3">
             {[{n:"01",title:"Crie sua conta",desc:"Informe seus dados e o nome da empresa."},{n:"02",title:"Organize a rotina",desc:"Conheça os módulos e configure sua operação."},{n:"03",title:"Escolha seu plano",desc:"Continue usando após o teste grátis."}].map((step) => <div key={step.n} className="rounded-2xl border bg-card p-5"><p className="font-display text-3xl font-extrabold text-primary">{step.n}</p><h3 className="mt-4 font-bold">{step.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{step.desc}</p></div>)}
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="por-dentro" className="py-16 sm:py-20">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Por dentro do sistema</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Veja como é trabalhar com o Service Pro OS</h2><p className="mt-4 leading-7 text-muted-foreground">Telas reais do sistema: a visão geral do seu dia, a abertura de uma OS passo a passo e a emissão da garantia vinculada à ordem.</p></div>
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          {[
+            { src: screenVisaoGeral, alt: "Tela de visão geral do Service Pro OS com faturamento do dia e acesso rápido às áreas", title: "Visão geral do seu dia", desc: "Faturamento, despesas e acesso rápido a cada área assim que você entra." },
+            { src: screenNovaOs, alt: "Abertura de ordem de serviço em passos: cliente, aparelho e defeito, peças e valores", title: "Nova OS em passos guiados", desc: "Cliente, aparelho com checklist e fotos, peças e valores — sem se perder no caminho." },
+            { src: screenGarantia, alt: "Emissão de garantia vinculada ao número da ordem de serviço", title: "Garantia ligada à OS", desc: "O número da garantia acompanha a ordem e o certificado sai pronto para imprimir ou enviar." },
+          ].map((shot) => <figure key={shot.title} className="overflow-hidden rounded-2xl border bg-card shadow-lg">
+            <img src={shot.src} alt={shot.alt} loading="lazy" className="aspect-[8/5] w-full object-cover object-top" />
+            <figcaption className="p-5"><h3 className="font-display text-lg font-bold">{shot.title}</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">{shot.desc}</p></figcaption>
+          </figure>)}
         </div>
       </div>
     </section>
