@@ -65,8 +65,8 @@ export function LandingPage() {
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
         <div>
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-sm font-semibold text-primary"><Clock3 className="size-4" /> 3 dias grátis para experimentar</div>
-          <h1 className="max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">Service Pro OS: <span className="text-primary">gestão para assistência técnica.</span></h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">Do aparelho recebido ao serviço finalizado: registre o atendimento, envie o orçamento para aprovação, emita a garantia e acompanhe o resultado financeiro. Mais organização no balcão e mais clareza para decidir.</p>
+          <h1 className="max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">Saia do caderno e <span className="text-primary">proteja sua bancada.</span></h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">Service Pro OS organiza sua assistência técnica: checklist com fotos na entrada, orçamento aprovado pelo cliente, garantia vinculada à OS e lucro real no fim do mês. Tudo liberado a partir de R$ 29,90/mês.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button size="lg" className="h-12 gap-2 px-6 shadow-brand" onClick={goToSignup}>Começar teste grátis <ArrowRight className="size-4" /></Button>
             <Button size="lg" variant="outline" className="h-12 px-6" onClick={() => document.getElementById("recursos")?.scrollIntoView({ behavior: "smooth" })}>Conhecer recursos</Button>
@@ -92,6 +92,21 @@ export function LandingPage() {
         </div>
       </div>
     </section>
+
+    <section id="problema" className="scroll-mt-24 py-16 sm:py-20">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">O problema de verdade</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Você conserta bem. O que cansa é o resto.</h2><p className="mt-4 leading-7 text-muted-foreground">Aparelho trocado, peça que some, cliente dizendo que o defeito não existia, mês fechado sem saber se sobrou dinheiro. É isso que o Service Pro OS resolve.</p></div>
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {[
+            { title: "O caderno que se perde", problem: "Papel rasga, molha e leva junto o histórico do serviço.", solution: "Cada OS fica salva, com número, cliente, aparelho e etapa — encontre por nome, CPF ou número." },
+            { title: "“Isso não estava assim”", problem: "Sem registro da entrada, é sua palavra contra a do cliente.", solution: "Checklist e até 6 fotos na abertura da OS, impressos no documento que o cliente recebe." },
+            { title: "Faturou, mas cadê o lucro?", problem: "O caixa gira, mas peças e despesas comem a margem sem você ver.", solution: "Relatório com receitas, custo de peças e produtos, despesas e lucro líquido por período." },
+          ].map((item) => <article key={item.title} className="rounded-2xl border bg-card p-6"><h3 className="font-display text-lg font-bold">{item.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.problem}</p><p className="mt-4 flex gap-2 text-sm font-medium leading-6"><Check className="mt-0.5 size-4 shrink-0 text-primary" />{item.solution}</p></article>)}
+        </div>
+      </div>
+    </section>
+
+
 
     <section id="recursos" className="scroll-mt-24 border-y bg-muted/30 py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
