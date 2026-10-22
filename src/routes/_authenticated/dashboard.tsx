@@ -553,9 +553,9 @@ function CustomerPicker({customers,onSelect,onCreate}:{customers:Customer[];onSe
       <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={onCreate}><Plus className="size-3.5"/>Cadastrar cliente</Button>
     </div>
     <Button type="button" variant="outline" className="h-auto min-h-10 w-full justify-between text-left font-normal" onClick={()=>setOpen(v=>!v)}>
-      <span>{chosen?<><b>{chosen.name}</b><span className="ml-2 text-muted-foreground">{chosen.document}</span></>:"Selecione pelo nome ou documento"}</span><ChevronDown className="size-4 shrink-0"/>
+      <span className="min-w-0 truncate">{chosen?<><b>{chosen.name}</b><span className="ml-2 text-muted-foreground">{chosen.document}</span></>:"Selecione pelo nome ou documento"}</span><ChevronDown className="size-4 shrink-0"/>
     </Button>
-    {open&&<div className="absolute z-20 mt-1 w-full rounded-md border bg-popover p-2 shadow-lg">
+    {open&&<div className="mt-1 w-full min-w-0 rounded-md border bg-popover p-2 shadow-lg">
       <div className="relative"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input autoFocus value={term} onChange={e=>setTerm(e.target.value)} placeholder="Pesquisar nome, CPF ou CNPJ" className="pl-9"/></div>
       <div className="mt-2 max-h-48 overflow-y-auto">{found.map(c=><Button key={c.id} type="button" variant="ghost" className="h-auto w-full justify-start py-2 text-left" onClick={()=>{setChosen(c);onSelect(c.id);setOpen(false)}}><span><b className="block">{c.name}</b><small className="text-muted-foreground">{c.document}</small></span></Button>)}{!found.length&&<div className="p-3 text-sm text-muted-foreground"><p>Nenhum cliente encontrado.</p><Button type="button" variant="link" className="mt-1 h-auto p-0" onClick={onCreate}><Plus className="size-4"/>Cadastrar agora</Button></div>}</div>
     </div>}

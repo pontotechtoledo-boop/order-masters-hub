@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Download, MessageCircle, Share2, FileDown } from 'lucide-react';
+import { Download, MessageCircle, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { whatsappLink } from '@/lib/document-sharing';
 import { createDocumentPdf } from '@/lib/document-pdf';
@@ -38,18 +38,20 @@ export function DocumentWhatsAppPanel({ active, title, body, company, phone, mes
       } catch (e) { setError(e instanceof Error ? e.message : 'Não foi possível gerar o PDF.'); }
       finally { setBusy(false); }
     }}><FileDown/>{busy ? 'Preparando PDF…' : 'Preparar PDF e aviso'}</Button> : <div className="flex flex-wrap gap-2">
-      {canShare && <Button onClick={async () => {
+      <Button onClick={async () => {
         setError('');
-        try { await navigator.share({ files: [file], text: message, title }); setNotice('Compartilhamento aberto. O envio é confirmado no aplicativo escolhido.'); }
-        catch (e) { if (e instanceof Error && e.name !== 'AbortError') setError('Não foi possível compartilhar. Baixe o PDF e anexe no WhatsApp.'); }
-      }}><Share2/>Compartilhar PDF e aviso</Button>}
-      <Button variant="outline" onClick={download}><Download/>Baixar PDF</Button>
-      <Button variant="outline" onClick={() => {
+        if (canShare) {
+          try { await navigator.share({ files: [file], text: message, title }); setNotice('Escolha o WhatsApp e confirme o cliente para enviar o PDF com o aviso.'); return; }
+          catch (e) { if (e instanceof Error && e.name === 'AbortError') return; }
+        }
         try {
-          window.open(whatsappLink(phone, message), '_blank', 'noopener,noreferrer');
-          setNotice('Conversa do cliente aberta com o aviso. O PDF deve ser anexado no WhatsApp; o envio não é automático.');
+          const link = whatsappLink(phone, message);
+          download();
+          window.open(link, '_blank', 'noopener,noreferrer');
+          setNotice('PDF baixado e conversa aberta com o aviso. Anexe o PDF no WhatsApp e confirme o envio.');
         } catch (e) { setError(e instanceof Error ? e.message : 'Não foi possível abrir o WhatsApp.'); }
-      }}><MessageCircle/>Enviar aviso</Button>
+      }}><MessageCircle/>Enviar PDF e aviso no WhatsApp</Button>
+      <Button variant="outline" onClick={download}><Download/>Só baixar PDF</Button>
     </div>}
     {file && <p className="break-words text-xs text-muted-foreground">{file.name} · Ao compartilhar, selecione WhatsApp e confirme o cliente.</p>}
     {notice && <p role="status" className="text-sm text-muted-foreground">{notice}</p>}
