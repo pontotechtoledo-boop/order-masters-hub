@@ -409,7 +409,7 @@ function Sidebar({section,setSection,open,close,collapsed,toggleCollapsed}:{sect
         {!collapsed&&<Button variant="ghost" size="icon" onClick={close} className="ml-auto lg:hidden"><X/></Button>}
       </div>
       <nav className={"flex-1 overflow-y-auto py-4 "+(collapsed?"px-2":"px-3")}>
-        {nav.map((item,i)=><div key={item.label}>{item.group&&!collapsed&&<p className={"mb-2 px-3 text-[10px] font-bold text-muted-foreground "+(i?"mt-6":"")}>{item.group}</p>}<Button variant="ghost" onClick={()=>setSection(item.label)} className={"group relative mb-1 h-10 w-full gap-3 "+(collapsed?"justify-center px-2":"justify-start px-3")+" "+(section===item.label?"bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground":"text-sidebar-foreground")} aria-label={item.label}><item.icon className="size-[18px]"/>{!collapsed&&item.label}{collapsed&&<span className="pointer-events-none absolute left-full top-1/2 z-[70] ml-2 hidden -translate-y-1/2 whitespace-nowrap rounded-md border bg-popover px-2.5 py-1.5 text-xs font-medium text-popover-foreground shadow-md group-hover:block">{item.label}</span>}</Button></div>)}
+        {nav.map((item,i)=><div key={item.label}>{item.group&&!collapsed&&<p className={"mb-2 px-3 text-[10px] font-bold text-muted-foreground "+(i?"mt-6":"")}>{item.group}</p>}<Button variant="ghost" onClick={()=>setSection(item.label)} className={"group relative mb-1 h-10 w-full gap-3 "+(collapsed?"justify-center px-2":"justify-start px-3")+" "+(section===item.label?"bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground":"text-sidebar-foreground")} aria-label={item.label}><item.icon className="size-[18px]"/>{!collapsed&&(item.label==="Plataforma"?"Assinaturas/Administração":item.label)}{collapsed&&<span className="pointer-events-none absolute left-full top-1/2 z-[70] ml-2 hidden -translate-y-1/2 whitespace-nowrap rounded-md border bg-popover px-2.5 py-1.5 text-xs font-medium text-popover-foreground shadow-md group-hover:block">{item.label}</span>}</Button></div>)}
       </nav>
     </aside>
   </>
@@ -596,7 +596,7 @@ function OrderDialog({open,customers,stock,close,onSave,onCreateCustomer}:{open:
     <p className="text-sm font-semibold sm:hidden">Passo {step+1} de 3 — {steps[step]}</p>
     <form className="grid gap-4" onSubmit={e=>{
       e.preventDefault();
-      if(step<2){next();return}
+      if(step<2){return}
       const f=new FormData(e.currentTarget),c=customers.find(x=>x.id===customerId);
       if(!c){alert("Selecione um cliente cadastrado.");setStep(0);return}
       if(!category||!finalCategory||!finalBrand||!finalModel){alert("Selecione o equipamento e informe o tipo, a marca e o modelo.");setStep(1);return}
@@ -642,7 +642,7 @@ function OrderDialog({open,customers,stock,close,onSave,onCreateCustomer}:{open:
         <Button type="button" variant="outline" onClick={close}>Cancelar</Button>
         <div className="flex gap-2">
           {step>0&&<Button type="button" variant="outline" onClick={()=>setStep(s=>s-1)}><ChevronLeft/>Voltar</Button>}
-          {step<2?<Button type="button" onClick={next}>Avançar<ChevronRight/></Button>:<Button type="submit"><Check/>Criar ordem</Button>}
+          {step<2?<Button key="next" type="button" onClick={e=>{e.preventDefault();next()}}>Avançar<ChevronRight/></Button>:<Button key="submit" type="submit"><Check/>Criar ordem</Button>}
         </div>
       </div>
     </form>
