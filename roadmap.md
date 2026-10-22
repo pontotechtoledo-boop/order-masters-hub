@@ -75,3 +75,9 @@
 - [x] Remover código Paddle (paddle.ts, paddle.server.ts, use-paddle-checkout) e validar build/testes
 - [x] Testar compra aprovada em sandbox (cartão 4242): assinatura ativada, período correto, painel liberado, troca de plano mensal→trimestral confirmada
 - [ ] Usuário concluir formulário de ativação no Stripe; depois instalar o aplicativo Lovable na conta real e concluir a conferência de pagamentos
+
+## Landing de conversão e correções (entrega atual)
+- [x] Nova chamada, seção de problemas reais e preços sem recursos bloqueados
+- [x] Botão único para enviar PDF e aviso no WhatsApp
+- [x] Corrigir lista de clientes cortada e etapa que pulava na nova OS
+- [x] Menu mostra Assinaturas/Administração

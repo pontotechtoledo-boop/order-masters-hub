@@ -409,7 +409,7 @@ function Sidebar({section,setSection,open,close,collapsed,toggleCollapsed}:{sect
         {!collapsed&&<Button variant="ghost" size="icon" onClick={close} className="ml-auto lg:hidden"><X/></Button>}
       </div>
       <nav className={"flex-1 overflow-y-auto py-4 "+(collapsed?"px-2":"px-3")}>
-        {nav.map((item,i)=><div key={item.label}>{item.group&&!collapsed&&<p className={"mb-2 px-3 text-[10px] font-bold text-muted-foreground "+(i?"mt-6":"")}>{item.group}</p>}<Button variant="ghost" onClick={()=>setSection(item.label)} className={"group relative mb-1 h-10 w-full gap-3 "+(collapsed?"justify-center px-2":"justify-start px-3")+" "+(section===item.label?"bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground":"text-sidebar-foreground")} aria-label={item.label}><item.icon className="size-[18px]"/>{!collapsed&&item.label}{collapsed&&<span className="pointer-events-none absolute left-full top-1/2 z-[70] ml-2 hidden -translate-y-1/2 whitespace-nowrap rounded-md border bg-popover px-2.5 py-1.5 text-xs font-medium text-popover-foreground shadow-md group-hover:block">{item.label}</span>}</Button></div>)}
+        {nav.map((item,i)=>{const shown=item.label==="Plataforma"?"Assinaturas/Administração":item.label;return <div key={item.label}>{item.group&&!collapsed&&<p className={"mb-2 px-3 text-[10px] font-bold text-muted-foreground "+(i?"mt-6":"")}>{item.group}</p>}<Button variant="ghost" onClick={()=>setSection(item.label)} className={"group relative mb-1 h-10 w-full gap-3 "+(collapsed?"justify-center px-2":"justify-start px-3")+" "+(section===item.label?"bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground":"text-sidebar-foreground")} aria-label={shown}><item.icon className="size-[18px]"/>{!collapsed&&shown}{collapsed&&<span className="pointer-events-none absolute left-full top-1/2 z-[70] ml-2 hidden -translate-y-1/2 whitespace-nowrap rounded-md border bg-popover px-2.5 py-1.5 text-xs font-medium text-popover-foreground shadow-md group-hover:block">{shown}</span>}</Button></div>})}
       </nav>
     </aside>
   </>
@@ -553,9 +553,9 @@ function CustomerPicker({customers,onSelect,onCreate}:{customers:Customer[];onSe
       <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={onCreate}><Plus className="size-3.5"/>Cadastrar cliente</Button>
     </div>
     <Button type="button" variant="outline" className="h-auto min-h-10 w-full justify-between text-left font-normal" onClick={()=>setOpen(v=>!v)}>
-      <span>{chosen?<><b>{chosen.name}</b><span className="ml-2 text-muted-foreground">{chosen.document}</span></>:"Selecione pelo nome ou documento"}</span><ChevronDown className="size-4 shrink-0"/>
+      <span className="min-w-0 truncate">{chosen?<><b>{chosen.name}</b><span className="ml-2 text-muted-foreground">{chosen.document}</span></>:"Selecione pelo nome ou documento"}</span><ChevronDown className="size-4 shrink-0"/>
     </Button>
-    {open&&<div className="absolute z-20 mt-1 w-full rounded-md border bg-popover p-2 shadow-lg">
+    {open&&<div className="mt-1 w-full min-w-0 rounded-md border bg-popover p-2 shadow-lg">
       <div className="relative"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input autoFocus value={term} onChange={e=>setTerm(e.target.value)} placeholder="Pesquisar nome, CPF ou CNPJ" className="pl-9"/></div>
       <div className="mt-2 max-h-48 overflow-y-auto">{found.map(c=><Button key={c.id} type="button" variant="ghost" className="h-auto w-full justify-start py-2 text-left" onClick={()=>{setChosen(c);onSelect(c.id);setOpen(false)}}><span><b className="block">{c.name}</b><small className="text-muted-foreground">{c.document}</small></span></Button>)}{!found.length&&<div className="p-3 text-sm text-muted-foreground"><p>Nenhum cliente encontrado.</p><Button type="button" variant="link" className="mt-1 h-auto p-0" onClick={onCreate}><Plus className="size-4"/>Cadastrar agora</Button></div>}</div>
     </div>}
@@ -596,7 +596,7 @@ function OrderDialog({open,customers,stock,close,onSave,onCreateCustomer}:{open:
     <p className="text-sm font-semibold sm:hidden">Passo {step+1} de 3 — {steps[step]}</p>
     <form className="grid gap-4" onSubmit={e=>{
       e.preventDefault();
-      if(step<2){next();return}
+      if(step<2){return}
       const f=new FormData(e.currentTarget),c=customers.find(x=>x.id===customerId);
       if(!c){alert("Selecione um cliente cadastrado.");setStep(0);return}
       if(!category||!finalCategory||!finalBrand||!finalModel){alert("Selecione o equipamento e informe o tipo, a marca e o modelo.");setStep(1);return}
@@ -642,7 +642,7 @@ function OrderDialog({open,customers,stock,close,onSave,onCreateCustomer}:{open:
         <Button type="button" variant="outline" onClick={close}>Cancelar</Button>
         <div className="flex gap-2">
           {step>0&&<Button type="button" variant="outline" onClick={()=>setStep(s=>s-1)}><ChevronLeft/>Voltar</Button>}
-          {step<2?<Button type="button" onClick={next}>Avançar<ChevronRight/></Button>:<Button type="submit"><Check/>Criar ordem</Button>}
+          {step<2?<Button key="next" type="button" onClick={e=>{e.preventDefault();next()}}>Avançar<ChevronRight/></Button>:<Button key="submit" type="submit"><Check/>Criar ordem</Button>}
         </div>
       </div>
     </form>
