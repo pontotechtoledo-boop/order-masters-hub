@@ -37,7 +37,7 @@ export function LandingPage() {
   const plans = [
     { name: "Mensal", price: "R$ 29,90", period: "/mês", detail: "Comece com um compromisso mensal", equivalent: "Cobrança automática a cada mês", featured: false },
     { name: "Trimestral", price: "R$ 69,90", period: "/trimestre", detail: "O menor valor equivalente por mês", equivalent: "Equivale a R$ 23,30/mês · cobrança a cada 3 meses", featured: true },
-    { name: "Anual", price: "R$ 299,90", period: "/ano", detail: "Um ano de gestão em uma assinatura", equivalent: "Equivale a cerca de R$ 24,99/mês · cobrança anual", featured: false },
+    { name: "Anual", price: "R$ 299,90", period: "/ano", detail: "Um ano de gestão em uma assinatura", equivalent: "Menos de R$ 0,83 por dia · cobrança anual", featured: false },
   ];
 
   return <main className="min-h-screen overflow-x-clip bg-background text-foreground">
@@ -146,7 +146,7 @@ export function LandingPage() {
 
     <section id="planos" className="scroll-mt-24 border-y bg-muted/30 py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Planos</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Todos os recursos. Você escolhe o ciclo.</h2><p className="mt-4 text-muted-foreground">Teste por 3 dias grátis. Os três planos incluem os mesmos recursos para sua empresa; o que muda é o período de cobrança.</p></div>
+        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Planos</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Todos os recursos. Você escolhe o ciclo.</h2><p className="mt-4 text-muted-foreground">Sem pegadinha: estoque, PDV, garantias e financeiro não ficam presos a um plano mais caro. Os três ciclos incluem tudo — muda só a forma de cobrança. Teste 3 dias grátis.</p></div>
         <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
           {plans.map((plan) => <article key={plan.name} className={`relative flex flex-col rounded-2xl border bg-card p-6 ${plan.featured ? "border-primary shadow-xl ring-1 ring-primary/20" : ""}`}>
             {plan.featured && <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">Menor valor por mês</span>}
@@ -163,6 +163,7 @@ export function LandingPage() {
     <section className="py-16 sm:py-20"><div className="mx-auto max-w-3xl px-5 sm:px-8"><h2 className="font-display text-3xl font-extrabold">Antes de começar</h2><div className="mt-8 divide-y border-y">{[
       { question: "O que acontece depois dos 3 dias grátis?", answer: "Para continuar usando após o teste, escolha uma assinatura mensal, trimestral ou anual. O acesso é liberado quando o pagamento é confirmado." },
       { question: "Preciso do plano anual para ter todos os recursos?", answer: "Não. Mensal, trimestral e anual incluem os mesmos recursos. Escolha o ciclo de cobrança que faz mais sentido para sua empresa." },
+      { question: "Estoque e PDV custam a mais?", answer: "Não. Todos os recursos estão incluídos em qualquer ciclo: mensal, trimestral ou anual." },
       { question: "O sistema envia mensagens automaticamente no WhatsApp?", answer: "Não. Ele prepara o aviso e o PDF da OS ou da garantia. Você abre seu WhatsApp, confirma o destinatário e compartilha ou anexa o documento." },
       { question: "Posso cancelar a renovação?", answer: "Sim. Gerencie a assinatura dentro do sistema. Ao cancelar a renovação, o acesso permanece até o fim do período já pago. Para pedidos de reembolso, consulte a política de 14 dias." },
     ].map((item) => <details key={item.question} className="py-5"><summary className="cursor-pointer font-semibold">{item.question}</summary><p className="mt-3 text-sm leading-7 text-muted-foreground">{item.answer}</p></details>)}</div></div></section>
