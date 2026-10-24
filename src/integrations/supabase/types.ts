@@ -1473,6 +1473,17 @@ export type Database = {
         Args: { _org: string }
         Returns: boolean
       }
+      process_hotmart_event: {
+        Args: {
+          _email: string
+          _event: string
+          _event_id: string
+          _occurred_at: string
+          _price_id: string
+          _subscriber_code: string
+        }
+        Returns: string
+      }
       process_subscription_payment: {
         Args: {
           _environment: string
