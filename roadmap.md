@@ -81,3 +81,6 @@
 - [x] Botão único para enviar PDF e aviso no WhatsApp
 - [x] Corrigir lista de clientes cortada e etapa que pulava na nova OS
 - [x] Menu mostra Assinaturas/Administração
+
+## Separar Assinatura e Administração
+- [x] Abas separadas no grupo Plataforma
