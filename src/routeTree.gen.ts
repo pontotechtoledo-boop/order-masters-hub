@@ -21,6 +21,7 @@ import { Route as TermosRouteImport } from './routes/termos'
 import { Route as AuthenticatedAssinaturaRouteImport } from './routes/_authenticated/assinatura'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as OrcamentoTokenRouteImport } from './routes/orcamento.$token'
+import { Route as ApiPublicPaymentsHotmartRouteImport } from './routes/api/public/payments/hotmart'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -82,6 +83,12 @@ const OrcamentoTokenRoute = OrcamentoTokenRouteImport.update({
   path: '/orcamento/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPaymentsHotmartRoute =
+  ApiPublicPaymentsHotmartRouteImport.update({
+    id: '/api/public/payments/hotmart',
+    path: '/api/public/payments/hotmart',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -101,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/assinatura': typeof AuthenticatedAssinaturaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orcamento/$token': typeof OrcamentoTokenRoute
+  '/api/public/payments/hotmart': typeof ApiPublicPaymentsHotmartRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -115,6 +123,7 @@ export interface FileRoutesByTo {
   '/assinatura': typeof AuthenticatedAssinaturaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orcamento/$token': typeof OrcamentoTokenRoute
+  '/api/public/payments/hotmart': typeof ApiPublicPaymentsHotmartRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -131,6 +140,7 @@ export interface FileRoutesById {
   '/_authenticated/assinatura': typeof AuthenticatedAssinaturaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/orcamento/$token': typeof OrcamentoTokenRoute
+  '/api/public/payments/hotmart': typeof ApiPublicPaymentsHotmartRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/assinatura'
     | '/dashboard'
     | '/orcamento/$token'
+    | '/api/public/payments/hotmart'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/assinatura'
     | '/dashboard'
     | '/orcamento/$token'
+    | '/api/public/payments/hotmart'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -176,6 +188,7 @@ export interface FileRouteTypes {
     | '/_authenticated/assinatura'
     | '/_authenticated/dashboard'
     | '/orcamento/$token'
+    | '/api/public/payments/hotmart'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -190,6 +203,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermosRoute: typeof TermosRoute
   OrcamentoTokenRoute: typeof OrcamentoTokenRoute
+  ApiPublicPaymentsHotmartRoute: typeof ApiPublicPaymentsHotmartRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -279,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrcamentoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/payments/hotmart': {
+      id: '/api/public/payments/hotmart'
+      path: '/api/public/payments/hotmart'
+      fullPath: '/api/public/payments/hotmart'
+      preLoaderRoute: typeof ApiPublicPaymentsHotmartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -313,6 +334,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   TermosRoute: TermosRoute,
   OrcamentoTokenRoute: OrcamentoTokenRoute,
+  ApiPublicPaymentsHotmartRoute: ApiPublicPaymentsHotmartRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
