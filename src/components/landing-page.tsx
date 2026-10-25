@@ -5,7 +5,7 @@ import screenNovaOs from "@/assets/screen-nova-os.png";
 import screenGarantia from "@/assets/screen-garantia.png";
 
 export function LandingPage() {
-  const goToSignup = () => { window.location.href = "/cadastro"; };
+  const goToSignup = () => { document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }); };
   const goToLogin = () => { window.location.href = "/auth"; };
 
   const features = [
@@ -64,11 +64,11 @@ export function LandingPage() {
       <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.13),transparent_48%)]" />
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
         <div>
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-sm font-semibold text-primary"><Clock3 className="size-4" /> 3 dias grátis para experimentar</div>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-sm font-semibold text-primary"><Clock3 className="size-4" /> 7 dias de garantia ou seu dinheiro de volta</div>
           <h1 className="max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">Saia do caderno e <span className="text-primary">proteja sua bancada.</span></h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">Service Pro OS organiza sua assistência técnica: checklist com fotos na entrada, orçamento aprovado pelo cliente, garantia vinculada à OS e lucro real no fim do mês. Tudo liberado a partir de R$ 29,90/mês.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button size="lg" className="h-12 gap-2 px-6 shadow-brand" onClick={goToSignup}>Começar teste grátis <ArrowRight className="size-4" /></Button>
+            <Button size="lg" className="h-12 gap-2 px-6 shadow-brand" onClick={goToSignup}>Ver planos e assinar <ArrowRight className="size-4" /></Button>
             <Button size="lg" variant="outline" className="h-12 px-6" onClick={() => document.getElementById("recursos")?.scrollIntoView({ behavior: "smooth" })}>Conhecer recursos</Button>
           </div>
           <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -120,9 +120,9 @@ export function LandingPage() {
     <section id="como-funciona" className="scroll-mt-24 py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-          <div><p className="text-sm font-bold uppercase tracking-widest text-primary">Comece sem complicação</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Do cadastro ao controle da sua operação</h2><p className="mt-4 leading-7 text-muted-foreground">Crie sua conta, cadastre sua empresa e explore os recursos do sistema durante o período de teste.</p><Button className="mt-7 gap-2" size="lg" onClick={goToSignup}>Criar minha conta grátis <ArrowRight className="size-4" /></Button></div>
+          <div><p className="text-sm font-bold uppercase tracking-widest text-primary">Comece sem complicação</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Do cadastro ao controle da sua operação</h2><p className="mt-4 leading-7 text-muted-foreground">Assine pela Hotmart e receba o acesso no e-mail usado na compra. Renovou? O mesmo acesso continua liberado.</p><Button className="mt-7 gap-2" size="lg" onClick={goToSignup}>Escolher meu plano <ArrowRight className="size-4" /></Button></div>
           <div className="grid gap-4 sm:grid-cols-3">
-            {[{n:"01",title:"Crie sua conta",desc:"Informe seus dados e o nome da empresa."},{n:"02",title:"Organize a rotina",desc:"Conheça os módulos e configure sua operação."},{n:"03",title:"Escolha seu plano",desc:"Continue usando após o teste grátis."}].map((step) => <div key={step.n} className="rounded-2xl border bg-card p-5"><p className="font-display text-3xl font-extrabold text-primary">{step.n}</p><h3 className="mt-4 font-bold">{step.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{step.desc}</p></div>)}
+            {[{n:"01",title:"Escolha o plano",desc:"Mensal, trimestral ou anual — todos com tudo liberado."},{n:"02",title:"Receba o acesso",desc:"Chega no seu e-mail um link para criar sua senha."},{n:"03",title:"Organize a rotina",desc:"Use 7 dias com garantia de reembolso total."}].map((step) => <div key={step.n} className="rounded-2xl border bg-card p-5"><p className="font-display text-3xl font-extrabold text-primary">{step.n}</p><h3 className="mt-4 font-bold">{step.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{step.desc}</p></div>)}
           </div>
         </div>
       </div>
@@ -146,7 +146,7 @@ export function LandingPage() {
 
     <section id="planos" className="scroll-mt-24 border-y bg-muted/30 py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Planos</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Todos os recursos. Você escolhe o ciclo.</h2><p className="mt-4 text-muted-foreground">Sem pegadinha: estoque, PDV, garantias e financeiro não ficam presos a um plano mais caro. Os três ciclos incluem tudo — muda só a forma de cobrança. Teste 3 dias grátis.</p></div>
+        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Planos</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Todos os recursos. Você escolhe o ciclo.</h2><p className="mt-4 text-muted-foreground">Sem pegadinha: estoque, PDV, garantias e financeiro não ficam presos a um plano mais caro. Os três ciclos incluem tudo — muda só a forma de cobrança. Garantia de 7 dias.</p></div>
         <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
           {plans.map((plan) => <article key={plan.name} className={`relative flex flex-col rounded-2xl border bg-card p-6 ${plan.featured ? "border-primary shadow-xl ring-1 ring-primary/20" : ""}`}>
             {plan.featured && <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">Menor valor por mês</span>}
@@ -154,22 +154,22 @@ export function LandingPage() {
             <p className="mt-6"><span className="font-display text-3xl font-extrabold">{plan.price}</span><span className="text-sm text-muted-foreground">{plan.period}</span></p>
             <p className="mt-3 text-xs leading-5 text-muted-foreground">{plan.equivalent}</p><p className="mt-6 font-semibold">Incluído neste plano</p><ul className="mt-4 grid gap-3 text-sm text-muted-foreground">{included.map((benefit) => <li key={benefit} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-primary" /><span>{benefit}</span></li>)}</ul><div className="h-7" />
             <Button asChild variant={plan.featured ? "default" : "outline"} className="mt-auto w-full gap-2 self-end"><a href={{ Mensal: "https://pay.hotmart.com/W108179804M?off=m9mvnjhc", Trimestral: "https://pay.hotmart.com/W108179804M?off=qo10u1si", Anual: "https://pay.hotmart.com/W108179804M?off=m8p4t7ri" }[plan.name] ?? "/cadastro"} target="_blank" rel="noopener noreferrer">Assinar {plan.name.toLowerCase()} <ArrowRight className="size-4" /></a></Button>
-            <button type="button" onClick={goToSignup} className="mt-3 text-sm font-semibold text-primary underline-offset-4 hover:underline">Ou teste 3 dias grátis</button>
+            
           </article>)}
         </div>
-        <p className="mt-6 text-center text-xs text-muted-foreground">Renovação automática conforme o ciclo contratado. Você pode cancelar a renovação e manter o acesso até o fim do período pago. Consulte os termos e a política de reembolso de 14 dias.</p>
+        <p className="mt-6 text-center text-xs text-muted-foreground">Renovação automática conforme o ciclo contratado. Você pode cancelar a renovação e manter o acesso até o fim do período pago. Consulte os termos e a política de reembolso de 7 dias.</p>
       </div>
     </section>
 
     <section className="py-16 sm:py-20"><div className="mx-auto max-w-3xl px-5 sm:px-8"><h2 className="font-display text-3xl font-extrabold">Antes de começar</h2><div className="mt-8 divide-y border-y">{[
-      { question: "O que acontece depois dos 3 dias grátis?", answer: "Para continuar usando após o teste, escolha uma assinatura mensal, trimestral ou anual. O acesso é liberado quando o pagamento é confirmado." },
+      { question: "Como recebo meu acesso?", answer: "Assim que o pagamento é aprovado na Hotmart, você recebe no e-mail da compra um link para criar sua senha. Nas renovações, o mesmo acesso continua — sem novo cadastro." },
       { question: "Preciso do plano anual para ter todos os recursos?", answer: "Não. Mensal, trimestral e anual incluem os mesmos recursos. Escolha o ciclo de cobrança que faz mais sentido para sua empresa." },
       { question: "Estoque e PDV custam a mais?", answer: "Não. Todos os recursos estão incluídos em qualquer ciclo: mensal, trimestral ou anual." },
       { question: "O sistema envia mensagens automaticamente no WhatsApp?", answer: "Não. Ele prepara o aviso e o PDF da OS ou da garantia. Você abre seu WhatsApp, confirma o destinatário e compartilha ou anexa o documento." },
-      { question: "Posso cancelar a renovação?", answer: "Sim. Gerencie a assinatura dentro do sistema. Ao cancelar a renovação, o acesso permanece até o fim do período já pago. Para pedidos de reembolso, consulte a política de 14 dias." },
+      { question: "Posso cancelar a renovação?", answer: "Sim. Gerencie a assinatura dentro do sistema. Ao cancelar a renovação, o acesso permanece até o fim do período já pago. Para pedidos de reembolso, consulte a política de 7 dias." },
     ].map((item) => <details key={item.question} className="py-5"><summary className="cursor-pointer font-semibold">{item.question}</summary><p className="mt-3 text-sm leading-7 text-muted-foreground">{item.answer}</p></details>)}</div></div></section>
 
-    <section className="py-16 sm:py-20"><div className="mx-auto max-w-4xl px-5 text-center sm:px-8"><span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary"><Wrench className="size-7" /></span><h2 className="mt-5 font-display text-3xl font-extrabold sm:text-4xl">Pronto para organizar sua assistência?</h2><p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">Comece com 3 dias grátis e descubra como o Service Pro OS pode simplificar sua rotina.</p><Button size="lg" className="mt-7 gap-2" onClick={goToSignup}>Iniciar teste grátis <ArrowRight className="size-4" /></Button><p className="mt-3 text-xs text-muted-foreground">Já tem conta? <button className="font-semibold text-primary underline-offset-4 hover:underline" onClick={goToLogin}>Entre aqui</button></p></div></section>
+    <section className="py-16 sm:py-20"><div className="mx-auto max-w-4xl px-5 text-center sm:px-8"><span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary"><Wrench className="size-7" /></span><h2 className="mt-5 font-display text-3xl font-extrabold sm:text-4xl">Pronto para organizar sua assistência?</h2><p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">Assine com 7 dias de garantia e descubra como o Service Pro OS pode simplificar sua rotina.</p><Button size="lg" className="mt-7 gap-2" onClick={goToSignup}>Assinar agora <ArrowRight className="size-4" /></Button><p className="mt-3 text-xs text-muted-foreground">Já tem conta? <button className="font-semibold text-primary underline-offset-4 hover:underline" onClick={goToLogin}>Entre aqui</button></p></div></section>
 
     <footer className="border-t"><div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-7 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8"><div><span className="font-display font-bold text-foreground">Service Pro OS</span><span className="ml-2">Gestão para assistência técnica</span></div><p className="flex flex-wrap gap-3"><a href="/termos" className="underline">Termos</a><a href="/privacidade" className="underline">Privacidade</a><a href="/reembolso" className="underline">Reembolso</a><span>© {new Date().getFullYear()} Service Pro OS</span></p></div></footer>
   </main>;

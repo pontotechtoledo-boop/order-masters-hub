@@ -42,15 +42,29 @@ export const Route = createFileRoute("/api/public/payments/hotmart")({
     const occurredAt = new Date(parsed.creation_date ?? Date.now()).toISOString();
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: result, error } = await supabaseAdmin.rpc("process_hotmart_event" as never, {
+      const email = (data.buyer?.email ?? "").trim().toLowerCase();
+      const run = () => supabaseAdmin.rpc("process_hotmart_event" as never, {
         _event_id: parsed.id,
         _event: parsed.event,
         _occurred_at: occurredAt,
-        _email: data.buyer?.email ?? "",
+        _email: email,
         _subscriber_code: data.subscription?.subscriber?.code ?? data.purchase?.transaction ?? "",
         _price_id: priceId,
       } as never);
+      let { data: result, error } = await run();
       if (error) throw error;
+      // Primeira compra com e-mail novo: cria o acesso e envia o convite para definir a senha.
+      // Clientes que já têm conta nunca recebem novo convite; só têm o período estendido.
+      if (result === "user_not_found" && email) {
+        const buyerName = (data.buyer as { name?: string } | undefined)?.name;
+        const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+          data: { full_name: buyerName ?? email.split("@")[0] },
+          redirectTo: "https://serviceproos.app/reset-password",
+        });
+        if (inviteError) throw inviteError;
+        ({ data: result, error } = await run());
+        if (error) throw error;
+      }
       if (result !== "ok" && result !== "duplicate") console.warn("Hotmart evento não aplicado:", parsed.event, result);
       return Response.json({ received: true, result });
     } catch (error) {
