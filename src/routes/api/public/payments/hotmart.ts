@@ -25,7 +25,9 @@ function safeEqual(a: string, b: string) {
 }
 
 export const Route = createFileRoute("/api/public/payments/hotmart")({
-  server: { handlers: { POST: async ({ request }) => {
+  server: { handlers: {
+    GET: async () => Response.json({ ok: true }),
+    POST: async ({ request }) => {
     const secret = process.env["HOTMART_HOTTOK"];
     const hottok = request.headers.get("x-hotmart-hottok") ?? "";
     if (!secret || !safeEqual(hottok, secret)) return new Response("Não autorizado", { status: 401 });
