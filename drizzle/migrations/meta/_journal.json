@@ -99,6 +99,13 @@
       "when": 1792516001063,
       "tag": "0013_deprecate_paddle_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792957189866,
+      "tag": "0014_hotmart_auto_account_and_grace",
+      "breakpoints": true
     }
   ]
 }
