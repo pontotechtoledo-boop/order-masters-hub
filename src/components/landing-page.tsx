@@ -157,7 +157,7 @@ export function LandingPage() {
             <button type="button" onClick={goToSignup} className="mt-3 text-sm font-semibold text-primary underline-offset-4 hover:underline">Ou teste 3 dias grátis</button>
           </article>)}
         </div>
-        <p className="mt-6 text-center text-xs text-muted-foreground">Renovação automática conforme o ciclo contratado. Você pode cancelar a renovação e manter o acesso até o fim do período pago. Consulte os termos e a política de reembolso de 14 dias.</p>
+        <p className="mt-6 text-center text-xs text-muted-foreground">Renovação automática conforme o ciclo contratado. Você pode cancelar a renovação e manter o acesso até o fim do período pago. Consulte os termos e a política de reembolso de 7 dias.</p>
       </div>
     </section>
 
@@ -166,7 +166,7 @@ export function LandingPage() {
       { question: "Preciso do plano anual para ter todos os recursos?", answer: "Não. Mensal, trimestral e anual incluem os mesmos recursos. Escolha o ciclo de cobrança que faz mais sentido para sua empresa." },
       { question: "Estoque e PDV custam a mais?", answer: "Não. Todos os recursos estão incluídos em qualquer ciclo: mensal, trimestral ou anual." },
       { question: "O sistema envia mensagens automaticamente no WhatsApp?", answer: "Não. Ele prepara o aviso e o PDF da OS ou da garantia. Você abre seu WhatsApp, confirma o destinatário e compartilha ou anexa o documento." },
-      { question: "Posso cancelar a renovação?", answer: "Sim. Gerencie a assinatura dentro do sistema. Ao cancelar a renovação, o acesso permanece até o fim do período já pago. Para pedidos de reembolso, consulte a política de 14 dias." },
+      { question: "Posso cancelar a renovação?", answer: "Sim. Gerencie a assinatura dentro do sistema. Ao cancelar a renovação, o acesso permanece até o fim do período já pago. Para pedidos de reembolso, consulte a política de 7 dias." },
     ].map((item) => <details key={item.question} className="py-5"><summary className="cursor-pointer font-semibold">{item.question}</summary><p className="mt-3 text-sm leading-7 text-muted-foreground">{item.answer}</p></details>)}</div></div></section>
 
     <section className="py-16 sm:py-20"><div className="mx-auto max-w-4xl px-5 text-center sm:px-8"><span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary"><Wrench className="size-7" /></span><h2 className="mt-5 font-display text-3xl font-extrabold sm:text-4xl">Pronto para organizar sua assistência?</h2><p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">Comece com 3 dias grátis e descubra como o Service Pro OS pode simplificar sua rotina.</p><Button size="lg" className="mt-7 gap-2" onClick={goToSignup}>Iniciar teste grátis <ArrowRight className="size-4" /></Button><p className="mt-3 text-xs text-muted-foreground">Já tem conta? <button className="font-semibold text-primary underline-offset-4 hover:underline" onClick={goToLogin}>Entre aqui</button></p></div></section>
