@@ -153,7 +153,8 @@ export function LandingPage() {
             <h3 className="font-display text-xl font-bold">{plan.name}</h3><p className="mt-2 text-sm text-muted-foreground">{plan.detail}</p>
             <p className="mt-6"><span className="font-display text-3xl font-extrabold">{plan.price}</span><span className="text-sm text-muted-foreground">{plan.period}</span></p>
             <p className="mt-3 text-xs leading-5 text-muted-foreground">{plan.equivalent}</p><p className="mt-6 font-semibold">Incluído neste plano</p><ul className="mt-4 grid gap-3 text-sm text-muted-foreground">{included.map((benefit) => <li key={benefit} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-primary" /><span>{benefit}</span></li>)}</ul><div className="h-7" />
-            <Button variant={plan.featured ? "default" : "outline"} className="mt-auto w-full gap-2 self-end" onClick={goToSignup}>Começar teste grátis <ArrowRight className="size-4" /></Button>
+            <Button asChild variant={plan.featured ? "default" : "outline"} className="mt-auto w-full gap-2 self-end"><a href={{ Mensal: "https://pay.hotmart.com/W108179804M?off=m9mvnjhc", Trimestral: "https://pay.hotmart.com/W108179804M?off=qo10u1si", Anual: "https://pay.hotmart.com/W108179804M?off=m8p4t7ri" }[plan.name] ?? "/cadastro"} target="_blank" rel="noopener noreferrer">Assinar {plan.name.toLowerCase()} <ArrowRight className="size-4" /></a></Button>
+            <button type="button" onClick={goToSignup} className="mt-3 text-sm font-semibold text-primary underline-offset-4 hover:underline">Ou teste 3 dias grátis</button>
           </article>)}
         </div>
         <p className="mt-6 text-center text-xs text-muted-foreground">Renovação automática conforme o ciclo contratado. Você pode cancelar a renovação e manter o acesso até o fim do período pago. Consulte os termos e a política de reembolso de 14 dias.</p>
