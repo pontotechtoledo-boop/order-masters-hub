@@ -1,4 +1,5 @@
 // @ts-nocheck -- typed DB client lags behind newer tables; runtime behavior unchanged
+import { isInRenewalGrace, RENEWAL_GRACE_MS } from "@/lib/subscriptions";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -130,7 +131,8 @@ function Index(){
   const trialDays = data && !data.paidAccess && data.trialActive ? Math.max(1, Math.ceil((Date.parse(data.organization.trial_ends_at) - Date.now()) / 86400000)) : null;
   const readOnly = Boolean(data && !data.trialActive && !data.paidAccess && everSubscribed);
   const pastDue = Boolean(data?.paidAccess && data.subscription?.status === "past_due");
-  const banner=<>{trialDays!==null&&<div className="border-b bg-accent px-4 py-1.5 text-center text-xs text-accent-foreground"><b>Versão trial</b> · {trialDays} {trialDays===1?"dia restante":"dias restantes"}</div>}{pastDue&&<div role="alert" className="border-b bg-warning-soft px-4 py-1.5 text-center text-xs text-warning"><b>Pagamento pendente</b> · regularize em <a className="underline" href="/assinatura">Minha assinatura</a> para não perder o acesso.</div>}{readOnly&&<div role="alert" className="border-b bg-destructive/10 px-4 py-1.5 text-center text-xs text-destructive"><b>Somente consulta</b> · sua assinatura venceu. Você pode ver e exportar seus dados; para cadastrar ou alterar, <a className="underline" href="/assinatura">renove a assinatura</a>.</div>}</>;
+  const graceEnd = data?.subscription && isInRenewalGrace(data.subscription) ? new Date(Date.parse(data.subscription.current_period_end!) + RENEWAL_GRACE_MS).toLocaleDateString("pt-BR") : null;
+  const banner=<>{trialDays!==null&&<div className="border-b bg-accent px-4 py-1.5 text-center text-xs text-accent-foreground"><b>Versão trial</b> · {trialDays} {trialDays===1?"dia restante":"dias restantes"}</div>}{pastDue&&<div role="alert" className="border-b bg-warning-soft px-4 py-1.5 text-center text-xs text-warning"><b>Pagamento pendente</b> · regularize em <a className="underline" href="/assinatura">Minha assinatura</a> para não perder o acesso.</div>}{graceEnd&&<div role="alert" className="border-b bg-warning-soft px-4 py-1.5 text-center text-xs text-warning"><b>Seu plano venceu</b> · renove até {graceEnd} pela Hotmart para continuar usando. <a className="underline" href="/planos#planos">Renovar plano</a></div>}{readOnly&&<div role="alert" className="border-b bg-destructive/10 px-4 py-1.5 text-center text-xs text-destructive"><b>Somente consulta</b> · sua assinatura venceu. Você pode ver e exportar seus dados; para cadastrar ou alterar, <a className="underline" href="/assinatura">renove a assinatura</a>.</div>}</>;
   return <DashboardApp banner={banner}/>;
 }
 function DashboardApp({banner}:{banner?:ReactNode}){

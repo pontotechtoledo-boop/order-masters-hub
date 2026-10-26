@@ -55,7 +55,7 @@ export function LandingPage() {
         </nav>
         <div className="flex items-center gap-2">
           <Button variant="ghost" className="hidden sm:inline-flex" onClick={goToLogin}>Entrar</Button>
-          <Button onClick={goToSignup} className="gap-2">Testar grátis <ArrowRight className="size-4" /></Button>
+          <Button onClick={goToSignup} className="gap-2">Assinar <ArrowRight className="size-4" /></Button>
         </div>
       </div>
     </header>
