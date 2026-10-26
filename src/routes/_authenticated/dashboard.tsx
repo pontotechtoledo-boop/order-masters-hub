@@ -1,3 +1,4 @@
+import { isInRenewalGrace, RENEWAL_GRACE_MS } from "@/lib/subscriptions";
 // @ts-nocheck -- typed DB client lags behind newer tables; runtime behavior unchanged
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
