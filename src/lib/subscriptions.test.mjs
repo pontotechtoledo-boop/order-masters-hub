@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { findPlan, hasPaidAccess } from "./subscriptions";
+import { findPlan, hasPaidAccess, isInRenewalGrace } from "./subscriptions";
 describe("Planos aprovados", () => {
   test("mensal R$ 29,90 por mês", () => { expect(findPlan("pontotech_monthly")).toMatchObject({ amount: 2990, interval: "month", frequency: 1 }); });
   test("trimestral R$ 69,90 a cada três meses", () => { expect(findPlan("pontotech_quarterly")).toMatchObject({ amount: 6990, interval: "month", frequency: 3 }); });
@@ -13,5 +13,11 @@ describe("Planos aprovados", () => {
     const sub = { status: "past_due", current_period_end: null, first_failed_at: "2026-10-10T00:00:00Z" };
     expect(hasPaidAccess(sub, Date.parse("2026-10-16T23:59:59Z"))).toBe(true);
     expect(hasPaidAccess(sub, Date.parse("2026-10-17T00:00:00Z"))).toBe(false);
+  });
+  test("plano vencido continua por mais 7 dias com aviso", () => {
+    const sub = { status: "active", current_period_end: "2026-11-01T00:00:00Z" };
+    expect(isInRenewalGrace(sub, Date.parse("2026-11-03T00:00:00Z"))).toBe(true);
+    expect(hasPaidAccess(sub, Date.parse("2026-11-07T23:59:59Z"))).toBe(true);
+    expect(hasPaidAccess(sub, Date.parse("2026-11-08T00:00:00Z"))).toBe(false);
   });
 });

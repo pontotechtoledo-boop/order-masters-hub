@@ -10,9 +10,16 @@ export function findPlan(id: string) {
   if (!plan) throw new Error("Plano inválido.");
   return plan;
 }
+/** Dias extras de uso após o fim do período pago, com aviso para renovar. */
+export const RENEWAL_GRACE_MS = 7 * 86400000;
+export function isInRenewalGrace(subscription: { status: string; current_period_end: string | null } | null, now = Date.now()) {
+  if (!subscription?.current_period_end || subscription.status !== "active") return false;
+  const end = Date.parse(subscription.current_period_end);
+  return now >= end && now < end + RENEWAL_GRACE_MS;
+}
 export function hasPaidAccess(subscription: { status: string; current_period_end: string | null; first_failed_at?: string | null } | null, now = Date.now()) {
   if (!subscription) return false;
   if (subscription.status === "past_due") return Boolean(subscription.first_failed_at && now < Date.parse(subscription.first_failed_at) + 7 * 86400000);
   if (subscription.status === "canceled") return Boolean(subscription.current_period_end && Date.parse(subscription.current_period_end) > now);
-  return ["active", "trialing"].includes(subscription.status) && (!subscription.current_period_end || Date.parse(subscription.current_period_end) > now);
+  return ["active", "trialing"].includes(subscription.status) && (!subscription.current_period_end || Date.parse(subscription.current_period_end) + RENEWAL_GRACE_MS > now);
 }
