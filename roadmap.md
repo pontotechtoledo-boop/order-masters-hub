@@ -88,5 +88,6 @@
 ## Verificação das alterações da Hotmart
 - [x] Executar os testes existentes de planos, acesso e integração Hotmart
 - [x] Usar os tipos gerados na chamada de processamento de eventos Hotmart
-- [ ] Confirmar o resultado automático da verificação completa de tipos e build
+- [x] Confirmar build automático aprovado, páginas sem erros e webhook com GET 200 / POST sem chave 401
+- [ ] Confirmar relatório separado da verificação completa de tipos — não disponibilizado pela verificação automática
 - [ ] Confirmar compra aprovada e recebimento do primeiro acesso — depende de compra de teste na Hotmart
