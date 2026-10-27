@@ -91,3 +91,5 @@
 - [x] Confirmar build automático aprovado, páginas sem erros e webhook com GET 200 / POST sem chave 401
 - [ ] Confirmar relatório separado da verificação completa de tipos — não disponibilizado pela verificação automática
 - [ ] Confirmar compra aprovada e recebimento do primeiro acesso — depende de compra de teste na Hotmart
+- [x] Verificar endereço publicado da Hotmart — GET 200 e resposta de saúde correta
+- [ ] Realizar teste originado na Hotmart e conferir processamento — depende de envio pelo painel Hotmart e e-mail de teste acessível ao usuário; nenhum evento Hotmart registrado na consulta atual
