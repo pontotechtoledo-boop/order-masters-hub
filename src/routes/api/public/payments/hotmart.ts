@@ -43,14 +43,14 @@ export const Route = createFileRoute("/api/public/payments/hotmart")({
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const email = (data.buyer?.email ?? "").trim().toLowerCase();
-      const run = () => supabaseAdmin.rpc("process_hotmart_event" as never, {
+      const run = () => supabaseAdmin.rpc("process_hotmart_event", {
         _event_id: parsed.id,
         _event: parsed.event,
         _occurred_at: occurredAt,
         _email: email,
         _subscriber_code: data.subscription?.subscriber?.code ?? data.purchase?.transaction ?? "",
         _price_id: priceId,
-      } as never);
+      });
       let { data: result, error } = await run();
       if (error) throw error;
       // Primeira compra com e-mail novo: cria o acesso e envia o convite para definir a senha.
