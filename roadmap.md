@@ -1,9 +1,9 @@
 # Roadmap PontoTech Toledo
 
 ## Login por e-mail e assinatura Hotmart
-- [ ] Alterar login para e-mail e manter recuperação de senha
-- [ ] Mostrar os três links Hotmart na assinatura interna com situação e vencimento
-- [ ] Validar login e assinatura em sessão autenticada, testes e verificação automática
+- [x] Alterar login para e-mail e manter recuperação de senha
+- [x] Mostrar os três links Hotmart na assinatura interna com situação e vencimento
+- [x] Validar formato do e-mail, recuperação sem e-mail, assinatura autenticada e tela de contratação no painel; 14 testes aprovados e build automático OK
 
 ## Informações comerciais e identidade do site
 - [x] Detalhar benefícios reais e recursos incluídos nos três planos sem mudar o design
