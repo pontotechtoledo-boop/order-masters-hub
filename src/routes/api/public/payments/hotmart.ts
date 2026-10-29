@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { planIdFromHotmartAmount } from "@/lib/hotmart";
+import { planIdFromHotmartPurchase } from "@/lib/hotmart";
 
 const payloadSchema = z.object({
   id: z.string().min(1).max(200),
@@ -10,8 +10,9 @@ const payloadSchema = z.object({
     buyer: z.object({ email: z.string().email().max(320) }).partial().optional(),
     purchase: z.object({
       transaction: z.string().max(200).optional(),
-      price: z.object({ value: z.number() }).partial().optional(),
-      full_price: z.object({ value: z.number() }).partial().optional(),
+      offer: z.object({ code: z.string().max(200) }).partial().optional(),
+      price: z.object({ value: z.number(), currency_value: z.string().max(10) }).partial().optional(),
+      full_price: z.object({ value: z.number(), currency_value: z.string().max(10) }).partial().optional(),
     }).partial().optional(),
     subscription: z.object({ subscriber: z.object({ code: z.string().max(200) }).partial().optional() }).partial().optional(),
   }).passthrough(),
@@ -37,8 +38,12 @@ export const Route = createFileRoute("/api/public/payments/hotmart")({
     catch { return new Response("Dados inválidos", { status: 400 }); }
 
     const { data } = parsed;
-    const amount = data.purchase?.full_price?.value ?? data.purchase?.price?.value ?? null;
-    const priceId = planIdFromHotmartAmount(amount) ?? "";
+    const priceId = planIdFromHotmartPurchase(data.purchase) ?? "";
+    // Não consome o evento: a Hotmart deve poder reenviar após corrigir a oferta.
+    if (["PURCHASE_APPROVED", "PURCHASE_COMPLETE"].includes(parsed.event) && !priceId) {
+      console.warn("Hotmart compra não aplicada: oferta ou preço não reconhecido", parsed.id);
+      return new Response("Plano não reconhecido", { status: 422 });
+    }
     const occurredAt = new Date(parsed.creation_date ?? Date.now()).toISOString();
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -66,6 +71,7 @@ export const Route = createFileRoute("/api/public/payments/hotmart")({
         if (error) throw error;
       }
       if (result !== "ok" && result !== "duplicate") console.warn("Hotmart evento não aplicado:", parsed.event, result);
+      if (result === "unknown_plan") return new Response("Plano não reconhecido", { status: 422 });
       return Response.json({ received: true, result });
     } catch (error) {
       console.error("Falha ao processar evento Hotmart", error);
