@@ -12,3 +12,22 @@ export function planIdFromHotmartAmount(value: number | null | undefined): PlanI
   const cents = Math.round(value * 100);
   return subscriptionPlans.find(plan => plan.amount === cents)?.id ?? null;
 }
+
+/** A oferta identifica o ciclo mesmo com descontos, taxas ou conversão de moeda. */
+export function planIdFromHotmartPurchase(purchase: {
+  offer?: { code?: string };
+  price?: { value?: number; currency_value?: string };
+  full_price?: { value?: number; currency_value?: string };
+} | null | undefined): PlanId | null {
+  const offerCode = purchase?.offer?.code;
+  if (offerCode) {
+    const match = subscriptionPlans.find(plan => new URL(hotmartCheckoutLinks[plan.id]).searchParams.get("off") === offerCode);
+    if (match) return match.id;
+  }
+  for (const price of [purchase?.price, purchase?.full_price]) {
+    if (price?.currency_value && price.currency_value !== "BRL") continue;
+    const plan = planIdFromHotmartAmount(price?.value);
+    if (plan) return plan;
+  }
+  return null;
+}

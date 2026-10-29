@@ -1,5 +1,10 @@
 # Roadmap PontoTech Toledo
 
+## Renovação real Hotmart não reconhecida
+- [x] Confirmar recebimento de compra aprovada e diagnóstico `unknown_plan`
+- [ ] Corrigir identificação por oferta Hotmart e validar os três planos
+- [ ] Reprocessar compra real após confirmação dos detalhes do evento; não liberar por simulação
+
 ## Login por e-mail e assinatura Hotmart
 - [x] Alterar login para e-mail e manter recuperação de senha
 - [x] Mostrar os três links Hotmart na assinatura interna com situação e vencimento

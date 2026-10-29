@@ -15,6 +15,7 @@
 - Resolve checkout through authenticated server-created transactions bound to the organization's authorized billing manager; never trust checkout custom data supplied directly by the browser.
 - Reuse the subscription page in the dashboard and dedicated authenticated billing route so both entry points share checkout and status behavior.
 - Use the shared Hotmart checkout-link catalog for subscription CTAs and read live billing records independently of Stripe browser tokens, so Hotmart access does not depend on Stripe activation.
+- Resolve Hotmart purchase cycles from the shared checkout offer codes before BRL amount fallback, and reject unrecognized approvals before event deduplication so they remain retryable.
 - Route all dashboard section selections through one navigation handler so sidebar expansion and scroll reset stay consistent across menus and quick actions.
 - Reuse operational-list helpers for initial limits and customer/order searches so the three operational lists follow the same rules.
 - Use warranties.order_number for the public number and retain warranties.code as the unique authenticity identifier; different organizations can have the same OS number.
