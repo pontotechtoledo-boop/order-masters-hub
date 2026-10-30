@@ -15,9 +15,9 @@ export function planIdFromHotmartAmount(value: number | null | undefined): PlanI
 
 /** A oferta identifica o ciclo mesmo com descontos, taxas ou conversão de moeda. */
 export function planIdFromHotmartPurchase(purchase: {
-  offer?: { code?: string };
-  price?: { value?: number; currency_value?: string };
-  full_price?: { value?: number; currency_value?: string };
+  offer?: { code?: string | undefined } | undefined;
+  price?: { value?: number | undefined; currency_value?: string | undefined } | undefined;
+  full_price?: { value?: number | undefined; currency_value?: string | undefined } | undefined;
 } | null | undefined): PlanId | null {
   const offerCode = purchase?.offer?.code;
   if (offerCode) {
