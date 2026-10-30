@@ -1521,6 +1521,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      subscription_allows_write: {
+        Args: {
+          _first_failed_at: string
+          _now: string
+          _period_end: string
+          _status: string
+        }
+        Returns: boolean
+      }
       sync_sale_income: {
         Args: {
           _amount: number
