@@ -10,7 +10,7 @@
 - [x] Corrigir identificação por oferta Hotmart e validar os três planos; 20 testes aprovados e build automático OK
 - [x] Liberar reenvio somente do evento aprovado que falhou, sem alterar a validade manualmente
 - [ ] Reprocessar compra real — depende de publicação e reenvio pela Hotmart; payload original não disponível para replay seguro
-- [ ] Conferir bloqueio de escrita após pagamento — empresa ainda está como trial; apenas subscriptions é atualizado pela função Hotmart, sem sincronização automática instalada
+- [x] Corrigir bloqueio pelo trial expirado: escrita passa a consultar a assinatura live e respeitar os sete dias de tolerância
 
 ## Login por e-mail e assinatura Hotmart
 - [x] Alterar login para e-mail e manter recuperação de senha
