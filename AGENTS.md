@@ -11,6 +11,7 @@
 
 - Keep all PontoTech visual roles centralized as semantic tokens in `src/styles.css` so every screen stays theme-consistent.
 - Keep subscription rules in a shared domain module and enforce writes in database triggers; client UI is never an access boundary.
+- Derive operational write access from the latest live subscription through organization_has_write_access, not the organization's legacy trial status, so paid renewals and grace periods agree across UI and database.
 - Process signed Paddle events transactionally through a service-role-only database function with event deduplication and chronological subscription updates.
 - Resolve checkout through authenticated server-created transactions bound to the organization's authorized billing manager; never trust checkout custom data supplied directly by the browser.
 - Reuse the subscription page in the dashboard and dedicated authenticated billing route so both entry points share checkout and status behavior.
