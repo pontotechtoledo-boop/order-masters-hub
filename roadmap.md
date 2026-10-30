@@ -2,8 +2,9 @@
 
 ## Renovação real Hotmart não reconhecida
 - [x] Confirmar recebimento de compra aprovada e diagnóstico `unknown_plan`
-- [ ] Corrigir identificação por oferta Hotmart e validar os três planos
-- [ ] Reprocessar compra real após confirmação dos detalhes do evento; não liberar por simulação
+- [x] Corrigir identificação por oferta Hotmart e validar os três planos; 20 testes aprovados e build automático OK
+- [x] Liberar reenvio somente do evento aprovado que falhou, sem alterar a validade manualmente
+- [ ] Reprocessar compra real — depende de publicação e reenvio pela Hotmart; payload original não disponível para replay seguro
 
 ## Login por e-mail e assinatura Hotmart
 - [x] Alterar login para e-mail e manter recuperação de senha
