@@ -11,6 +11,7 @@
 - [x] Liberar reenvio somente do evento aprovado que falhou, sem alterar a validade manualmente
 - [ ] Reprocessar compra real — depende de publicação e reenvio pela Hotmart; payload original não disponível para replay seguro
 - [x] Corrigir bloqueio pelo trial expirado: escrita passa a consultar a assinatura live e respeitar os sete dias de tolerância
+- [x] Validar na sessão de Cristiano acesso de escrita autorizado, painel disponível e seis testes determinísticos no banco; aviso persiste porque a compra real ainda não atualizou a validade
 
 ## Login por e-mail e assinatura Hotmart
 - [x] Alterar login para e-mail e manter recuperação de senha
