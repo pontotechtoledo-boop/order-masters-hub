@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, CheckCircle2, ClipboardCheck, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, UserPlus, Wrench } from "lucide-react";
+import { ArrowRight, CheckCircle2, ClipboardCheck, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,8 +32,7 @@ function AuthPage() {
           {message&&<p className="rounded-md border bg-muted p-3 text-sm" role="status">{message}</p>}
           <Button className="mt-1 h-12 gap-2 shadow-brand" disabled={loading}>{loading?"Entrando…":<>Entrar no painel <ArrowRight className="size-4"/></>}</Button>
         </form>
-        <p className="mt-4 text-sm text-muted-foreground">Primeiro acesso? Confira no e-mail da compra o link para criar sua senha. Para recuperar o acesso, use “Esqueci minha senha”.</p>
-        <Button type="button" variant="outline" className="mt-4 h-12 w-full gap-2" onClick={()=>{window.location.href="/planos"}}><UserPlus className="size-4"/> Ainda não tenho acesso — ver planos</Button><p className="mt-4 flex justify-center gap-3 text-xs text-muted-foreground"><a href="/termos" className="underline">Termos</a><a href="/privacidade" className="underline">Privacidade</a><a href="/reembolso" className="underline">Reembolso</a></p>
+        <p className="mt-4 flex justify-center gap-3 text-xs text-muted-foreground"><a href="/termos" className="underline">Termos</a><a href="/privacidade" className="underline">Privacidade</a><a href="/reembolso" className="underline">Reembolso</a></p>
       </div>
     </section>
     <aside className="auth-showcase relative hidden min-h-screen overflow-hidden bg-brand-ink p-12 text-brand-ink-foreground lg:flex lg:flex-col lg:justify-between">
