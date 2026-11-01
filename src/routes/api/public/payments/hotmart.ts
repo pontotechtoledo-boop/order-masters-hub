@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { planIdFromHotmartPurchase } from "@/lib/hotmart";
+import { hotmartConfirmationKey } from "@/lib/hotmart-notification";
 
 const payloadSchema = z.object({
   id: z.string().min(1).max(200),
   event: z.string().min(1).max(80),
   creation_date: z.number().optional(),
   data: z.object({
-    buyer: z.object({ email: z.string().email().max(320) }).partial().optional(),
+    buyer: z.object({ email: z.string().email().max(320), name: z.string().max(200).optional() }).partial().optional(),
     purchase: z.object({
       transaction: z.string().max(200).optional(),
       offer: z.object({ code: z.string().max(200) }).partial().optional(),
@@ -38,6 +39,9 @@ export const Route = createFileRoute("/api/public/payments/hotmart")({
     catch { return new Response("Dados inválidos", { status: 400 }); }
 
     const { data } = parsed;
+    if (["PURCHASE_APPROVED", "PURCHASE_COMPLETE"].includes(parsed.event) && !data.buyer?.email) {
+      return new Response("E-mail do comprador obrigatório", { status: 400 });
+    }
     const priceId = planIdFromHotmartPurchase(data.purchase) ?? "";
     // Não consome o evento: a Hotmart deve poder reenviar após corrigir a oferta.
     if (["PURCHASE_APPROVED", "PURCHASE_COMPLETE"].includes(parsed.event) && !priceId) {
@@ -61,7 +65,7 @@ export const Route = createFileRoute("/api/public/payments/hotmart")({
       // Primeira compra com e-mail novo: cria o acesso e envia o convite para definir a senha.
       // Clientes que já têm conta nunca recebem novo convite; só têm o período estendido.
       if (result === "user_not_found" && email) {
-        const buyerName = (data.buyer as { name?: string } | undefined)?.name;
+        const buyerName = data.buyer?.name;
         const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
           data: { full_name: buyerName ?? email.split("@")[0] },
           redirectTo: "https://serviceproos.app/reset-password",
@@ -72,6 +76,16 @@ export const Route = createFileRoute("/api/public/payments/hotmart")({
       }
       if (result !== "ok" && result !== "duplicate") console.warn("Hotmart evento não aplicado:", parsed.event, result);
       if (result === "unknown_plan") return new Response("Plano não reconhecido", { status: 422 });
+      const confirmationKey = hotmartConfirmationKey(parsed.event, result, parsed.id, data.purchase?.transaction);
+      if (confirmationKey && email) {
+        // A retry can reach a duplicate database event after an email failure.
+        // The managed send key deduplicates approval/completion of the same payment.
+        const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+        await sendTemplateEmail("subscription-confirmation", email, {
+          templateData: { name: data.buyer?.name },
+          idempotencyKey: confirmationKey,
+        });
+      }
       return Response.json({ received: true, result });
     } catch (error) {
       console.error("Falha ao processar evento Hotmart", error);

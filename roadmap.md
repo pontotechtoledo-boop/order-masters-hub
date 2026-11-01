@@ -1,9 +1,10 @@
 # Roadmap PontoTech Toledo
 
 ## E-mails de compra e renovação Hotmart
-- [ ] Preparar envio de e-mail com link https://serviceproos.app/auth após confirmação de compra ou renovação
-- [ ] Preservar convite para criar senha no primeiro acesso e senha existente nas renovações
-- [ ] Validar envio sem duplicação e confirmar disponibilidade do domínio de e-mail
+- [x] Preparar envio de e-mail com link https://serviceproos.app/auth após confirmação de compra ou renovação
+- [x] Preservar convite para criar senha no primeiro acesso e senha existente nas renovações
+- [ ] Validar confirmação e proteção contra duplicação
+- [ ] Confirmar entrega real — depende da verificação DNS de notify.serviceproos.app e publicação
 
 ## Renovação real Hotmart não reconhecida
 - [x] Confirmar recebimento de compra aprovada e diagnóstico `unknown_plan`
