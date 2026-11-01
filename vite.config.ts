@@ -9,7 +9,7 @@ import { loadEnv } from "vite";
 import path from "node:path";
 
 // Keep private environment values on the server, never in client defines.
-Object.assign(process.env, loadEnv(process.env.NODE_ENV === 'production' ? 'production' : 'development', process.cwd(), ''));
+Object.assign(process.env, loadEnv(process.env['NODE_ENV'] === 'production' ? 'production' : 'development', process.cwd(), ''));
 
 export default defineConfig({
   vite: {
