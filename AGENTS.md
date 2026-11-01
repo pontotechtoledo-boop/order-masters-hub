@@ -26,3 +26,4 @@
 - Share paper-size settings across OS and warranty printing so standard and thermal printers use the same document content.
 - Generate shareable order and warranty PDFs on demand in the browser with private photos; use native file sharing or downloads and recipient-specific WhatsApp notices, never claim wa.me attaches files or confirms delivery.
 - Derive the public SVG favicon from the login's wrench icon and reference it in the root head so the site icon matches the product identity.
+- Send purchase and renewal confirmations only from the verified Hotmart handler after payment processing, using managed email and a payment-scoped idempotency key; replayed database events can retry failed email without extending access again.
