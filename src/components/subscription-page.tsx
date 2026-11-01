@@ -46,7 +46,7 @@ export function SubscriptionPage({ organizationId, embedded = false }: { organiz
         </article>)}</div>
       </section>
       {!data?.canManage && <p className="text-sm text-muted-foreground">A contratação e a gestão ficam disponíveis para o proprietário ou administrador da empresa.</p>}
-      <footer className="flex flex-wrap items-start gap-2 border-t pt-5 text-xs leading-5 text-muted-foreground"><ShieldCheck className="mt-0.5 size-4 shrink-0" /><p>Pagamento seguro pela Hotmart. Use o mesmo e-mail da sua conta na compra para manter seu acesso e seus dados.<br />A renovação automática e o cancelamento são gerenciados na Hotmart. Pagamentos aprovados atualizam esta assinatura, sem gerar outra senha.<br /><a className="underline" href="/termos">Termos</a> · <a className="underline" href="/privacidade">Privacidade</a> · <a className="underline" href="/reembolso">Reembolso</a></p></footer>
+      <footer className="flex flex-wrap items-start gap-2 border-t pt-5 text-xs leading-5 text-muted-foreground"><ShieldCheck className="mt-0.5 size-4 shrink-0" /><p>Pagamento seguro pela Hotmart. Use o mesmo e-mail da sua conta na compra para manter seu acesso e seus dados.<br />A renovação automática e o cancelamento são gerenciados na Hotmart. Pagamentos aprovados atualizam esta assinatura.<br /><a className="underline" href="/termos">Termos</a> · <a className="underline" href="/privacidade">Privacidade</a> · <a className="underline" href="/reembolso">Reembolso</a></p></footer>
     </>}
   </div>;
 }
