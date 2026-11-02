@@ -18,7 +18,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "Serviceproos"
+const SITE_NAME = "Service Pro OS"
 const ROOT_DOMAIN = "serviceproos.app"
 
 // Sample data for preview mode ONLY (not used in actual email sending).
