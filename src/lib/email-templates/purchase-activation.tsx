@@ -1,0 +1,8 @@
+import { Body, Button, Head, Heading, Html, Preview, Text } from '@react-email/components';
+import type { TemplateEntry } from './registry';
+import { BrandCard, main, h1, text, button } from './brand';
+
+function PurchaseActivation({name,activationUrl}:{name?:string;activationUrl?:string}) {
+  return <Html lang="pt-BR"><Head/><Preview>Pagamento confirmado. Conclua seu cadastro no Service Pro OS.</Preview><Body style={main}><BrandCard><Heading style={h1}>Sua assinatura foi confirmada</Heading><Text style={text}>{name?`Olá, ${name}!`:'Olá!'}</Text><Text style={text}>Obrigado por escolher o Service Pro OS para cuidar da sua assistência técnica. Seu pagamento foi confirmado.</Text><Text style={text}>Agora, conclua seu cadastro e crie sua senha pelo link seguro abaixo. O link é pessoal, válido por 7 dias e deve ser utilizado uma única vez.</Text><Button href={activationUrl} style={button}>Concluir cadastro e criar senha</Button><Text style={{...text,marginTop:'20px'}}>Depois, acesse seu app de gestão em https://serviceproos.app/auth. Nas renovações, você mantém a mesma conta e senha.</Text><Text style={text}>Se o link expirar, use “Esqueci minha senha” na tela de login. Não faça uma nova compra.</Text></BrandCard></Body></Html>;
+}
+export const template={component:PurchaseActivation,subject:'Pagamento confirmado — conclua seu cadastro Service Pro OS',displayName:'Primeira compra: ativação da conta',previewData:{name:'Cliente',activationUrl:'https://serviceproos.app/ativar'}} satisfies TemplateEntry;
