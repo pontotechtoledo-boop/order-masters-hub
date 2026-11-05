@@ -101,3 +101,13 @@ button, [role="button"] {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
+
+/* Sales page roles retain the shared technical-blue identity. */
+:root {
+  --sales-hero-shade: linear-gradient(90deg, oklch(.22 .06 248 / .98) 0%, oklch(.27 .075 248 / .94) 46%, oklch(.28 .055 248 / .55) 100%);
+}
+.sales-hero-shade { background: var(--sales-hero-shade); }
+.sales-hero { min-height: 520px; }
+@media (max-width: 767px) {
+  .sales-hero { min-height: 0; }
+}
