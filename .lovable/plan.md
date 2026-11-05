@@ -1,7 +1,7 @@
 # Página de venda e assinatura antes da senha
 
 ## Resultado esperado
-Uma página mais persuasiva, com azuis mais presentes e duas entradas: comprar o plano agora ou criar a conta para conhecer o sistema com as abas bloqueadas.
+Uma página mais persuasiva, com azuis mais presentes e duas entradas: comprar o plano agora ou conhecer o sistema com as abas bloqueadas, sem informar e-mail nem criar conta.
 
 ## 1. Página de venda
 - Manter a identidade Service Pro OS, Sora/Manrope e os três preços: R$ 29,90 mensal, R$ 69,90 trimestral e R$ 299,90 anual.
@@ -10,6 +10,8 @@ Uma página mais persuasiva, com azuis mais presentes e duas entradas: comprar o
 - Apoiar a mensagem com benefícios concretos: fotos e checklist, garantia vinculada à OS, peças e lucro sob controle.
 - Mostrar preço inicial, compra segura e garantia própria de reembolso de 7 dias perto do botão principal.
 - Botões: “Assinar agora” e “Acesse e conheça o sistema”. Aproximar planos, telas reais e respostas às objeções.
+- Criar a seção “Acesse e conheça”, com botão que abre uma prévia pública do sistema sem pedir e-mail. Mostrar visão geral e todas as abas com cadeados; nenhuma operação ou dado privado estará disponível.
+- Na prévia, manter um botão “Assinar com Stripe”. Apenas ao decidir comprar, a pessoa escolhe o plano e informa os dados necessários ao pagamento e à futura conta.
 - Não usar cronômetro, vagas limitadas, depoimentos inventados, promessa de reajuste iminente ou preço congelado para sempre.
 
 ## 2. Comprar antes de escolher a senha
@@ -24,6 +26,7 @@ Uma página mais persuasiva, com azuis mais presentes e duas entradas: comprar o
 
 ## 3. Preservar o que já existe
 - Cadastro antes da compra continua disponível, com visão prévia e todas as abas visíveis e bloqueadas.
+- A nova prévia pública não substitui o painel autenticado: usa somente dados demonstrativos e não cria cadastro, empresa ou sessão de acesso.
 - Contratação dentro do sistema continua vinculada à pessoa autenticada e à sua assistência.
 - Compras e renovações confirmadas mantêm os e-mails com link de login.
 - Manter renovação automática, liberação após pagamento, tolerância de 7 dias e troca trimestral/anual na próxima renovação paga.
@@ -36,6 +39,7 @@ Uma página mais persuasiva, com azuis mais presentes e duas entradas: comprar o
 
 - Conferir novamente os três preços e os eventos de pagamento nos ambientes de teste e produção.
 - Testar em celular e computador os dois caminhos de compra, e-mail repetido, CPF/CNPJ inválido, pagamento recusado e confirmação pendente.
+- Conferir o caminho página → “Acesse e conheça” → prévia sem e-mail → abas bloqueadas → “Assinar com Stripe”, sem consultas operacionais ou acesso a informações de clientes.
 - Testar pagamento aprovado, ativação por e-mail, definição de senha, login e leitura da assinatura pela interface.
 - Testar notificações repetidas/fora de ordem, falha e reenvio de e-mail, renovação e mudança de ciclo sem duplicar assinatura.
 - Validar reembolso/contestação e bloqueio de operações sem pagamento.
@@ -43,6 +47,7 @@ Uma página mais persuasiva, com azuis mais presentes e duas entradas: comprar o
 - Após publicação pelo responsável, conferir a versão pública e acompanhar uma compra real controlada antes de ampliar os anúncios; a renovação real futura continuará sendo acompanhada separadamente.
 
 ## Detalhes técnicos
+- Criar uma página pública de prévia, reutilizando a navegação e a apresentação da visão geral em módulos compartilhados seguros; não importar a página operacional nem iniciar seus carregamentos. A seção da landing aponta para essa página, e a assinatura aponta para o novo fluxo público de compra.
 - Reutilizar Stripe Embedded Checkout e o cliente Stripe compartilhado, com preços e ambiente validados no servidor.
 - Acrescentar uma entidade privada de contratação inicial, com identidade gerada pelo servidor, sessão Stripe persistida e estados de pagamento/ativação separados. Não expor listas de usuários nem documentos ao público.
 - Vincular conta e empresa apenas após pagamento assinado e prova de posse do e-mail. Usar convite de autenticação ou capacidade aleatória, expirável e de uso único; não transformar pagamento em confirmação automática de e-mail.
