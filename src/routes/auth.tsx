@@ -4,8 +4,10 @@ import { ArrowRight, CheckCircle2, ClipboardCheck, Eye, EyeOff, LockKeyhole, Mai
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { selectedPlan } from "@/lib/subscriptions";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>) => ({ plano: selectedPlan(search.plano) }),
   head: () => ({ meta: [
     { title: "Entrar | Service Pro OS" },
     { name: "description", content: "Acesse o sistema de gestão da sua assistência técnica." },
@@ -19,15 +21,16 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { plano } = Route.useSearch();
   const [identifier,setIdentifier]=useState(""),[password,setPassword]=useState(""),[show,setShow]=useState(false),[loading,setLoading]=useState(false),[message,setMessage]=useState("");
-  const submit=async(e:React.FormEvent)=>{e.preventDefault();setLoading(true);setMessage("");try{const {error}=await supabase.auth.signInWithPassword({email:identifier.trim(),password});if(error){setMessage("E-mail ou senha inválidos.");return}navigate({to:"/dashboard",replace:true})}catch{setMessage("Não foi possível entrar. Tente novamente.")}finally{setLoading(false)}};
+  const submit=async(e:React.FormEvent)=>{e.preventDefault();setLoading(true);setMessage("");try{const {error}=await supabase.auth.signInWithPassword({email:identifier.trim(),password});if(error){setMessage("E-mail ou senha inválidos.");return}navigate({to:"/dashboard",search:{plano},replace:true})}catch{setMessage("Não foi possível entrar. Tente novamente.")}finally{setLoading(false)}};
   const forgot=async()=>{if(!identifier){setMessage("Digite seu e-mail para recuperar a senha.");return}const recoveryEmail=identifier.trim();if(!recoveryEmail.includes("@")){setMessage("Para recuperar a senha, informe o e-mail cadastrado.");return}const {error}=await supabase.auth.resetPasswordForEmail(recoveryEmail,{redirectTo:`${window.location.origin}/reset-password`});setMessage(error?"Não foi possível enviar o e-mail.":"Se o e-mail estiver cadastrado, você receberá as instruções.")};
   return <main className="min-h-screen bg-background lg:grid lg:grid-cols-[minmax(30rem,0.92fr)_minmax(34rem,1.08fr)]">
     <section className="flex min-h-screen items-center px-6 py-10 sm:px-12 lg:px-[clamp(3rem,7vw,8rem)]">
       <div className="mx-auto w-full max-w-md lg:mx-0">
         <div className="mb-8 flex items-center gap-3"><span className="grid size-11 place-items-center rounded-lg bg-primary text-primary-foreground shadow-brand"><Wrench className="size-5"/></span><div><p className="font-display text-lg font-extrabold leading-tight">Service Pro OS</p><p className="text-xs font-semibold text-primary">Gestão para sua Assistência Técnica</p></div></div><div className="mb-8"><p className="mb-3 text-xs font-bold uppercase text-primary">Área segura</p><h1 className="font-display text-3xl font-extrabold sm:text-4xl">Bem-vindo de volta</h1></div>
         <form className="grid gap-5" onSubmit={submit}>
-          <label className="grid gap-2 text-xs font-bold uppercase">E-mail<div className="relative"><Mail className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input className="h-12 bg-card pl-11" type="email" value={identifier} onChange={e=>setIdentifier(e.target.value)} autoComplete="email" placeholder="E-mail usado na compra" required/></div></label>
+          <label className="grid gap-2 text-xs font-bold uppercase">E-mail<div className="relative"><Mail className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input className="h-12 bg-card pl-11" type="email" value={identifier} onChange={e=>setIdentifier(e.target.value)} autoComplete="email" placeholder="E-mail" required/></div></label>
           <label className="grid gap-2 text-xs font-bold uppercase"><span className="flex items-center justify-between"><span>Senha</span><Button type="button" variant="link" className="h-auto p-0 text-xs normal-case" aria-label="Esqueci minha senha" onClick={e=>{e.preventDefault();forgot()}}>Esqueci minha senha</Button></span><div className="relative"><LockKeyhole className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/><Input className="h-12 bg-card px-11" type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="Digite sua senha" required/><Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1" onClick={()=>setShow(v=>!v)} aria-label={show?"Ocultar senha":"Mostrar senha"}>{show?<EyeOff/>:<Eye/>}</Button></div></label>
           {message&&<p className="rounded-md border bg-muted p-3 text-sm" role="status">{message}</p>}
           <Button className="mt-1 h-12 gap-2 shadow-brand" disabled={loading}>{loading?"Entrando…":<>Entrar no painel <ArrowRight className="size-4"/></>}</Button>

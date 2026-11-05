@@ -13,6 +13,8 @@
 - Reuse password guidance and validation across signup and recovery; hosted Auth remains the security boundary and breached-password protection must stay enabled.
 - Keep subscription rules in a shared domain module and enforce writes in database triggers; client UI is never an access boundary.
 - Derive operational write access only from the latest live paid subscription through organization_has_write_access, never legacy trial dates; keep the dashboard closed until billing is verified.
+- Render first-time unpaid accounts in a separate non-operational preview using the shared sidebar and overview; never mount operational loaders or dialogs there, and keep payment tied to authenticated billing.
+- Carry optional catalog-validated plan selection through signup, email confirmation and login URLs; selecting a plan never charges without checkout confirmation.
 - Process signed Stripe events transactionally through a service-role-only database function with event deduplication and chronological subscription updates.
 - Resolve checkout through authenticated server-created transactions bound to the organization's authorized billing manager; never trust checkout custom data supplied directly by the browser.
 - Reuse the subscription page in the dashboard and dedicated authenticated billing route so both entry points share checkout and status behavior.
