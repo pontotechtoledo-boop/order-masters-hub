@@ -706,6 +706,81 @@ export type Database = {
         }
         Relationships: []
       }
+      public_subscription_purchases: {
+        Row: {
+          activated_at: string | null
+          activation_expires_at: string | null
+          activation_token_hash: string | null
+          browser_token_hash: string
+          company_name: string
+          created_at: string
+          document: string
+          email: string
+          environment: string
+          expires_at: string
+          full_name: string
+          gateway_session_id: string | null
+          id: string
+          invite_token_hash: string | null
+          last_event_at: string | null
+          organization_id: string | null
+          paid_at: string | null
+          paid_payload: Json | null
+          price_id: string
+          provisioning_until: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          activated_at?: string | null
+          activation_expires_at?: string | null
+          activation_token_hash?: string | null
+          browser_token_hash: string
+          company_name: string
+          created_at?: string
+          document: string
+          email: string
+          environment: string
+          expires_at?: string
+          full_name: string
+          gateway_session_id?: string | null
+          id?: string
+          invite_token_hash?: string | null
+          last_event_at?: string | null
+          organization_id?: string | null
+          paid_at?: string | null
+          paid_payload?: Json | null
+          price_id: string
+          provisioning_until?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          activated_at?: string | null
+          activation_expires_at?: string | null
+          activation_token_hash?: string | null
+          browser_token_hash?: string
+          company_name?: string
+          created_at?: string
+          document?: string
+          email?: string
+          environment?: string
+          expires_at?: string
+          full_name?: string
+          gateway_session_id?: string | null
+          id?: string
+          invite_token_hash?: string | null
+          last_event_at?: string | null
+          organization_id?: string | null
+          paid_at?: string | null
+          paid_payload?: Json | null
+          price_id?: string
+          provisioning_until?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       sale_items: {
         Row: {
           description: string
@@ -1266,6 +1341,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_public_purchase_provisioning: {
+        Args: { _id: string }
+        Returns: boolean
+      }
+      complete_public_purchase: { Args: { _id: string }; Returns: boolean }
       consume_inventory_item: {
         Args: {
           _inventory_item_id: string
@@ -1419,6 +1499,10 @@ export type Database = {
         Returns: Json
       }
       ensure_user_organization: { Args: never; Returns: string }
+      initialize_public_purchase_identity: {
+        Args: { _id: string; _user_id: string }
+        Returns: string
+      }
       is_org_member: { Args: { _organization_id: string }; Returns: boolean }
       is_platform_owner: { Args: never; Returns: boolean }
       issue_service_order_warranty: {
@@ -1494,7 +1578,49 @@ export type Database = {
         }
         Returns: undefined
       }
+      public_purchase_owned_user: { Args: { _id: string }; Returns: string }
       read_order_quote: { Args: { _token: string }; Returns: Json }
+      record_public_purchase_payment: {
+        Args: {
+          _environment: string
+          _id: string
+          _paid_at: string
+          _payload: Json
+          _price_id: string
+          _session_id: string
+        }
+        Returns: {
+          activated_at: string | null
+          activation_expires_at: string | null
+          activation_token_hash: string | null
+          browser_token_hash: string
+          company_name: string
+          created_at: string
+          document: string
+          email: string
+          environment: string
+          expires_at: string
+          full_name: string
+          gateway_session_id: string | null
+          id: string
+          invite_token_hash: string | null
+          last_event_at: string | null
+          organization_id: string | null
+          paid_at: string | null
+          paid_payload: Json | null
+          price_id: string
+          provisioning_until: string | null
+          status: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "public_subscription_purchases"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      registration_email_exists: { Args: { _email: string }; Returns: boolean }
       reserve_subscription_checkout: {
         Args: {
           _environment: string
@@ -1520,6 +1646,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      revoke_public_purchase: {
+        Args: { _id: string; _occurred_at: string }
+        Returns: undefined
       }
       subscription_allows_write: {
         Args: {

@@ -141,6 +141,27 @@
       "when": 1793842859450,
       "tag": "0019_registration_document_and_customer_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793843700237,
+      "tag": "0020_public_purchase_onboarding",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793843957858,
+      "tag": "0021_transactional_public_purchase_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793844010380,
+      "tag": "0022_public_activation_expiry_and_revocation",
+      "breakpoints": true
     }
   ]
 }

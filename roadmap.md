@@ -1,11 +1,14 @@
 # Roadmap PontoTech Toledo
 
+## Prints para vídeo de divulgação
+- [x] Capturar páginas funcionais do sistema sem dados pessoais e entregar imagens organizadas — 16 PNGs e ZIP; assistência demonstrativa vazia, liberação apenas simulada no navegador para captura
+
 ## Página de venda e compra antes da senha
 - [ ] Criar seção “Acesse e conheça” com prévia pública sem e-mail, abas bloqueadas e botão de assinatura Stripe
 - [ ] Reforçar azuis e urgência honesta no início da landing, com identidade própria
 - [ ] Adicionar compra Stripe antes da senha com vínculo seguro e conclusão por e-mail
 - [ ] Preservar prévia bloqueada e contratação autenticada existentes
-- [ ] Auditar publicação, três planos, pagamento, renovação e entrega de e-mail; listar pendências comprovadas
+- [ ] Auditar publicação, três planos, pagamento, renovação e entrega de e-mail — três preços live confirmados, 34 testes e build OK; envios registrados, sem prova de recebimento; compra pública ainda requer revisão de segurança dos tokens e continuidade, publicação e validação live
 
 ## Cadastro e identidade da assistência
 - [x] Remover nome de empresa imposto por e-mail e conferir cadastro atual
