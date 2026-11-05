@@ -10,12 +10,14 @@ export const getBillingOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(value => input.parse(value))
   .handler(async ({ data, context }) => {
+    const { error: organizationError } = await context.supabase.rpc("ensure_user_organization");
+    if (organizationError) throw new Error("Não foi possível preparar sua empresa.");
     const memberQuery = context.supabase.from("organization_members").select("organization_id,role,organizations(id,name,trial_ends_at)").eq("user_id", context.userId).eq("active", true).order("created_at").limit(1);
     if (data.organizationId) memberQuery.eq("organization_id", data.organizationId);
     const { data: member, error } = await memberQuery.maybeSingle();
     if (error || !member?.organizations) throw new Error("Não foi possível consultar a empresa da sua conta.");
     const organization = member.organizations;
-    const { data: subscription, error: subscriptionError } = await context.supabase.from("subscriptions").select("status,price_id,current_period_end,cancel_at_period_end,first_failed_at,payment_confirmed_at").eq("organization_id", member.organization_id).eq("environment", data.environment).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const { data: subscription, error: subscriptionError } = await context.supabase.from("subscriptions").select("status,price_id,current_period_end,cancel_at_period_end,first_failed_at,payment_confirmed_at,gateway_subscription_id,gateway_customer_id").eq("organization_id", member.organization_id).eq("environment", data.environment).order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (subscriptionError) throw new Error("Não foi possível consultar a assinatura.");
     return { organization, subscription, canManage: ["owner", "admin"].includes(member.role), paidAccess: hasPaidAccess(subscription), trialActive: Boolean(organization.trial_ends_at && Date.parse(organization.trial_ends_at) > Date.now()) };
   });
@@ -31,7 +33,7 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
       const { data: member, error: memberError } = await context.supabase.from("organization_members").select("role").eq("organization_id", data.organizationId).eq("user_id", context.userId).eq("active", true).maybeSingle();
       if (memberError || !member || !["owner", "admin"].includes(member.role)) throw new Error("Somente o proprietário ou administrador pode contratar.");
 
-      const stripe = createStripeClient(data.environment as StripeEnv);
+      const stripe = createStripeClient(data.environment);
       // Resolve o preço pelo lookup_key e confere valor, moeda e ciclo com o catálogo interno.
       const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
       const stripePrice = prices.data[0];
@@ -52,12 +54,18 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
       }
 
       try {
+        const { data: { user } } = await context.supabase.auth.getUser();
+        const customerId = await resolveOrCreateCustomer(stripe, { email: user?.email, userId: context.userId });
         const session = await stripe.checkout.sessions.create({
           line_items: [{ price: stripePrice.id, quantity: 1 }],
           mode: "subscription",
           ui_mode: "embedded_page",
           return_url: data.returnUrl,
           locale: "pt-BR",
+          customer: customerId,
+          automatic_tax: { enabled: true },
+          customer_update: { address: "auto" },
+          billing_address_collection: "required",
           metadata: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId },
           subscription_data: { metadata: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId } },
         });
@@ -84,9 +92,9 @@ export const createBillingPortal = createServerFn({ method: "POST" })
     const { data: member } = await context.supabase.from("organization_members").select("role").eq("organization_id", data.organizationId).eq("user_id", context.userId).eq("active", true).maybeSingle();
     if (!member || !["owner", "admin"].includes(member.role)) throw new Error("Somente o proprietário ou administrador pode gerenciar a assinatura.");
     const { data: subscription } = await context.supabase.from("subscriptions").select("gateway_customer_id").eq("organization_id", data.organizationId).eq("environment", data.environment).order("created_at", { ascending: false }).limit(1).maybeSingle();
-    if (!subscription?.gateway_customer_id) throw new Error("Sua empresa ainda não possui assinatura.");
+    if (!subscription?.gateway_customer_id?.startsWith("cus_")) throw new Error("Sua empresa ainda não possui assinatura.");
     try {
-      const stripe = createStripeClient(data.environment as StripeEnv);
+      const stripe = createStripeClient(data.environment);
       const portal = await stripe.billingPortal.sessions.create({ customer: subscription.gateway_customer_id, return_url: data.returnUrl });
       return { url: portal.url };
     } catch (error) {
@@ -101,28 +109,69 @@ export const changeSubscriptionPlan = createServerFn({ method: "POST" })
   .inputValidator(value => input.extend({ organizationId: z.string().uuid(), priceId: z.string() }).parse(value))
   .handler(async ({ data, context }): Promise<PlanChangeResult> => {
     try {
-      findPlan(data.priceId);
+      const plan = findPlan(data.priceId);
       const { data: member } = await context.supabase.from("organization_members").select("role").eq("organization_id", data.organizationId).eq("user_id", context.userId).eq("active", true).maybeSingle();
       if (!member || !["owner", "admin"].includes(member.role)) throw new Error("Somente o proprietário ou administrador pode alterar o plano.");
       const { data: subscription } = await context.supabase.from("subscriptions").select("gateway_subscription_id,price_id,status").eq("organization_id", data.organizationId).eq("environment", data.environment).order("created_at", { ascending: false }).limit(1).maybeSingle();
-      if (!subscription || !["active", "trialing"].includes(subscription.status)) throw new Error("Só é possível trocar de plano com a assinatura ativa.");
+      if (!subscription?.gateway_subscription_id?.startsWith("sub_") || !["active", "trialing"].includes(subscription.status)) throw new Error("Só é possível trocar de plano com a assinatura ativa.");
       if (subscription.price_id === data.priceId) throw new Error("Este já é o seu plano.");
 
-      const stripe = createStripeClient(data.environment as StripeEnv);
+      const stripe = createStripeClient(data.environment);
       const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
       const stripePrice = prices.data[0];
       if (!stripePrice) throw new Error("O preço deste plano ainda não está disponível neste ambiente.");
 
-      const current = await stripe.subscriptions.retrieve(subscription.gateway_subscription_id!);
+      const current = await stripe.subscriptions.retrieve(subscription.gateway_subscription_id);
       const itemId = current.items.data[0]?.id;
       if (!itemId) throw new Error("Não foi possível identificar o plano atual.");
       // Sem cobrança proporcional: o novo valor passa a valer na próxima renovação.
-      await stripe.subscriptions.update(subscription.gateway_subscription_id!, {
-        items: [{ id: itemId, price: stripePrice.id, quantity: 1 }],
-        proration_behavior: "none",
+      const currentItem = current.items.data[0];
+      if (!currentItem?.current_period_start || !currentItem.current_period_end) throw new Error("Período atual indisponível.");
+      const schedule = current.schedule
+        ? await stripe.subscriptionSchedules.retrieve(typeof current.schedule === "string" ? current.schedule : current.schedule.id)
+        : await stripe.subscriptionSchedules.create({ from_subscription: current.id });
+      await stripe.subscriptionSchedules.update(schedule.id, {
+        end_behavior: "release",
+        phases: [
+          { start_date: currentItem.current_period_start, end_date: currentItem.current_period_end, items: [{ price: currentItem.price.id, quantity: 1 }], proration_behavior: "none" },
+          { items: [{ price: stripePrice.id, quantity: 1 }], duration: { interval: plan.interval, interval_count: plan.frequency }, proration_behavior: "none" },
+        ],
       });
       return { ok: true };
     } catch (error) {
       return { error: error instanceof Error && !("type" in error) ? error.message : getStripeErrorMessage(error) };
     }
   });
+
+async function resolveOrCreateCustomer(
+  stripe: ReturnType<typeof createStripeClient>,
+  options: { email?: string; userId?: string },
+): Promise<string> {
+  if (options.userId && !/^[a-zA-Z0-9_-]+$/.test(options.userId)) {
+    throw new Error("Invalid userId");
+  }
+  if (options.userId) {
+    const found = await stripe.customers.search({
+      query: `metadata['userId']:'${options.userId}'`,
+      limit: 1,
+    });
+    if (found.data.length) return found.data[0].id;
+  }
+  if (options.email) {
+    const existing = await stripe.customers.list({ email: options.email, limit: 1 });
+    if (existing.data.length) {
+      const customer = existing.data[0];
+      if (options.userId && customer.metadata?.userId !== options.userId) {
+        await stripe.customers.update(customer.id, {
+          metadata: { ...customer.metadata, userId: options.userId },
+        });
+      }
+      return customer.id;
+    }
+  }
+  const created = await stripe.customers.create({
+    ...(options.email && { email: options.email }),
+    ...(options.userId && { metadata: { userId: options.userId } }),
+  });
+  return created.id;
+}
