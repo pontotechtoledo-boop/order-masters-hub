@@ -1563,6 +1563,10 @@ export type Database = {
         Returns: boolean
       }
       username_available: { Args: { _username: string }; Returns: boolean }
+      valid_registration_document: {
+        Args: { _value: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "owner" | "admin" | "attendant" | "technician" | "finance"

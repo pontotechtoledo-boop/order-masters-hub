@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { newPasswordSchema, passwordErrorMessage } from '@/lib/password-guidance';
+import { newPasswordSchema, passwordErrorMessage, passwordIdentityMessage } from '@/lib/password-guidance';
 import { PasswordRequirements } from '@/components/password-requirements';
 
 export const Route = createFileRoute("/reset-password")({
@@ -30,6 +30,9 @@ function ResetPassword() {
     if (!validation.success) { setMessage(`Confira sua senha: ${validation.error.issues.map(issue => issue.message).join('; ')}.`); return; }
     setBusy(true);
     try {
+      const { data } = await supabase.auth.getUser();
+      const identityMessage = passwordIdentityMessage(password, data.user?.user_metadata['full_name'], data.user?.user_metadata['company_name']);
+      if (identityMessage) { setMessage(identityMessage); return; }
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       navigate({ to: '/dashboard', replace: true });
