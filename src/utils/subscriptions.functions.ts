@@ -26,7 +26,7 @@ type CheckoutResult = { clientSecret: string } | { error: string };
 
 export const createSubscriptionCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(value => input.extend({ organizationId: z.string().uuid(), priceId: z.string(), returnUrl: z.string().url() }).parse(value))
+  .inputValidator(value => input.extend({ organizationId: z.string().uuid(), priceId: z.string(), returnUrl: z.string().optional() }).parse(value))
   .handler(async ({ data, context }): Promise<CheckoutResult> => {
     try {
       findPlan(data.priceId);
@@ -60,7 +60,7 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
           line_items: [{ price: stripePrice.id, quantity: 1 }],
           mode: "subscription",
           ui_mode: "embedded_page",
-          return_url: data.returnUrl,
+          return_url: "https://serviceproos.app/assinatura?session_id={CHECKOUT_SESSION_ID}", // fixed official destination
           locale: "pt-BR",
           customer: customerId,
           customer_update: { address: "auto" },
@@ -87,7 +87,7 @@ type PortalResult = { url: string } | { error: string };
 
 export const createBillingPortal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(value => input.extend({ organizationId: z.string().uuid(), returnUrl: z.string().url() }).parse(value))
+  .inputValidator(value => input.extend({ organizationId: z.string().uuid(), returnUrl: z.string().optional() }).parse(value))
   .handler(async ({ data, context }): Promise<PortalResult> => {
     const { data: member } = await context.supabase.from("organization_members").select("role").eq("organization_id", data.organizationId).eq("user_id", context.userId).eq("active", true).maybeSingle();
     if (!member || !["owner", "admin"].includes(member.role)) throw new Error("Somente o proprietário ou administrador pode gerenciar a assinatura.");
@@ -95,7 +95,7 @@ export const createBillingPortal = createServerFn({ method: "POST" })
     if (!subscription?.gateway_customer_id?.startsWith("cus_")) throw new Error("Sua empresa ainda não possui assinatura.");
     try {
       const stripe = createStripeClient(data.environment);
-      const portal = await stripe.billingPortal.sessions.create({ customer: subscription.gateway_customer_id, return_url: data.returnUrl });
+      const portal = await stripe.billingPortal.sessions.create({ customer: subscription.gateway_customer_id, return_url: "https://serviceproos.app/assinatura" });
       return { url: portal.url };
     } catch (error) {
       return { error: getStripeErrorMessage(error) };
