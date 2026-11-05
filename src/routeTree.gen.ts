@@ -21,7 +21,6 @@ import { Route as TermosRouteImport } from './routes/termos'
 import { Route as AuthenticatedAssinaturaRouteImport } from './routes/_authenticated/assinatura'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as OrcamentoTokenRouteImport } from './routes/orcamento.$token'
-import { Route as ApiPublicPaymentsHotmartRouteImport } from './routes/api/public/payments/hotmart'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -86,12 +85,6 @@ const OrcamentoTokenRoute = OrcamentoTokenRouteImport.update({
   path: '/orcamento/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicPaymentsHotmartRoute =
-  ApiPublicPaymentsHotmartRouteImport.update({
-    id: '/api/public/payments/hotmart',
-    path: '/api/public/payments/hotmart',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -127,7 +120,6 @@ export interface FileRoutesByFullPath {
   '/assinatura': typeof AuthenticatedAssinaturaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orcamento/$token': typeof OrcamentoTokenRoute
-  '/api/public/payments/hotmart': typeof ApiPublicPaymentsHotmartRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -145,7 +137,6 @@ export interface FileRoutesByTo {
   '/assinatura': typeof AuthenticatedAssinaturaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/orcamento/$token': typeof OrcamentoTokenRoute
-  '/api/public/payments/hotmart': typeof ApiPublicPaymentsHotmartRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -165,7 +156,6 @@ export interface FileRoutesById {
   '/_authenticated/assinatura': typeof AuthenticatedAssinaturaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/orcamento/$token': typeof OrcamentoTokenRoute
-  '/api/public/payments/hotmart': typeof ApiPublicPaymentsHotmartRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -185,7 +175,6 @@ export interface FileRouteTypes {
     | '/assinatura'
     | '/dashboard'
     | '/orcamento/$token'
-    | '/api/public/payments/hotmart'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -203,7 +192,6 @@ export interface FileRouteTypes {
     | '/assinatura'
     | '/dashboard'
     | '/orcamento/$token'
-    | '/api/public/payments/hotmart'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -222,7 +210,6 @@ export interface FileRouteTypes {
     | '/_authenticated/assinatura'
     | '/_authenticated/dashboard'
     | '/orcamento/$token'
-    | '/api/public/payments/hotmart'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -240,7 +227,6 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermosRoute: typeof TermosRoute
   OrcamentoTokenRoute: typeof OrcamentoTokenRoute
-  ApiPublicPaymentsHotmartRoute: typeof ApiPublicPaymentsHotmartRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -333,13 +319,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrcamentoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/payments/hotmart': {
-      id: '/api/public/payments/hotmart'
-      path: '/api/public/payments/hotmart'
-      fullPath: '/api/public/payments/hotmart'
-      preLoaderRoute: typeof ApiPublicPaymentsHotmartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -395,7 +374,6 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   TermosRoute: TermosRoute,
   OrcamentoTokenRoute: OrcamentoTokenRoute,
-  ApiPublicPaymentsHotmartRoute: ApiPublicPaymentsHotmartRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,

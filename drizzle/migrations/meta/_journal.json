@@ -113,6 +113,13 @@
       "when": 1793322505044,
       "tag": "0015_align_live_subscription_write_access",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1793839315227,
+      "tag": "0016_restore_stripe_recurring_billing",
+      "breakpoints": true
     }
   ]
 }

@@ -12,11 +12,11 @@
 - Keep all PontoTech visual roles centralized as semantic tokens in `src/styles.css` so every screen stays theme-consistent.
 - Keep subscription rules in a shared domain module and enforce writes in database triggers; client UI is never an access boundary.
 - Derive operational write access from the latest live subscription through organization_has_write_access, not the organization's legacy trial status, so paid renewals and grace periods agree across UI and database.
-- Process signed Paddle events transactionally through a service-role-only database function with event deduplication and chronological subscription updates.
+- Process signed Stripe events transactionally through a service-role-only database function with event deduplication and chronological subscription updates.
 - Resolve checkout through authenticated server-created transactions bound to the organization's authorized billing manager; never trust checkout custom data supplied directly by the browser.
 - Reuse the subscription page in the dashboard and dedicated authenticated billing route so both entry points share checkout and status behavior.
-- Use the shared Hotmart checkout-link catalog for subscription CTAs and read live billing records independently of Stripe browser tokens, so Hotmart access does not depend on Stripe activation.
-- Resolve Hotmart purchase cycles from the shared checkout offer codes before BRL amount fallback, and reject unrecognized approvals before event deduplication so they remain retryable.
+- Use authenticated Stripe embedded checkout for subscription CTAs; preserve legacy paid periods without converting provider IDs or silently transferring recurring charges.
+- Derive Stripe checkout environment strictly from valid publishable token prefixes, while operational access always reads live billing records.
 - Route all dashboard section selections through one navigation handler so sidebar expansion and scroll reset stay consistent across menus and quick actions.
 - Reuse operational-list helpers for initial limits and customer/order searches so the three operational lists follow the same rules.
 - Use warranties.order_number for the public number and retain warranties.code as the unique authenticity identifier; different organizations can have the same OS number.
@@ -26,4 +26,4 @@
 - Share paper-size settings across OS and warranty printing so standard and thermal printers use the same document content.
 - Generate shareable order and warranty PDFs on demand in the browser with private photos; use native file sharing or downloads and recipient-specific WhatsApp notices, never claim wa.me attaches files or confirms delivery.
 - Derive the public SVG favicon from the login's wrench icon and reference it in the root head so the site icon matches the product identity.
-- Send purchase and renewal confirmations only from the verified Hotmart handler after payment processing, using managed email and a payment-scoped idempotency key; replayed database events can retry failed email without extending access again.
+- Send purchase and renewal confirmations only from the verified Stripe invoice.paid handler after payment processing, using managed email and a payment-scoped idempotency key; replayed database events can retry failed email without extending access again.

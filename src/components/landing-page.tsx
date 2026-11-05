@@ -120,9 +120,9 @@ export function LandingPage() {
     <section id="como-funciona" className="scroll-mt-24 py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-          <div><p className="text-sm font-bold uppercase tracking-widest text-primary">Comece sem complicação</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Do cadastro ao controle da sua operação</h2><p className="mt-4 leading-7 text-muted-foreground">Assine pela Hotmart e receba o acesso no e-mail usado na compra. Renovou? O mesmo acesso continua liberado.</p><Button className="mt-7 gap-2" size="lg" onClick={goToSignup}>Escolher meu plano <ArrowRight className="size-4" /></Button></div>
+          <div><p className="text-sm font-bold uppercase tracking-widest text-primary">Comece sem complicação</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Do cadastro ao controle da sua operação</h2><p className="mt-4 leading-7 text-muted-foreground">Crie sua conta, confirme seu e-mail e assine com segurança pelo Stripe. As renovações mantêm o mesmo acesso.</p><Button className="mt-7 gap-2" size="lg" onClick={goToSignup}>Escolher meu plano <ArrowRight className="size-4" /></Button></div>
           <div className="grid gap-4 sm:grid-cols-3">
-            {[{n:"01",title:"Escolha o plano",desc:"Mensal, trimestral ou anual — todos com tudo liberado."},{n:"02",title:"Receba o acesso",desc:"Chega no seu e-mail um link para criar sua senha."},{n:"03",title:"Organize a rotina",desc:"Use 7 dias com garantia de reembolso total."}].map((step) => <div key={step.n} className="rounded-2xl border bg-card p-5"><p className="font-display text-3xl font-extrabold text-primary">{step.n}</p><h3 className="mt-4 font-bold">{step.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{step.desc}</p></div>)}
+            {[{n:"01",title:"Escolha o plano",desc:"Mensal, trimestral ou anual — todos com tudo liberado."},{n:"02",title:"Receba o acesso",desc:"Confirme seu e-mail e conclua o pagamento pelo Stripe."},{n:"03",title:"Organize a rotina",desc:"Use 7 dias com garantia de reembolso total."}].map((step) => <div key={step.n} className="rounded-2xl border bg-card p-5"><p className="font-display text-3xl font-extrabold text-primary">{step.n}</p><h3 className="mt-4 font-bold">{step.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{step.desc}</p></div>)}
           </div>
         </div>
       </div>
@@ -153,7 +153,7 @@ export function LandingPage() {
             <h3 className="font-display text-xl font-bold">{plan.name}</h3><p className="mt-2 text-sm text-muted-foreground">{plan.detail}</p>
             <p className="mt-6"><span className="font-display text-3xl font-extrabold">{plan.price}</span><span className="text-sm text-muted-foreground">{plan.period}</span></p>
             <p className="mt-3 text-xs leading-5 text-muted-foreground">{plan.equivalent}</p><p className="mt-6 font-semibold">Incluído neste plano</p><ul className="mt-4 grid gap-3 text-sm text-muted-foreground">{included.map((benefit) => <li key={benefit} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-primary" /><span>{benefit}</span></li>)}</ul><div className="h-7" />
-            <Button asChild variant={plan.featured ? "default" : "outline"} className="mt-auto w-full gap-2 self-end"><a href={{ Mensal: "https://pay.hotmart.com/W108179804M?off=m9mvnjhc", Trimestral: "https://pay.hotmart.com/W108179804M?off=qo10u1si", Anual: "https://pay.hotmart.com/W108179804M?off=m8p4t7ri" }[plan.name] ?? "/cadastro"} target="_blank" rel="noopener noreferrer">Assinar {plan.name.toLowerCase()} <ArrowRight className="size-4" /></a></Button>
+            <Button asChild variant={plan.featured ? "default" : "outline"} className="mt-auto w-full gap-2 self-end"><a href="/cadastro">Assinar {plan.name.toLowerCase()} <ArrowRight className="size-4" /></a></Button>
             
           </article>)}
         </div>
@@ -162,7 +162,7 @@ export function LandingPage() {
     </section>
 
     <section className="py-16 sm:py-20"><div className="mx-auto max-w-3xl px-5 sm:px-8"><h2 className="font-display text-3xl font-extrabold">Antes de começar</h2><div className="mt-8 divide-y border-y">{[
-      { question: "Como recebo meu acesso?", answer: "Assim que o pagamento é aprovado na Hotmart, você recebe no e-mail da compra um link para criar sua senha. Nas renovações, o mesmo acesso continua — sem novo cadastro." },
+      { question: "Como recebo meu acesso?", answer: "Crie sua conta e confirme seu e-mail antes de pagar. Após a confirmação pelo Stripe, o acesso é liberado. Nas renovações, você mantém o mesmo cadastro." },
       { question: "Preciso do plano anual para ter todos os recursos?", answer: "Não. Mensal, trimestral e anual incluem os mesmos recursos. Escolha o ciclo de cobrança que faz mais sentido para sua empresa." },
       { question: "Estoque e PDV custam a mais?", answer: "Não. Todos os recursos estão incluídos em qualquer ciclo: mensal, trimestral ou anual." },
       { question: "O sistema envia mensagens automaticamente no WhatsApp?", answer: "Não. Ele prepara o aviso e o PDF da OS ou da garantia. Você abre seu WhatsApp, confirma o destinatário e compartilha ou anexa o documento." },
