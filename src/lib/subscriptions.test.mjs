@@ -5,6 +5,12 @@ describe("Planos aprovados", () => {
   test("trimestral R$ 69,90 a cada três meses", () => { expect(findPlan("pontotech_quarterly")).toMatchObject({ amount: 6990, interval: "month", frequency: 3 }); });
   test("anual R$ 299,90 por ano", () => { expect(findPlan("pontotech_yearly")).toMatchObject({ amount: 29990, interval: "year", frequency: 1 }); });
   test("rejeita plano desconhecido", () => { expect(() => findPlan("pontotech_weekly")).toThrow("Plano inválido."); });
+  test("assinatura renovada libera uso e não mantém aviso de vencimento", () => {
+    const renewed = { status: "active", current_period_end: "2026-12-05T00:00:00Z" };
+    expect(hasPaidAccess(renewed, Date.parse("2026-11-05T00:00:00Z"))).toBe(true);
+    expect(isInRenewalGrace(renewed, Date.parse("2026-11-05T00:00:00Z"))).toBe(false);
+  });
+  test("reembolso ou contestação não libera escrita", () => expect(hasPaidAccess({ status: "unpaid", current_period_end: "2026-12-05T00:00:00Z" }, Date.parse("2026-11-05T00:00:00Z"))).toBe(false));
   test("cancelamento preserva período pago", () => {
     expect(hasPaidAccess({ status: "canceled", current_period_end: "2026-11-01T00:00:00Z" }, Date.parse("2026-10-10T00:00:00Z"))).toBe(true);
     expect(hasPaidAccess({ status: "canceled", current_period_end: "2026-11-01T00:00:00Z" }, Date.parse("2026-11-01T00:00:00Z"))).toBe(false);

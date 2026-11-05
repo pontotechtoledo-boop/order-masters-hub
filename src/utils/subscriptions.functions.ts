@@ -63,9 +63,9 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
           return_url: data.returnUrl,
           locale: "pt-BR",
           customer: customerId,
-          automatic_tax: { enabled: true },
           customer_update: { address: "auto" },
           billing_address_collection: "required",
+          expires_at: Math.floor(Date.now() / 1000) + 1800,
           metadata: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId },
           subscription_data: { metadata: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId } },
         });
