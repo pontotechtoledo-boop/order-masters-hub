@@ -709,6 +709,7 @@ export type Database = {
       public_subscription_purchases: {
         Row: {
           activated_at: string | null
+          activation_expires_at: string | null
           activation_token_hash: string | null
           browser_token_hash: string
           company_name: string
@@ -732,6 +733,7 @@ export type Database = {
         }
         Insert: {
           activated_at?: string | null
+          activation_expires_at?: string | null
           activation_token_hash?: string | null
           browser_token_hash: string
           company_name: string
@@ -755,6 +757,7 @@ export type Database = {
         }
         Update: {
           activated_at?: string | null
+          activation_expires_at?: string | null
           activation_token_hash?: string | null
           browser_token_hash?: string
           company_name?: string
@@ -1588,6 +1591,7 @@ export type Database = {
         }
         Returns: {
           activated_at: string | null
+          activation_expires_at: string | null
           activation_token_hash: string | null
           browser_token_hash: string
           company_name: string
@@ -1642,6 +1646,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      revoke_public_purchase: {
+        Args: { _id: string; _occurred_at: string }
+        Returns: undefined
       }
       subscription_allows_write: {
         Args: {
