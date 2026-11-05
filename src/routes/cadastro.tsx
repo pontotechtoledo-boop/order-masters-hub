@@ -8,7 +8,7 @@ import { newPasswordSchema, passwordErrorMessage, passwordIdentityMessage } from
 import { validRegistrationDocument, normalizeRegistrationEmail, duplicateSignup } from '@/lib/registration';
 import { PasswordRequirements } from '@/components/password-requirements';
 import { selectedPlan } from '@/lib/subscriptions';
-export const Route = createFileRoute('/cadastro')({
+export const Route = createFileRoute('/cadastro')({staticData:{sitemap:true},
   validateSearch: (search: Record<string, unknown>): { plano?: ReturnType<typeof selectedPlan> } => ({ plano: selectedPlan(search["plano"]) }),
   head: () => ({ meta: [{ title: 'Criar conta e assinar | Service Pro OS' }, { name: 'description', content: 'Cadastre sua assistência técnica para contratar o Service Pro OS com pagamento seguro pelo Stripe.' }, { property: 'og:title', content: 'Assine o Service Pro OS' }, { property: 'og:description', content: 'Crie sua conta, confirme seu e-mail e escolha sua assinatura.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary' }] }),
   component: Signup,

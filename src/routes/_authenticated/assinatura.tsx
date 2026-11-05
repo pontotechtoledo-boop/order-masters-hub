@@ -3,7 +3,7 @@ import { ArrowLeft, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubscriptionPage, billingQueryOptions } from "@/components/subscription-page";
 
-export const Route = createFileRoute("/_authenticated/assinatura")({
+export const Route = createFileRoute("/_authenticated/assinatura")({staticData:{sitemap:false},
   head: () => ({ meta: [
     { title: "Minha assinatura | Service Pro OS" },
     { name: "description", content: "Contrate e gerencie sua assinatura Service Pro OS: mensal, trimestral ou anual." },

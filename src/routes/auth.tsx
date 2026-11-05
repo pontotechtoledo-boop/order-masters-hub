@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { selectedPlan } from "@/lib/subscriptions";
 
-export const Route = createFileRoute("/auth")({
+export const Route = createFileRoute("/auth")({staticData:{sitemap:true},
   validateSearch: (search: Record<string, unknown>): { plano?: ReturnType<typeof selectedPlan> } => ({ plano: selectedPlan(search["plano"]) }),
   head: () => ({ meta: [
     { title: "Entrar | Service Pro OS" },

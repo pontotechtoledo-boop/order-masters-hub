@@ -28,7 +28,7 @@ import { SubscriptionPage, billingQueryOptions } from "@/components/subscription
 import { useQuery } from "@tanstack/react-query";
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from "recharts";
 
-export const Route = createFileRoute("/_authenticated/dashboard")({
+export const Route = createFileRoute("/_authenticated/dashboard")({staticData:{sitemap:false},
   validateSearch: (search: Record<string, unknown>): { plano?: ReturnType<typeof selectedPlan> } => ({ plano: selectedPlan(search["plano"]) }),
   head: () => ({ meta: [
     { title: "Service Pro OS | Gestão para sua Assistência Técnica" },
