@@ -1,6 +1,7 @@
 # Roadmap PontoTech Toledo
 
 ## Página de venda e compra antes da senha
+- [ ] Criar seção “Acesse e conheça” com prévia pública sem e-mail, abas bloqueadas e botão de assinatura Stripe
 - [ ] Reforçar azuis e urgência honesta no início da landing, com identidade própria
 - [ ] Adicionar compra Stripe antes da senha com vínculo seguro e conclusão por e-mail
 - [ ] Preservar prévia bloqueada e contratação autenticada existentes
