@@ -1,11 +1,11 @@
 # Roadmap PontoTech Toledo
 
 ## Cadastro e identidade da assistência
-- [ ] Remover nome de empresa imposto por e-mail e conferir cadastro atual
-- [ ] Exigir CPF/CNPJ válido e guardar no cadastro da assistência
-- [ ] Confirmar e-mail único e mostrar retorno claro para cadastro repetido
-- [ ] Tornar orientação de senha intuitiva, mantendo proteção contra vazamentos
-- [ ] Validar regras e telas
+- [x] Remover nome de empresa imposto por e-mail e conferir cadastro atual
+- [x] Exigir CPF/CNPJ válido e guardar no cadastro da assistência
+- [x] Confirmar e-mail único e mostrar retorno claro para cadastro repetido
+- [x] Tornar orientação de senha intuitiva, mantendo proteção contra vazamentos
+- [x] Validar regras e telas — 30 testes, 9 regras no banco, cadastro repetido bloqueado e nome PontoTech confirmado no painel
 
 ## Prévia antes da assinatura e textos de acesso
 - [x] Simplificar e-mail no login e textos de cadastro/confirmação, mantendo requisitos de senha e proteção contra senhas vazadas
