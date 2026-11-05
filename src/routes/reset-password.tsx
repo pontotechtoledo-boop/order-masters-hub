@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { newPasswordSchema, passwordErrorMessage } from '@/lib/password-guidance';
+import { PasswordRequirements } from '@/components/password-requirements';
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [
@@ -15,4 +17,32 @@ export const Route = createFileRoute("/reset-password")({
   ] }),
   component: ResetPassword,
 });
-function ResetPassword(){const navigate=useNavigate();const [password,setPassword]=useState(""),[ready,setReady]=useState(false),[message,setMessage]=useState("");useEffect(()=>{const recovery=["recovery","invite"].includes(new URLSearchParams(window.location.hash.slice(1)).get("type")??"");supabase.auth.getSession().then(({data})=>setReady(recovery||Boolean(data.session)));},[]);return <main className="grid min-h-screen place-items-center p-4"><section className="w-full max-w-md rounded-lg border bg-card p-6 shadow-card"><h1 className="text-xl font-bold">Crie uma nova senha</h1><p className="mt-1 text-sm text-muted-foreground">Use pelo menos 8 caracteres.</p>{ready?<form className="mt-6 grid gap-4" onSubmit={async e=>{e.preventDefault();const {error}=await supabase.auth.updateUser({password});if(error){const m=error.message.toLowerCase();setMessage(m.includes("weak")||m.includes("pwned")||m.includes("guess")?"Essa senha é muito comum e já apareceu em vazamentos na internet. Escolha outra, misturando letras, números e símbolos (ex.: Bancada#2026Toledo).":m.includes("same")||m.includes("different from the old")?"A nova senha precisa ser diferente da anterior.":m.includes("session")||m.includes("expired")||m.includes("jwt")?"O link expirou. Peça um novo em “Esqueci minha senha”.":"Não foi possível alterar a senha. Tente uma senha diferente.");return}navigate({to:"/dashboard",replace:true})}}><Input type="password" minLength={8} value={password} onChange={e=>setPassword(e.target.value)} required/><Button>Salvar nova senha</Button></form>:<p className="mt-6 rounded-md bg-muted p-3 text-sm">Este link expirou ou não é válido.</p>}{message&&<p className="mt-3 text-sm text-destructive">{message}</p>}</section></main>}
+function ResetPassword() {
+  const navigate = useNavigate();
+  const [password, setPassword] = useState(''), [ready, setReady] = useState(false), [message, setMessage] = useState(''), [busy, setBusy] = useState(false);
+  useEffect(() => {
+    const recovery = ['recovery', 'invite'].includes(new URLSearchParams(window.location.hash.slice(1)).get('type') ?? '');
+    supabase.auth.getSession().then(({ data }) => setReady(recovery || Boolean(data.session)));
+  }, []);
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault(); setMessage('');
+    const validation = newPasswordSchema.safeParse(password);
+    if (!validation.success) { setMessage(`Confira sua senha: ${validation.error.issues.map(issue => issue.message).join('; ')}.`); return; }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      navigate({ to: '/dashboard', replace: true });
+    } catch (error) { setMessage(passwordErrorMessage(error, 'Não foi possível alterar a senha. Tente novamente.')); }
+    finally { setBusy(false); }
+  };
+  return <main className="grid min-h-screen place-items-center p-4"><section className="w-full max-w-md rounded-lg border bg-card p-6 shadow-card">
+    <h1 className="text-xl font-bold">Crie uma nova senha</h1>
+    {ready ? <form className="mt-6 grid gap-4" onSubmit={submit}>
+      <label className="grid gap-2 text-sm font-medium">Nova senha<Input type="password" autoComplete="new-password" minLength={8} maxLength={128} aria-describedby="reset-password-rules" value={password} onChange={e => setPassword(e.target.value)} required /></label>
+      <PasswordRequirements password={password} id="reset-password-rules" />
+      <Button disabled={busy}>{busy ? 'Salvando…' : 'Salvar nova senha'}</Button>
+    </form> : <p className="mt-6 rounded-md bg-muted p-3 text-sm">Este link expirou ou não é válido.</p>}
+    {message && <p role="status" className="mt-3 text-sm text-destructive">{message}</p>}
+  </section></main>;
+}
