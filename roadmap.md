@@ -1,5 +1,11 @@
 # Roadmap PontoTech Toledo
 
+## Página de venda e compra antes da senha
+- [ ] Reforçar azuis e urgência honesta no início da landing, com identidade própria
+- [ ] Adicionar compra Stripe antes da senha com vínculo seguro e conclusão por e-mail
+- [ ] Preservar prévia bloqueada e contratação autenticada existentes
+- [ ] Auditar publicação, três planos, pagamento, renovação e entrega de e-mail; listar pendências comprovadas
+
 ## Cadastro e identidade da assistência
 - [x] Remover nome de empresa imposto por e-mail e conferir cadastro atual
 - [x] Exigir CPF/CNPJ válido e guardar no cadastro da assistência
