@@ -16,7 +16,13 @@ export async function provisionPaidPurchase(id: string, environment: StripeEnv) 
     if(purchase.status==='activated') return purchase;
     throw new Error('Pagamento não permite ativação.');
   }
-  if(purchase.user_id && purchase.organization_id && purchase.invite_token_hash) return purchase;
+  if(purchase.user_id && purchase.organization_id && purchase.invite_token_hash) {
+    // A previous attempt may have persisted the identity before Stripe metadata failed.
+    const stripe=createStripeClient(environment);
+    await stripe.customers.update(String(payload['customerId']),{metadata:{userId:purchase.user_id}});
+    await stripe.subscriptions.update(String(payload['subscriptionId']),{metadata:{userId:purchase.user_id,organizationId:purchase.organization_id,checkoutId:purchase.id,publicPurchaseId:purchase.id}});
+    return purchase;
+  }
   const {data:claimed,error:claimError}=await supabaseAdmin.rpc('claim_public_purchase_provisioning',{_id:id});
   if(claimError||!claimed) throw new Error('Ativação sendo preparada.');
   try {

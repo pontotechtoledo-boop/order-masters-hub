@@ -1,5 +1,9 @@
 # Roadmap PontoTech Toledo
 
+## Liberação automática Stripe real
+- [x] Confirmar webhook live e eventos existentes; corrigir vínculo da primeira fatura com checkout persistido e recuperação de metadados Stripe; painel consulta acesso live a cada 5 segundos. 24 testes, replay assinado 2× HTTP 200 e assinatura sandbox vinculada ao proprietário confirmados
+- [ ] Confirmar liberação das abas em produção após pagamento live — depende de publicar esta versão e de uma compra real; nenhuma cobrança real realizada
+
 ## Prints para vídeo de divulgação
 - [x] Capturar páginas funcionais do sistema sem dados pessoais e entregar imagens organizadas — 16 PNGs e ZIP; assistência demonstrativa vazia, liberação apenas simulada no navegador para captura
 

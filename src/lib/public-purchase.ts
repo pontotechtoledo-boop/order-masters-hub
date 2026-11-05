@@ -16,3 +16,8 @@ export function paidPurchaseCanActivate(status: string, payload: Record<string, 
   const end = typeof payload['periodEnd'] === 'string' ? Date.parse(payload['periodEnd']) : NaN;
   return status === 'paid' && ['active', 'trialing'].includes(String(payload['status'])) && end > now;
 }
+
+// Only the webhook's verified, persisted purchase can supply this association.
+export function publicPurchasePaymentPayload(payload: Record<string, unknown>, purchaseId: string) {
+  return { ...payload, checkoutId: z.string().uuid().parse(purchaseId) };
+}
