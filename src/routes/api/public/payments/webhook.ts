@@ -15,7 +15,8 @@ export const Route = createFileRoute('/api/public/payments/webhook')({ server: {
     if (normalized.publicPurchaseId) {
       const { data: publicPurchase } = await supabaseAdmin.from('public_subscription_purchases').select('status,user_id').eq('id',normalized.publicPurchaseId).eq('environment',environment).maybeSingle();
       if (!publicPurchase) throw new Error('Contratação pública ausente.');
-      if (normalized.type === 'payment.revoked' || normalized.type === 'subscription.canceled') {
+      if (publicPurchase.status === 'revoked' && normalized.invoiceId) return Response.json({received:true});
+      if (normalized.type === 'payment.revoked') {
         const {error:revokeError}=await supabaseAdmin.rpc('revoke_public_purchase',{_id:normalized.publicPurchaseId,_occurred_at:new Date(event.created*1000).toISOString()});if(revokeError)throw revokeError;
         if (!publicPurchase.user_id) return Response.json({received:true});
       } else if (normalized.invoiceId && !publicPurchase.user_id) {
@@ -29,10 +30,13 @@ export const Route = createFileRoute('/api/public/payments/webhook')({ server: {
         const {provisionPaidPurchase,hashPurchaseToken}=await import('@/lib/public-purchase.server');
         const purchase=await provisionPaidPurchase(normalized.publicPurchaseId,environment);
         if(purchase.status==='revoked')return Response.json({received:true});
-        const token=await hashPurchaseToken(`${purchase.id}:${process.env['LOVABLE_API_KEY']!}`);
-        const {error:tokenError}=await supabaseAdmin.from('public_subscription_purchases').update({activation_token_hash:await hashPurchaseToken(token),activation_expires_at:new Date(Date.now()+7*86400000).toISOString()}).eq('id',purchase.id);
+        // Auth's invitation capability is random and stable across delivery retries;
+        // never derive an activation capability from a project-wide secret.
+        const token=purchase.invite_token_hash;
+        if(!token)throw new Error('Convite de ativação ausente.');
+        const {error:tokenError}=await supabaseAdmin.from('public_subscription_purchases').update({activation_token_hash:await hashPurchaseToken(token),activation_expires_at:purchase.activation_expires_at??new Date(Date.now()+7*86400000).toISOString()}).eq('id',purchase.id).eq('status','paid');
         if(tokenError)throw tokenError;
-        const {error:paymentError}=await supabaseAdmin.rpc('process_subscription_payment',{_event_id:event.id,_environment:environment,_occurred_at:new Date(event.created*1000).toISOString(),_event_type:normalized.type,_payload:JSON.parse(JSON.stringify(normalized.payload))});
+        const {error:paymentError}=await supabaseAdmin.rpc('process_subscription_payment',{_event_id:event.id,_environment:environment,_occurred_at:new Date(event.created*1000).toISOString(),_event_type:normalized.type,_payload:JSON.parse(JSON.stringify({...normalized.payload,checkoutId:purchase.id}))});
         if(paymentError)throw paymentError;
         const {sendTemplateEmail}=await import('@/lib/email-templates/send-email');
         await sendTemplateEmail('purchase-activation',purchase.email,{templateData:{name:purchase.full_name,activationUrl:`https://serviceproos.app/ativar?purchase=${purchase.id}&token=${token}`},idempotencyKey:stripeConfirmationKey(environment,normalized.invoiceId)});

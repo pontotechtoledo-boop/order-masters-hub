@@ -1,5 +1,8 @@
 # Roadmap PontoTech Toledo
 
+## Liberação automática Stripe real
+- [ ] Confirmar webhook live, vínculo servidor-conta e atualização automática das abas; validar processamento e apontar pendência de publicação/pagamento real
+
 ## Prints para vídeo de divulgação
 - [x] Capturar páginas funcionais do sistema sem dados pessoais e entregar imagens organizadas — 16 PNGs e ZIP; assistência demonstrativa vazia, liberação apenas simulada no navegador para captura
 

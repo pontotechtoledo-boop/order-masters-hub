@@ -15,6 +15,7 @@
 - Normalize signup emails and interpret Auth duplicate responses without exposing account lists; hosted Auth uniqueness remains the account boundary.
 - Public previews import only presentation modules and static data, never operational routes or loaders; the same sidebar serves paid and preview screens.
 - Public Stripe onboarding uses a private server-created purchase, verified invoice settlement and one-use email activation before account access; never attach a legacy customer by unauthenticated email match.
+- Retry public-purchase Stripe identity binding even after local provisioning; activation uses the random Auth invite capability with a non-renewing expiry so partial failures and webhook retries stay recoverable.
 - Keep subscription rules in a shared domain module and enforce writes in database triggers; client UI is never an access boundary.
 - Derive operational write access only from the latest live paid subscription through organization_has_write_access, never legacy trial dates; keep the dashboard closed until billing is verified.
 - Render first-time unpaid accounts in a separate non-operational preview using the shared sidebar and overview; never mount operational loaders or dialogs there, and keep payment tied to authenticated billing.
