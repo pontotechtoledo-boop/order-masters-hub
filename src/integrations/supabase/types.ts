@@ -1496,6 +1496,10 @@ export type Database = {
         Returns: Json
       }
       ensure_user_organization: { Args: never; Returns: string }
+      initialize_public_purchase_identity: {
+        Args: { _id: string; _user_id: string }
+        Returns: string
+      }
       is_org_member: { Args: { _organization_id: string }; Returns: boolean }
       is_platform_owner: { Args: never; Returns: boolean }
       issue_service_order_warranty: {
@@ -1571,6 +1575,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      public_purchase_owned_user: { Args: { _id: string }; Returns: string }
       read_order_quote: { Args: { _token: string }; Returns: Json }
       record_public_purchase_payment: {
         Args: {

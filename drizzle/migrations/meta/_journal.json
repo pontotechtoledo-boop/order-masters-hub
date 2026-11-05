@@ -148,6 +148,13 @@
       "when": 1793843700237,
       "tag": "0020_public_purchase_onboarding",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793843957858,
+      "tag": "0021_transactional_public_purchase_identity",
+      "breakpoints": true
     }
   ]
 }
