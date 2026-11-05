@@ -1,9 +1,11 @@
 # Roadmap PontoTech Toledo
 
 ## Revisão de acesso e garantia Stripe
-- [ ] Impedir uso sem assinatura paga, inclusive sem fallback de trial antigo
-- [ ] Conferir renovação durante/depois da tolerância, gestão de cobrança e troca de ciclo automática
-- [ ] Validar testes e telas; cobranças live continuam dependendo da ativação Stripe e publicação
+- [x] Destacar garantia própria de reembolso de 7 dias, sem atribuí-la ao Stripe
+- [x] Impedir uso sem assinatura paga e remover fallback de trial antigo no banco e na consulta de assinatura
+- [x] Corrigir confirmação paga entregue fora de ordem; preservar renovação durante/depois da tolerância e validar preço/ciclo na troca agendada
+- [x] Validar 18 testes, 7 regras de banco e páginas em computador/celular sem erros
+- [ ] Validar troca trimestral/anual efetiva e primeira renovação live — depende da instalação do aplicativo Lovable no Stripe, provisionamento e publicação; troca de ciclo continua agendada para próxima renovação
 
 ## Retorno ao Stripe
 - [x] Restaurar contratação embutida, cadastro sem teste grátis e gestão da assinatura
