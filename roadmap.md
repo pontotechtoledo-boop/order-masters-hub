@@ -1,5 +1,8 @@
 # Roadmap PontoTech Toledo
 
+## Prints para vídeo de divulgação
+- [ ] Capturar páginas funcionais do sistema sem dados pessoais e entregar imagens organizadas
+
 ## Página de venda e compra antes da senha
 - [ ] Criar seção “Acesse e conheça” com prévia pública sem e-mail, abas bloqueadas e botão de assinatura Stripe
 - [ ] Reforçar azuis e urgência honesta no início da landing, com identidade própria
