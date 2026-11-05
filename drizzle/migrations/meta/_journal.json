@@ -141,6 +141,13 @@
       "when": 1793842859450,
       "tag": "0019_registration_document_and_customer_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793843700237,
+      "tag": "0020_public_purchase_onboarding",
+      "breakpoints": true
     }
   ]
 }
