@@ -1,5 +1,12 @@
 # Roadmap PontoTech Toledo
 
+## Retorno ao Stripe
+- [ ] Restaurar contratação embutida, cadastro sem teste grátis e gestão da assinatura
+- [ ] Remover integração ativa Hotmart preservando registros e períodos pagos
+- [ ] Processar confirmação, renovação, falha e reembolso Stripe com segurança e e-mail
+- [ ] Validar regras e contratação completa em ambiente de teste
+- [ ] Liberar produção — depende da instalação do aplicativo Lovable na conta Stripe live, provisionamento automático e publicação
+
 ## E-mails de compra e renovação Hotmart
 - [x] Preparar envio de e-mail com link https://serviceproos.app/auth após confirmação de compra ou renovação
 - [x] Preservar convite para criar senha no primeiro acesso e senha existente nas renovações
