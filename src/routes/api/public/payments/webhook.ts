@@ -16,7 +16,7 @@ export const Route = createFileRoute('/api/public/payments/webhook')({ server: {
       const { data: publicPurchase } = await supabaseAdmin.from('public_subscription_purchases').select('status,user_id').eq('id',normalized.publicPurchaseId).eq('environment',environment).maybeSingle();
       if (!publicPurchase) throw new Error('Contratação pública ausente.');
       if (normalized.type === 'payment.revoked' || normalized.type === 'subscription.canceled') {
-        await supabaseAdmin.from('public_subscription_purchases').update({status:'revoked',last_event_at:new Date(event.created*1000).toISOString()}).eq('id',normalized.publicPurchaseId);
+        const {error:revokeError}=await supabaseAdmin.rpc('revoke_public_purchase',{_id:normalized.publicPurchaseId,_occurred_at:new Date(event.created*1000).toISOString()});if(revokeError)throw revokeError;
         if (!publicPurchase.user_id) return Response.json({received:true});
       } else if (normalized.invoiceId && !publicPurchase.user_id) {
         const {error:recordError}=await supabaseAdmin.rpc('record_public_purchase_payment',{_id:normalized.publicPurchaseId,_session_id:normalized.payload.sessionId??'',_price_id:normalized.payload.priceId??'',_environment:environment,_payload:JSON.parse(JSON.stringify(normalized.payload)),_paid_at:new Date(event.created*1000).toISOString()});
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/api/public/payments/webhook')({ server: {
         const purchase=await provisionPaidPurchase(normalized.publicPurchaseId,environment);
         if(purchase.status==='revoked')return Response.json({received:true});
         const token=await hashPurchaseToken(`${purchase.id}:${process.env['LOVABLE_API_KEY']!}`);
-        const {error:tokenError}=await supabaseAdmin.from('public_subscription_purchases').update({activation_token_hash:await hashPurchaseToken(token)}).eq('id',purchase.id);
+        const {error:tokenError}=await supabaseAdmin.from('public_subscription_purchases').update({activation_token_hash:await hashPurchaseToken(token),activation_expires_at:new Date(Date.now()+7*86400000).toISOString()}).eq('id',purchase.id);
         if(tokenError)throw tokenError;
         const {error:paymentError}=await supabaseAdmin.rpc('process_subscription_payment',{_event_id:event.id,_environment:environment,_occurred_at:new Date(event.created*1000).toISOString(),_event_type:normalized.type,_payload:JSON.parse(JSON.stringify(normalized.payload))});
         if(paymentError)throw paymentError;

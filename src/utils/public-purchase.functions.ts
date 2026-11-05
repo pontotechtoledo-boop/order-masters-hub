@@ -47,7 +47,7 @@ export const activatePublicPurchase=createServerFn({method:'POST'}).inputValidat
     const {hashPurchaseToken}=await import('@/lib/public-purchase.server');
     const {newPasswordSchema,passwordIdentityMessage,passwordErrorMessage}=await import('@/lib/password-guidance');
     const {data:purchase}=await supabaseAdmin.from('public_subscription_purchases').select('*').eq('id',data.purchaseId).eq('activation_token_hash',await hashPurchaseToken(data.token)).maybeSingle();
-    if(!purchase||!purchase.invite_token_hash||!purchase.user_id||purchase.status!=='paid') return {error:'Este link expirou ou já foi utilizado. Entre ou recupere sua senha.'};
+    if(!purchase||!purchase.invite_token_hash||!purchase.user_id||purchase.status!=='paid'||!purchase.activation_expires_at||Date.parse(purchase.activation_expires_at)<Date.now()) return {error:'Este link expirou ou já foi utilizado. Entre ou recupere sua senha.'};
     newPasswordSchema.parse(data.password);
     const identity=passwordIdentityMessage(data.password,purchase.full_name,purchase.company_name);if(identity)return {error:identity};
     const key=process.env['SUPABASE_PUBLISHABLE_KEY']!;
@@ -58,7 +58,7 @@ export const activatePublicPurchase=createServerFn({method:'POST'}).inputValidat
     if(passwordError)return {error:passwordErrorMessage(passwordError,'Não foi possível salvar a senha. Recupere o acesso em “Esqueci minha senha”.')};
     const {error:completionError}=await client.rpc('complete_public_purchase',{_id:purchase.id});if(completionError)throw completionError;
     const {sendTemplateEmail}=await import('@/lib/email-templates/send-email');
-    await sendTemplateEmail('subscription-confirmation',purchase.email,{templateData:{name:purchase.full_name},idempotencyKey:`purchase-account-ready-${purchase.id}`});
+    try { await sendTemplateEmail('subscription-confirmation',purchase.email,{templateData:{name:purchase.full_name},idempotencyKey:`purchase-account-ready-${purchase.id}`}); } catch { console.error('Não foi possível enviar confirmação de cadastro concluído.'); }
     return {ok:true};
   }catch(error){return {error:error instanceof Error?error.message:'Não foi possível ativar sua conta.'};}
 });
@@ -69,6 +69,6 @@ export const completeRecoveredPurchase=createServerFn({method:'POST'}).middlewar
   if(!purchase)return {ok:true};
   const {error}=await context.supabase.rpc('complete_public_purchase',{_id:purchase.id});if(error)throw error;
   const {sendTemplateEmail}=await import('@/lib/email-templates/send-email');
-  await sendTemplateEmail('subscription-confirmation',purchase.email,{templateData:{name:purchase.full_name},idempotencyKey:`purchase-account-ready-${purchase.id}`});
+  try { await sendTemplateEmail('subscription-confirmation',purchase.email,{templateData:{name:purchase.full_name},idempotencyKey:`purchase-account-ready-${purchase.id}`}); } catch { console.error('Não foi possível enviar confirmação de cadastro concluído.'); }
   return {ok:true};
 });
