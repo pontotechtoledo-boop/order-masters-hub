@@ -127,6 +127,13 @@
       "when": 1793840282796,
       "tag": "0017_require_paid_subscription_without_trial",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793840340582,
+      "tag": "0018_restore_access_on_verified_late_payment",
+      "breakpoints": true
     }
   ]
 }
