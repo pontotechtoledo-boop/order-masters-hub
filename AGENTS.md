@@ -11,6 +11,8 @@
 
 - Keep all PontoTech visual roles centralized as semantic tokens in `src/styles.css` so every screen stays theme-consistent.
 - Reuse password guidance and validation across signup and recovery; hosted Auth remains the security boundary and breached-password protection must stay enabled.
+- Validate CPF/CNPJ in the shared registration helper and the Auth insert trigger, and copy identity only from supplied signup metadata; this prevents preset names and invalid documents.
+- Normalize signup emails and interpret Auth duplicate responses without exposing account lists; hosted Auth uniqueness remains the account boundary.
 - Keep subscription rules in a shared domain module and enforce writes in database triggers; client UI is never an access boundary.
 - Derive operational write access only from the latest live paid subscription through organization_has_write_access, never legacy trial dates; keep the dashboard closed until billing is verified.
 - Render first-time unpaid accounts in a separate non-operational preview using the shared sidebar and overview; never mount operational loaders or dialogs there, and keep payment tied to authenticated billing.
