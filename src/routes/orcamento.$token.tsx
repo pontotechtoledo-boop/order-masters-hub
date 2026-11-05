@@ -5,7 +5,7 @@ import { publicQuote } from '@/utils/quotes.functions';
 import { Button } from '@/components/ui/button';
 import { Check, X, Wrench } from 'lucide-react';
 
-export const Route = createFileRoute('/orcamento/$token')({
+export const Route = createFileRoute('/orcamento/$token')({staticData:{sitemap:false},
   loader: ({ params }) => publicQuote({ data: { token: params.token } }),
   head: () => ({ meta: [
     { title: 'Orçamento de serviço | Service Pro OS' },

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { SystemSidebar } from '@/components/system-sidebar';
 import { PreviewOverview } from '@/components/preview-overview';
 
-export const Route = createFileRoute('/conhecer')({
+export const Route = createFileRoute('/conhecer')({staticData:{sitemap:true},
   head:()=>({meta:[{title:'Conheça o sistema | Service Pro OS'},{name:'description',content:'Veja as áreas do Service Pro OS sem cadastro. Escolha sua assinatura quando quiser começar.'},{property:'og:title',content:'Conheça o Service Pro OS'},{property:'og:description',content:'Visão prévia de ordens, garantias, estoque e financeiro sem informar e-mail.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),
   component:PublicPreview,
 });

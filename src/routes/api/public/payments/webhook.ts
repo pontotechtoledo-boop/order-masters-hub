@@ -3,7 +3,7 @@ import { createStripeClient, verifyWebhook, type StripeEnv } from '@/lib/stripe.
 import { stripePeriod, stripeConfirmationKey } from '@/lib/stripe-billing';
 import { publicPurchasePaymentPayload } from '@/lib/public-purchase';
 
-export const Route = createFileRoute('/api/public/payments/webhook')({ server: { handlers: { POST: async ({ request }) => {
+export const Route = createFileRoute('/api/public/payments/webhook')({staticData:{sitemap:false}, server: { handlers: { POST: async ({ request }) => {
   const environment = new URL(request.url).searchParams.get('env');
   if (environment !== 'sandbox' && environment !== 'live') return new Response('Ambiente inválido', { status: 400 });
   let event;

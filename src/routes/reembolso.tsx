@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalPage, SELLER } from "@/components/legal-page";
 
-export const Route = createFileRoute("/reembolso")({
+export const Route = createFileRoute("/reembolso")({staticData:{sitemap:true},
   head: () => ({ meta: [
     { title: "Política de Reembolso — Service Pro OS" },
     { name: "description", content: "Prazo de 7 dias para reembolso das assinaturas do Service Pro OS." },

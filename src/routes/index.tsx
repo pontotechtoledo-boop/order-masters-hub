@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LandingPage } from "@/components/landing-page";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/")({staticData:{sitemap:true},
   head: () => ({ meta: [
     { title: "Service Pro OS | Sistema para assistência técnica" },
     { name: "description", content: "Ordens de serviço, garantias, estoque e financeiro para assistências técnicas. Planos a partir de R$ 29,90/mês. Garantia de 7 dias." },

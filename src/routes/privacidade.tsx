@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalPage, SELLER } from "@/components/legal-page";
 
-export const Route = createFileRoute("/privacidade")({
+export const Route = createFileRoute("/privacidade")({staticData:{sitemap:true},
   head: () => ({ meta: [
     { title: "Política de Privacidade — Service Pro OS" },
     { name: "description", content: "Como o Service Pro OS coleta, usa e protege dados pessoais." },
