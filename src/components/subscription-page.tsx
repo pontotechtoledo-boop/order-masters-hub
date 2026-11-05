@@ -13,6 +13,7 @@ export const billingQueryOptions = (organizationId?: string) => ({ queryKey: ['s
 const date = (value: string | null | undefined) => value ? new Date(value).toLocaleDateString('pt-BR') : '—';
 export function SubscriptionPage({ organizationId, embedded = false }: { organizationId?: string; embedded?: boolean }) {
   const { data, error, isPending, refetch, isFetching } = useQuery({ ...billingQueryOptions(organizationId), refetchInterval: 5000 });
+  const { data: testBilling } = useQuery({ queryKey: ['subscription', organizationId, 'sandbox'], queryFn: () => getBillingOverview({ data: { organizationId, environment: 'sandbox' } }), enabled: import.meta.env['VITE_PAYMENTS_CLIENT_TOKEN']?.startsWith('pk_test_'), refetchInterval: 5000 });
   const [selected, setSelected] = useState<PlanId | null>(null);
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
@@ -50,6 +51,7 @@ export function SubscriptionPage({ organizationId, embedded = false }: { organiz
   };
   return <div className="space-y-6">
     <PaymentTestModeBanner />
+    {testBilling?.subscription?.status === 'active' && <p role="status" className="border-l-4 border-success bg-success/5 p-4 text-sm">Pagamento de teste confirmado · {subscriptionPlans.find(plan => plan.id === testBilling.subscription?.price_id)?.name} até {date(testBilling.subscription.current_period_end)}. O período real permanece inalterado.</p>}
     <header className="flex flex-wrap items-start justify-between gap-3"><div><p className="mb-2 text-xs font-semibold text-primary">Service Pro OS · {data?.organization.name ?? 'Sua empresa'}</p>{!embedded && <h1 className="font-display text-2xl font-bold">Minha assinatura</h1>}<p className="mt-2 text-sm text-muted-foreground">Seu plano, vencimento e renovação pelo Stripe.</p></div><div className="flex gap-2">{data?.canManage && stripeSubscription && <Button variant="outline" onClick={manage} disabled={busy}><CreditCard />Gerenciar cobrança<ExternalLink className="size-3" /></Button>}<Button variant="ghost" size="icon" aria-label="Atualizar assinatura" title="Atualizar assinatura" onClick={() => refetch()} disabled={isFetching}><RefreshCw className={isFetching ? 'animate-spin' : ''} /></Button></div></header>
     {notice && <p role="alert" className="border-l-4 border-primary bg-accent p-4 text-sm">{notice}</p>}
     {isPending ? <p className="flex items-center gap-2 py-10 text-muted-foreground"><LoaderCircle className="size-4 animate-spin" />Consultando assinatura…</p> : error ? <p role="alert" className="text-destructive">{error.message}</p> : <>
