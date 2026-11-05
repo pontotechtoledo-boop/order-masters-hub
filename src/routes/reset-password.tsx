@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { newPasswordSchema, passwordErrorMessage, passwordIdentityMessage } from '@/lib/password-guidance';
 import { PasswordRequirements } from '@/components/password-requirements';
+import { useServerFn } from '@tanstack/react-start';
+import { completeRecoveredPurchase } from '@/utils/public-purchase.functions';
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [
@@ -19,10 +21,10 @@ export const Route = createFileRoute("/reset-password")({
 });
 function ResetPassword() {
   const navigate = useNavigate();
+  const completePurchase = useServerFn(completeRecoveredPurchase);
   const [password, setPassword] = useState(''), [ready, setReady] = useState(false), [message, setMessage] = useState(''), [busy, setBusy] = useState(false);
   useEffect(() => {
-    const recovery = ['recovery', 'invite'].includes(new URLSearchParams(window.location.hash.slice(1)).get('type') ?? '');
-    supabase.auth.getSession().then(({ data }) => setReady(recovery || Boolean(data.session)));
+    supabase.auth.getUser().then(({ data }) => setReady(Boolean(data.user)));
   }, []);
   const submit = async (event: React.FormEvent) => {
     event.preventDefault(); setMessage('');
@@ -35,6 +37,7 @@ function ResetPassword() {
       if (identityMessage) { setMessage(identityMessage); return; }
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
+      await completePurchase();
       navigate({ to: '/dashboard', replace: true });
     } catch (error) { setMessage(passwordErrorMessage(error, 'Não foi possível alterar a senha. Tente novamente.')); }
     finally { setBusy(false); }

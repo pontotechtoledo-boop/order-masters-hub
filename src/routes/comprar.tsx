@@ -6,7 +6,7 @@ import { ArrowLeft, CheckCircle2, ShieldCheck, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getStripe, getStripeEnvironment } from '@/lib/stripe';
-import { plans, selectedPlan } from '@/lib/subscriptions';
+import { subscriptionPlans as plans, selectedPlan, type PlanId } from '@/lib/subscriptions';
 import { purchaseInput } from '@/lib/public-purchase';
 import { publicPurchaseStatus, startPublicPurchase } from '@/utils/public-purchase.functions';
 
@@ -14,7 +14,7 @@ export const Route=createFileRoute('/comprar')({validateSearch:(search:Record<st
 function Purchase(){
   const {plano,purchase}=Route.useSearch();
   const start=useServerFn(startPublicPurchase),getStatus=useServerFn(publicPurchaseStatus);
-  const [plan,setPlan]=useState(plano??'pontotech_monthly'),[name,setName]=useState(''),[company,setCompany]=useState(''),[email,setEmail]=useState(''),[document,setDocument]=useState(''),[accepted,setAccepted]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[existing,setExisting]=useState(false),[secret,setSecret]=useState(''),[confirmed,setConfirmed]=useState(false);
+  const [plan,setPlan]=useState<PlanId>(plano??'pontotech_monthly'),[name,setName]=useState(''),[company,setCompany]=useState(''),[email,setEmail]=useState(''),[document,setDocument]=useState(''),[accepted,setAccepted]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[existing,setExisting]=useState(false),[secret,setSecret]=useState(''),[confirmed,setConfirmed]=useState(false);
   const [pending,setPending]=useState<{purchaseId:string;browserToken:string}|null>(null);
   useEffect(()=>{if(purchase){const saved=sessionStorage.getItem(`purchase-${purchase}`);if(saved)setPending({purchaseId:purchase,browserToken:saved});}},[purchase]);
   useEffect(()=>{if(!pending)return;const timer=window.setInterval(async()=>{try{const result=await getStatus({data:pending});if(['paid','activated'].includes(result.status)){setConfirmed(true);setSecret('');window.clearInterval(timer);}}catch{/* Payment remains pending until server confirmation. */}},3000);return()=>window.clearInterval(timer);},[pending,getStatus]);

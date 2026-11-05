@@ -17,7 +17,7 @@ function Privacy() {
   return <LegalPage title="Política de Privacidade">
     <p><b>{SELLER.legalName}</b> ({SELLER.tradeName}), inscrita sob {SELLER.document}, é a controladora dos dados pessoais da conta e do uso do sistema, conforme a Lei Geral de Proteção de Dados (LGPD). Para os dados de clientes que a sua assistência cadastra no sistema, nós atuamos como operadora, seguindo suas instruções.</p>
     <h2>Dados coletados e finalidades</h2><ul>
-      <li><b>Cadastro</b> (nome, nome de usuário, e-mail, senha protegida, dados da empresa): criar e manter a conta. Base legal: execução de contrato.</li>
+      <li><b>Cadastro e contratação</b> (nome, e-mail, CPF ou CNPJ, dados da assistência e senha protegida): identificar o responsável, vincular a assinatura e criar e manter a conta. Na compra antes da senha, os dados da contratação são guardados para concluir o cadastro por link seguro enviado ao e-mail. Base legal: execução de contrato.</li>
       <li><b>Dados inseridos no sistema</b> (clientes, aparelhos, fotos, ordens, garantias, estoque, financeiro): prestar o serviço. Base legal: execução de contrato.</li>
       <li><b>Uso e dispositivo</b> (endereço IP, navegador, registros de acesso): segurança, prevenção a fraudes e melhoria do produto. Base legal: legítimo interesse.</li>
       <li><b>Mensagens de suporte</b>: atendimento. Base legal: execução de contrato e legítimo interesse.</li>
