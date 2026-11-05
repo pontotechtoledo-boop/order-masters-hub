@@ -35,9 +35,9 @@ export function LandingPage() {
   ];
 
   const plans = [
-    { name: "Mensal", price: "R$ 29,90", period: "/mês", detail: "Comece com um compromisso mensal", equivalent: "Cobrança automática a cada mês", featured: false },
-    { name: "Trimestral", price: "R$ 69,90", period: "/trimestre", detail: "O menor valor equivalente por mês", equivalent: "Equivale a R$ 23,30/mês · cobrança a cada 3 meses", featured: true },
-    { name: "Anual", price: "R$ 299,90", period: "/ano", detail: "Um ano de gestão em uma assinatura", equivalent: "Menos de R$ 0,83 por dia · cobrança anual", featured: false },
+    { id: "pontotech_monthly", name: "Mensal", price: "R$ 29,90", period: "/mês", detail: "Comece com um compromisso mensal", equivalent: "Cobrança automática a cada mês", featured: false },
+    { id: "pontotech_quarterly", name: "Trimestral", price: "R$ 69,90", period: "/trimestre", detail: "O menor valor equivalente por mês", equivalent: "Equivale a R$ 23,30/mês · cobrança a cada 3 meses", featured: true },
+    { id: "pontotech_yearly", name: "Anual", price: "R$ 299,90", period: "/ano", detail: "Um ano de gestão em uma assinatura", equivalent: "Menos de R$ 0,83 por dia · cobrança anual", featured: false },
   ];
 
   return <main className="min-h-screen overflow-x-clip bg-background text-foreground">
@@ -69,7 +69,7 @@ export function LandingPage() {
           <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">Service Pro OS organiza sua assistência técnica: checklist com fotos na entrada, orçamento aprovado pelo cliente, garantia vinculada à OS e lucro real no fim do mês. Tudo liberado a partir de R$ 29,90/mês.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button size="lg" className="h-12 gap-2 px-6 shadow-brand" onClick={goToSignup}>Ver planos e assinar <ArrowRight className="size-4" /></Button>
-            <Button size="lg" variant="outline" className="h-12 px-6" onClick={() => document.getElementById("recursos")?.scrollIntoView({ behavior: "smooth" })}>Conhecer recursos</Button>
+            <Button size="lg" variant="outline" className="h-12 px-6" asChild><a href="/cadastro">Acesse e conheça o sistema <ArrowRight className="size-4" /></a></Button>
           </div>
           <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-2"><Check className="size-4 text-primary" /> Cadastro simples</span>
@@ -153,7 +153,7 @@ export function LandingPage() {
             <h3 className="font-display text-xl font-bold">{plan.name}</h3><p className="mt-2 text-sm text-muted-foreground">{plan.detail}</p>
             <p className="mt-6"><span className="font-display text-3xl font-extrabold">{plan.price}</span><span className="text-sm text-muted-foreground">{plan.period}</span></p>
             <p className="mt-3 text-xs leading-5 text-muted-foreground">{plan.equivalent}</p><p className="mt-6 font-semibold">Incluído neste plano</p><ul className="mt-4 grid gap-3 text-sm text-muted-foreground">{included.map((benefit) => <li key={benefit} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-primary" /><span>{benefit}</span></li>)}</ul><div className="h-7" />
-            <Button asChild variant={plan.featured ? "default" : "outline"} className="mt-auto w-full gap-2 self-end"><a href="/cadastro">Assinar {plan.name.toLowerCase()} <ArrowRight className="size-4" /></a></Button>
+            <Button asChild variant={plan.featured ? "default" : "outline"} className="mt-auto w-full gap-2 self-end"><a href={`/cadastro?plano=${plan.id}`}>Assinar {plan.name.toLowerCase()} <ArrowRight className="size-4" /></a></Button>
             
           </article>)}
         </div>
@@ -164,7 +164,7 @@ export function LandingPage() {
 
     <section className="py-16 sm:py-20"><div className="mx-auto max-w-3xl px-5 sm:px-8"><h2 className="font-display text-3xl font-extrabold">Antes de começar</h2><div className="mt-8 divide-y border-y">{[
       { question: "Como recebo meu acesso?", answer: "Crie sua conta e confirme seu e-mail antes de pagar. Após a confirmação pelo Stripe, o acesso é liberado. Nas renovações, você mantém o mesmo cadastro." },
-      { question: "O que acontece se eu criar a conta sem assinar?", answer: "Você pode entrar, mas verá a tela de assinatura. As funções operacionais ficam disponíveis somente após a confirmação do pagamento." },
+      { question: "O que acontece se eu criar a conta sem assinar?", answer: "Você pode conhecer a visão geral e as áreas do sistema. Quando quiser começar, escolha sua assinatura na janela de pagamento." },
       { question: "Quando meu acesso volta após renovar?", answer: "Assim que o pagamento é confirmado, o acesso normal é restabelecido, inclusive durante ou depois dos 7 dias de tolerância. Não é necessário criar outra conta." },
       { question: "Preciso do plano anual para ter todos os recursos?", answer: "Não. Mensal, trimestral e anual incluem os mesmos recursos. Escolha o ciclo de cobrança que faz mais sentido para sua empresa." },
       { question: "Estoque e PDV custam a mais?", answer: "Não. Todos os recursos estão incluídos em qualquer ciclo: mensal, trimestral ou anual." },

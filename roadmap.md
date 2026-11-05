@@ -1,5 +1,11 @@
 # Roadmap PontoTech Toledo
 
+## Prévia antes da assinatura e textos de acesso
+- [ ] Simplificar e-mail no login e textos de cadastro/confirmação, mantendo requisitos de senha e proteção contra senhas vazadas
+- [ ] Mostrar o menu e visão prévia sem permitir operações para contas sem assinatura, com contratação Stripe em janela
+- [ ] Oferecer conhecer o sistema e escolher plano na landing, mantendo compra vinculada à conta confirmada
+- [ ] Conferir três preços live e eventos de reembolso, testar telas e fluxo de contratação
+
 ## Revisão de acesso e garantia Stripe
 - [x] Destacar garantia própria de reembolso de 7 dias, sem atribuí-la ao Stripe
 - [x] Impedir uso sem assinatura paga e remover fallback de trial antigo no banco e na consulta de assinatura

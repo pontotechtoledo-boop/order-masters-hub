@@ -4,6 +4,9 @@ export const subscriptionPlans = [
   { id: "pontotech_yearly", name: "Anual", amount: 29990, interval: "year", frequency: 1, period: "por ano", renewal: "Renovação a cada ano" },
 ] as const;
 export type PlanId = (typeof subscriptionPlans)[number]["id"];
+export function selectedPlan(value: unknown): PlanId | undefined {
+  return subscriptionPlans.find(plan => plan.id === value)?.id;
+}
 export const formatPlanPrice = (amount: number) => (amount / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 export function findPlan(id: string) {
   const plan = subscriptionPlans.find(plan => plan.id === id);

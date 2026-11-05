@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { findPlan, hasPaidAccess, isInRenewalGrace } from "./subscriptions";
+import { findPlan, hasPaidAccess, isInRenewalGrace, selectedPlan } from "./subscriptions";
 describe("Planos aprovados", () => {
+  test("escolha antecipada só aceita os três planos do catálogo", () => {
+    for (const id of ["pontotech_monthly", "pontotech_quarterly", "pontotech_yearly"]) expect(selectedPlan(id)).toBe(id);
+    expect(selectedPlan("outro_plano")).toBeUndefined();
+    expect(selectedPlan(null)).toBeUndefined();
+  });
   test("conta sem assinatura ou período pago não libera recursos", () => {
     expect(hasPaidAccess(null)).toBe(false);
     expect(hasPaidAccess({ status: "active", current_period_end: null })).toBe(false);
