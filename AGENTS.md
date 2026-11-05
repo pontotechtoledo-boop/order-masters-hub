@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Keep all PontoTech visual roles centralized as semantic tokens in `src/styles.css` so every screen stays theme-consistent.
+- Reuse password guidance and validation across signup and recovery; hosted Auth remains the security boundary and breached-password protection must stay enabled.
 - Keep subscription rules in a shared domain module and enforce writes in database triggers; client UI is never an access boundary.
 - Derive operational write access only from the latest live paid subscription through organization_has_write_access, never legacy trial dates; keep the dashboard closed until billing is verified.
 - Process signed Stripe events transactionally through a service-role-only database function with event deduplication and chronological subscription updates.
