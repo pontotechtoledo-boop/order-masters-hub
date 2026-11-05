@@ -20,24 +20,34 @@ export async function provisionPaidPurchase(id: string, environment: StripeEnv) 
   const {data:claimed,error:claimError}=await supabaseAdmin.rpc('claim_public_purchase_provisioning',{_id:id});
   if(claimError||!claimed) throw new Error('Ativação sendo preparada.');
   try {
-    const {data:exists,error:existsError}=await supabaseAdmin.rpc('registration_email_exists',{_email:purchase.email});
-    if(existsError) throw existsError;
-    if(exists) throw new Error('Este e-mail já tem conta. A contratação precisa ser recuperada após autenticação.');
-    const {data:invitation,error:inviteError}=await supabaseAdmin.auth.admin.generateLink({type:'invite',email:purchase.email,options:{data:{full_name:purchase.full_name,company_name:purchase.company_name,document:purchase.document},redirectTo:'https://serviceproos.app/ativar'}});
-    if(inviteError||!invitation.user||!invitation.properties?.hashed_token) throw new Error('Não foi possível preparar o convite.');
-    const userId=invitation.user.id;
-    const {data:organization,error:orgError}=await supabaseAdmin.from('organizations').insert({name:purchase.company_name,email:purchase.email,document:purchase.document}).select('id').single();
-    if(orgError||!organization) throw new Error('Não foi possível preparar a assistência.');
-    const {error:memberError}=await supabaseAdmin.from('organization_members').insert({organization_id:organization.id,user_id:userId,role:'owner',active:true});
-    if(memberError) throw memberError;
-    const {error:intentError}=await supabaseAdmin.from('subscription_checkouts').insert({id:purchase.id,user_id:userId,organization_id:organization.id,price_id:purchase.price_id,environment:purchase.environment,gateway_session_id:purchase.gateway_session_id});
-    if(intentError) throw intentError;
+    let userId=purchase.user_id;
+    let inviteToken=purchase.invite_token_hash;
+    if(!userId){
+      const {data:owned}=await supabaseAdmin.rpc('public_purchase_owned_user',{_id:id});
+      userId=owned;
+    }
+    if(!userId){
+      const {data:exists,error:existsError}=await supabaseAdmin.rpc('registration_email_exists',{_email:purchase.email});
+      if(existsError)throw existsError;
+      if(exists)throw new Error('Este e-mail já tem conta. A contratação precisa ser recuperada após autenticação.');
+    }
+    if(!inviteToken){
+      const {data:invitation,error:inviteError}=await supabaseAdmin.auth.admin.generateLink({type:'invite',email:purchase.email,options:{data:{full_name:purchase.full_name,company_name:purchase.company_name,document:purchase.document,public_purchase_id:purchase.id},redirectTo:'https://serviceproos.app/ativar'}});
+      if(inviteError||!invitation.user||!invitation.properties?.hashed_token)throw new Error('Não foi possível preparar o convite.');
+      if(userId&&userId!==invitation.user.id)throw new Error('Conta de ativação divergente.');
+      userId=invitation.user.id;inviteToken=invitation.properties.hashed_token;
+      const {error:identityError}=await supabaseAdmin.from('public_subscription_purchases').update({user_id:userId,invite_token_hash:inviteToken}).eq('id',id);
+      if(identityError)throw identityError;
+    }
+    if(!userId)throw new Error('Conta ausente.');
+    const {data:organizationId,error:orgError}=await supabaseAdmin.rpc('initialize_public_purchase_identity',{_id:id,_user_id:userId});
+    if(orgError||!organizationId)throw new Error('Não foi possível preparar a assistência.');
     const stripe=createStripeClient(environment);
     await stripe.customers.update(String(payload['customerId']),{metadata:{userId}});
-    await stripe.subscriptions.update(String(payload['subscriptionId']),{metadata:{userId,organizationId:organization.id,checkoutId:purchase.id,publicPurchaseId:purchase.id}});
-    const {error:saveError}=await supabaseAdmin.from('public_subscription_purchases').update({user_id:userId,organization_id:organization.id,invite_token_hash:invitation.properties.hashed_token,provisioning_until:null}).eq('id',id);
+    await stripe.subscriptions.update(String(payload['subscriptionId']),{metadata:{userId,organizationId,checkoutId:purchase.id,publicPurchaseId:purchase.id}});
+    const {error:saveError}=await supabaseAdmin.from('public_subscription_purchases').update({provisioning_until:null}).eq('id',id);
     if(saveError) throw saveError;
-    return {...purchase,user_id:userId,organization_id:organization.id,invite_token_hash:invitation.properties.hashed_token};
+    return {...purchase,user_id:userId,organization_id:organizationId,invite_token_hash:inviteToken};
   } catch(error) {
     await supabaseAdmin.from('public_subscription_purchases').update({provisioning_until:null}).eq('id',id);
     throw error;
