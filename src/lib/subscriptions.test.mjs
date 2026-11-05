@@ -1,6 +1,17 @@
 import { describe, expect, test } from "bun:test";
 import { findPlan, hasPaidAccess, isInRenewalGrace } from "./subscriptions";
 describe("Planos aprovados", () => {
+  test("conta sem assinatura ou período pago não libera recursos", () => {
+    expect(hasPaidAccess(null)).toBe(false);
+    expect(hasPaidAccess({ status: "active", current_period_end: null })).toBe(false);
+    expect(hasPaidAccess({ status: "pending", current_period_end: "2026-12-05T00:00:00Z" }, Date.parse("2026-11-05T00:00:00Z"))).toBe(false);
+  });
+  for (const day of ["2026-11-03", "2026-11-10"]) test(`renovar em ${day} restaura acesso antes ou depois da tolerância`, () => {
+    const now = Date.parse(`${day}T00:00:00Z`);
+    const renewed = { status: "active", first_failed_at: null, current_period_end: "2026-12-10T00:00:00Z" };
+    expect(hasPaidAccess(renewed, now)).toBe(true);
+    expect(isInRenewalGrace(renewed, now)).toBe(false);
+  });
   test("mensal R$ 29,90 por mês", () => { expect(findPlan("pontotech_monthly")).toMatchObject({ amount: 2990, interval: "month", frequency: 1 }); });
   test("trimestral R$ 69,90 a cada três meses", () => { expect(findPlan("pontotech_quarterly")).toMatchObject({ amount: 6990, interval: "month", frequency: 3 }); });
   test("anual R$ 299,90 por ano", () => { expect(findPlan("pontotech_yearly")).toMatchObject({ amount: 29990, interval: "year", frequency: 1 }); });

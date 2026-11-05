@@ -119,7 +119,7 @@ export const changeSubscriptionPlan = createServerFn({ method: "POST" })
       const stripe = createStripeClient(data.environment);
       const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
       const stripePrice = prices.data[0];
-      if (!stripePrice) throw new Error("O preço deste plano ainda não está disponível neste ambiente.");
+      if (!stripePrice || !stripePrice.active || stripePrice.type !== "recurring" || stripePrice.currency !== "brl" || stripePrice.unit_amount !== plan.amount || stripePrice.recurring?.interval !== plan.interval || stripePrice.recurring.interval_count !== plan.frequency) throw new Error("O preço ou ciclo deste plano não confere com o catálogo.");
 
       const current = await stripe.subscriptions.retrieve(subscription.gateway_subscription_id);
       const itemId = current.items.data[0]?.id;
