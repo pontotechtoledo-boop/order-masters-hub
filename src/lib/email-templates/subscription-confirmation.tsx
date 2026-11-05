@@ -18,7 +18,6 @@ function SubscriptionConfirmation({ name }: Props) {
           <Text style={styles.text}>Faça o login no seu app de gestão através do link abaixo:</Text>
           <Button href="https://serviceproos.app/auth" style={styles.button}>Acessar meu app de gestão</Button>
           <Text style={styles.text}>https://serviceproos.app/auth</Text>
-          <Text style={styles.text}>Se esta é sua primeira compra, confira também o e-mail de acesso para definir sua senha.</Text>
           <Text style={styles.text}>Equipe Service Pro OS</Text>
         </Container>
       </Body>
