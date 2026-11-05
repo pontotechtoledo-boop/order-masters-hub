@@ -1,4 +1,4 @@
-import { ArrowRight, BarChart3, Check, CircleDollarSign, ClipboardList, Clock3, Package, ShieldCheck, Smartphone, TrendingUp, Users, Wrench } from "lucide-react";
+import { ArrowRight, BarChart3, Check, CircleDollarSign, ClipboardList, Clock3, Monitor, Package, ShieldCheck, Smartphone, TrendingUp, Users, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import screenVisaoGeral from "@/assets/screen-visao-geral.png";
 import screenNovaOs from "@/assets/screen-nova-os.png";
@@ -68,6 +68,7 @@ export function LandingPage() {
         <h1 className="max-w-3xl font-display text-4xl font-extrabold leading-tight text-brand-ink-foreground sm:text-5xl">Service Pro OS</h1>
         <p className="mt-5 max-w-xl text-xl font-semibold leading-8 text-brand-ink-foreground">Sua bancada precisa de consertos. Sua gestão, de controle.</p>
         <p className="mt-4 max-w-xl text-base leading-7 text-brand-ink-muted">Fotos na entrada, OS organizada, garantia profissional e lucro sob controle. Comece a organizar o próximo atendimento — sem esperar o próximo prejuízo.</p>
+        <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold text-brand-ink-foreground"><span className="inline-flex items-center gap-2"><Monitor className="size-5 shrink-0"/>Computadores</span><span aria-hidden="true">+</span><span className="inline-flex items-center gap-2"><Smartphone className="size-5 shrink-0"/>Celulares</span><span className="w-full text-brand-ink-muted">Acesse pelo navegador no desktop ou smartphone, sem instalar.</span></p>
         <p className="mt-6 text-lg font-bold text-brand-ink-foreground">Todos os recursos a partir de R$ 29,90/mês.</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row"><Button asChild size="lg" className="h-12"><a href="/comprar">Assinar agora <ArrowRight className="size-4" /></a></Button><Button asChild size="lg" variant="outline" className="h-12 bg-card"><a href="/conhecer">Acesse e conheça o sistema <ArrowRight className="size-4" /></a></Button></div>
         <p className="mt-5 flex items-center gap-2 text-sm text-brand-ink-muted"><ShieldCheck className="size-4 text-brand-highlight"/>7 dias de garantia ou seu dinheiro de volta · Pagamento Stripe</p>
@@ -147,6 +148,7 @@ export function LandingPage() {
 
     <section className="py-16 sm:py-20"><div className="mx-auto max-w-3xl px-5 sm:px-8"><h2 className="font-display text-3xl font-extrabold">Antes de começar</h2><div className="mt-8 divide-y border-y">{[
       { question: "Como recebo meu acesso?", answer: "Você pode pagar primeiro e criar sua senha pelo link enviado após a confirmação. Também pode criar uma conta antes de assinar. Nas renovações, mantém o mesmo cadastro." },
+      { question: "Funciona em computadores e celulares?", answer: "Sim. Acesse o Service Pro OS pelo navegador do computador ou do smartphone, sem instalar. Use a mesma conta nos dois dispositivos." },
       { question: "O que acontece se eu criar a conta sem assinar?", answer: "Você pode abrir a prévia sem informar e-mail. As abas permanecem bloqueadas; quando quiser usar, escolha sua assinatura." },
       { question: "Quando meu acesso volta após renovar?", answer: "Assim que o pagamento é confirmado, o acesso normal é restabelecido, inclusive durante ou depois dos 7 dias de tolerância. Não é necessário criar outra conta." },
       { question: "Preciso do plano anual para ter todos os recursos?", answer: "Não. Mensal, trimestral e anual incluem os mesmos recursos. Escolha o ciclo de cobrança que faz mais sentido para sua empresa." },
