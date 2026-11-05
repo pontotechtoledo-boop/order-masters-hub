@@ -1,5 +1,9 @@
 # Roadmap PontoTech Toledo
 
+## Compatibilidade e novos testes
+- [ ] Destacar computadores e celulares na página de vendas e conferir no celular
+- [ ] Apagar todas as contas, registros e arquivos da aplicação para permitir novos cadastros; manter estrutura e integração Stripe
+
 ## Liberação automática Stripe real
 - [x] Confirmar webhook live e eventos existentes; corrigir vínculo da primeira fatura com checkout persistido e recuperação de metadados Stripe; painel consulta acesso live a cada 5 segundos. 24 testes, replay assinado 2× HTTP 200 e assinatura sandbox vinculada ao proprietário confirmados
 - [ ] Confirmar liberação das abas em produção após pagamento live — depende de publicar esta versão e de uma compra real; nenhuma cobrança real realizada
