@@ -122,7 +122,7 @@ export function LandingPage() {
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div><p className="text-sm font-bold uppercase tracking-widest text-primary">Comece sem complicação</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Do cadastro ao controle da sua operação</h2><p className="mt-4 leading-7 text-muted-foreground">Crie sua conta, confirme seu e-mail e assine com segurança pelo Stripe. As renovações mantêm o mesmo acesso.</p><Button className="mt-7 gap-2" size="lg" onClick={goToSignup}>Escolher meu plano <ArrowRight className="size-4" /></Button></div>
           <div className="grid gap-4 sm:grid-cols-3">
-            {[{n:"01",title:"Escolha o plano",desc:"Mensal, trimestral ou anual — todos com tudo liberado."},{n:"02",title:"Receba o acesso",desc:"Confirme seu e-mail e conclua o pagamento pelo Stripe."},{n:"03",title:"Organize a rotina",desc:"Use 7 dias com garantia de reembolso total."}].map((step) => <div key={step.n} className="rounded-2xl border bg-card p-5"><p className="font-display text-3xl font-extrabold text-primary">{step.n}</p><h3 className="mt-4 font-bold">{step.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{step.desc}</p></div>)}
+            {[{n:"01",title:"Crie sua conta",desc:"Cadastre sua assistência, confirme seu e-mail e faça login."},{n:"02",title:"Assine seu plano",desc:"Escolha o ciclo e pague pelo Stripe. Os recursos são liberados após a confirmação."},{n:"03",title:"Organize a rotina",desc:"Use o sistema com nossa garantia de reembolso de 7 dias."}].map((step) => <div key={step.n} className="rounded-2xl border bg-card p-5"><p className="font-display text-3xl font-extrabold text-primary">{step.n}</p><h3 className="mt-4 font-bold">{step.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{step.desc}</p></div>)}
           </div>
         </div>
       </div>
@@ -157,12 +157,15 @@ export function LandingPage() {
             
           </article>)}
         </div>
-        <p className="mt-6 text-center text-xs text-muted-foreground">Renovação automática conforme o ciclo contratado. Você pode cancelar a renovação e manter o acesso até o fim do período pago. Consulte os termos e a política de reembolso de 7 dias.</p>
+        <p className="mt-6 text-center text-xs text-muted-foreground">Renovação automática conforme o ciclo contratado. Você pode cancelar a renovação e manter o acesso até o fim do período pago.</p>
+        <div className="mx-auto mt-8 max-w-3xl border-y py-6 text-center"><ShieldCheck className="mx-auto size-7 text-primary" /><h3 className="mt-3 font-display text-xl font-bold">Nossa garantia: 7 dias ou seu dinheiro de volta</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">O Service Pro OS oferece reembolso integral em até 7 dias corridos após a compra ou renovação. A garantia é nossa; o Stripe processa o pagamento e a devolução.</p><a href="/reembolso" className="mt-3 inline-block text-sm font-semibold text-primary underline">Consultar política de reembolso</a></div>
       </div>
     </section>
 
     <section className="py-16 sm:py-20"><div className="mx-auto max-w-3xl px-5 sm:px-8"><h2 className="font-display text-3xl font-extrabold">Antes de começar</h2><div className="mt-8 divide-y border-y">{[
       { question: "Como recebo meu acesso?", answer: "Crie sua conta e confirme seu e-mail antes de pagar. Após a confirmação pelo Stripe, o acesso é liberado. Nas renovações, você mantém o mesmo cadastro." },
+      { question: "O que acontece se eu criar a conta sem assinar?", answer: "Você pode entrar, mas verá a tela de assinatura. As funções operacionais ficam disponíveis somente após a confirmação do pagamento." },
+      { question: "Quando meu acesso volta após renovar?", answer: "Assim que o pagamento é confirmado, o acesso normal é restabelecido, inclusive durante ou depois dos 7 dias de tolerância. Não é necessário criar outra conta." },
       { question: "Preciso do plano anual para ter todos os recursos?", answer: "Não. Mensal, trimestral e anual incluem os mesmos recursos. Escolha o ciclo de cobrança que faz mais sentido para sua empresa." },
       { question: "Estoque e PDV custam a mais?", answer: "Não. Todos os recursos estão incluídos em qualquer ciclo: mensal, trimestral ou anual." },
       { question: "O sistema envia mensagens automaticamente no WhatsApp?", answer: "Não. Ele prepara o aviso e o PDF da OS ou da garantia. Você abre seu WhatsApp, confirma o destinatário e compartilha ou anexa o documento." },

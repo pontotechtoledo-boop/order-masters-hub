@@ -1,5 +1,11 @@
 # Roadmap PontoTech Toledo
 
+## Revisão de acesso e garantia Stripe
+- [ ] Explicar e destacar garantia própria de reembolso de 7 dias, sem atribuí-la ao Stripe
+- [ ] Impedir uso sem assinatura paga, inclusive sem fallback de trial antigo
+- [ ] Conferir renovação durante/depois da tolerância, gestão de cobrança e troca de ciclo automática
+- [ ] Validar testes e telas; cobranças live continuam dependendo da ativação Stripe e publicação
+
 ## Retorno ao Stripe
 - [x] Restaurar contratação embutida, cadastro sem teste grátis e gestão da assinatura
 - [x] Remover integração ativa Hotmart preservando registros e períodos pagos
