@@ -1,17 +1,17 @@
 # Roadmap PontoTech Toledo
 
 ## Prévia antes da assinatura e textos de acesso
-- [ ] Simplificar e-mail no login e textos de cadastro/confirmação, mantendo requisitos de senha e proteção contra senhas vazadas
-- [ ] Mostrar o menu e visão prévia sem permitir operações para contas sem assinatura, com contratação Stripe em janela
-- [ ] Oferecer conhecer o sistema e escolher plano na landing, mantendo compra vinculada à conta confirmada
-- [ ] Conferir três preços live e eventos de reembolso, testar telas e fluxo de contratação
+- [x] Simplificar e-mail no login e textos de cadastro/confirmação, mantendo requisitos de senha e proteção contra senhas vazadas
+- [x] Mostrar o menu e visão prévia sem permitir operações para contas sem assinatura, com contratação Stripe em janela
+- [x] Oferecer conhecer o sistema e escolher plano na landing, mantendo compra vinculada à conta confirmada
+- [x] Conferir três preços live e eventos de reembolso, testar telas e fluxo de contratação
 
 ## Revisão de acesso e garantia Stripe
 - [x] Destacar garantia própria de reembolso de 7 dias, sem atribuí-la ao Stripe
 - [x] Impedir uso sem assinatura paga e remover fallback de trial antigo no banco e na consulta de assinatura
 - [x] Corrigir confirmação paga entregue fora de ordem; preservar renovação durante/depois da tolerância e validar preço/ciclo na troca agendada
 - [x] Validar 18 testes, 7 regras de banco e páginas em computador/celular sem erros
-- [ ] Validar troca trimestral/anual efetiva e primeira renovação live — depende da instalação do aplicativo Lovable no Stripe, provisionamento e publicação; troca de ciclo continua agendada para próxima renovação
+- [ ] Validar troca trimestral/anual efetiva e primeira renovação live — depende da publicação e de pagamento/renovação real; aplicativo instalado, chaves e três planos live confirmados; troca de ciclo continua agendada para próxima renovação
 
 ## Retorno ao Stripe
 - [x] Restaurar contratação embutida, cadastro sem teste grátis e gestão da assinatura
@@ -19,7 +19,7 @@
 - [x] Processar confirmação, renovação, falha e reembolso Stripe com segurança e e-mail
 - [x] Validar compra mensal de teste aprovada, período até 05/12/2026 e replay seguro do evento invoice.paid
 - [x] Confirmar domínio de envio verificado e telas no computador/celular sem erros
-- [ ] Liberar produção — depende da instalação do aplicativo Lovable na conta Stripe live, provisionamento automático e publicação; adicionar eventos charge.refunded e charge.dispute.created ao webhook live após provisionamento
+- [ ] Liberar produção — depende somente da publicação; aplicativo e chaves live confirmados, três preços ativos e eventos de reembolso/contestação adicionados
 - [ ] Confirmar entrega na caixa de entrada e primeira cobrança live — depende da publicação e da liberação Stripe
 
 ## E-mails de compra e renovação Hotmart

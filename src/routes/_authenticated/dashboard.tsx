@@ -27,7 +27,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  validateSearch: (search: Record<string, unknown>) => ({ plano: selectedPlan(search.plano) }),
+  validateSearch: (search: Record<string, unknown>): { plano?: ReturnType<typeof selectedPlan> } => ({ plano: selectedPlan(search["plano"]) }),
   head: () => ({ meta: [
     { title: "Service Pro OS | Gestão para sua Assistência Técnica" },
     { name: "description", content: "Gestão de ordens de serviço, clientes, garantias, estoque e financeiro para assistências técnicas." },
@@ -429,7 +429,7 @@ function Sidebar({section,setSection,open,close,collapsed,toggleCollapsed,locked
         {!collapsed&&<Button variant="ghost" size="icon" onClick={close} className="ml-auto lg:hidden"><X/></Button>}
       </div>
       <nav className={"flex-1 overflow-y-auto py-4 "+(collapsed?"px-2":"px-3")}>
-        {nav.map((item,i)=>{const shown=item.label;return <div key={item.label}>{item.group&&!collapsed&&<p className={"mb-2 px-3 text-[10px] font-bold text-muted-foreground "+(i?"mt-6":"")}>{item.group}</p>}<Button variant="ghost" onClick={()=>setSection(item.label)} className={"group relative mb-1 h-10 w-full gap-3 "+(collapsed?"justify-center px-2":"justify-start px-3")+" "+(section===item.label?"bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground":"text-sidebar-foreground")} aria-label={shown} aria-disabled={locked && item.label!=="Assinatura"} title={locked?`${shown} · disponível após assinar`:shown}><item.icon className="size-[18px]"/>{!collapsed&&<span className="flex min-w-0 flex-1 items-center justify-between gap-2"><span>{shown}</span>{locked&&item.label!=="Assinatura"&&<LockKeyhole className="size-3 shrink-0 opacity-60"/>}</span>}{collapsed&&<span className="pointer-events-none absolute left-full top-1/2 z-[70] ml-2 hidden -translate-y-1/2 whitespace-nowrap rounded-md border bg-popover px-2.5 py-1.5 text-xs font-medium text-popover-foreground shadow-md group-hover:block">{shown}</span>}</Button></div>})}
+        {nav.map((item,i)=>{const shown=item.label;return <div key={item.label}>{item.group&&!collapsed&&<p className={"mb-2 px-3 text-[10px] font-bold text-muted-foreground "+(i?"mt-6":"")}>{item.group}</p>}<Button variant="ghost" onClick={()=>setSection(item.label)} className={"group relative mb-1 h-10 w-full gap-3 "+(collapsed?"justify-center px-2":"justify-start px-3")+" "+(section===item.label?"bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground":"text-sidebar-foreground")} aria-label={shown} title={locked?`${shown} · disponível após assinar`:shown}><item.icon className="size-[18px]"/>{!collapsed&&<span className="flex min-w-0 flex-1 items-center justify-between gap-2"><span>{shown}</span>{locked&&item.label!=="Assinatura"&&<LockKeyhole className="size-3 shrink-0 opacity-60"/>}</span>}{collapsed&&<span className="pointer-events-none absolute left-full top-1/2 z-[70] ml-2 hidden -translate-y-1/2 whitespace-nowrap rounded-md border bg-popover px-2.5 py-1.5 text-xs font-medium text-popover-foreground shadow-md group-hover:block">{shown}</span>}</Button></div>})}
       </nav>
     </aside>
   </>

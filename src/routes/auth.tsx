@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { selectedPlan } from "@/lib/subscriptions";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => ({ plano: selectedPlan(search.plano) }),
+  validateSearch: (search: Record<string, unknown>): { plano?: ReturnType<typeof selectedPlan> } => ({ plano: selectedPlan(search["plano"]) }),
   head: () => ({ meta: [
     { title: "Entrar | Service Pro OS" },
     { name: "description", content: "Acesse o sistema de gestão da sua assistência técnica." },
