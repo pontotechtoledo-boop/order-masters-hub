@@ -9,7 +9,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { completeRecoveredPurchase } from '@/utils/public-purchase.functions';
 
 export const Route = createFileRoute("/reset-password")({staticData:{sitemap:false},
-  head: () => ({ meta: [
+  head: () => ({ meta:[{name:'robots',content:'noindex'},
     { title: "Redefinir senha | Service Pro OS" },
     { name: "description", content: "Defina uma nova senha para seu acesso ao Service Pro OS." },
     { property: "og:title", content: "Redefinir senha | Service Pro OS" },
