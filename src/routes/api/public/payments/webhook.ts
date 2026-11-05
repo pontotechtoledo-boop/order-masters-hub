@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createStripeClient, verifyWebhook, type StripeEnv } from '@/lib/stripe.server';
 import { stripePeriod, stripeConfirmationKey } from '@/lib/stripe-billing';
+import { publicPurchasePaymentPayload } from '@/lib/public-purchase';
 
 export const Route = createFileRoute('/api/public/payments/webhook')({ server: { handlers: { POST: async ({ request }) => {
   const environment = new URL(request.url).searchParams.get('env');
@@ -36,7 +37,7 @@ export const Route = createFileRoute('/api/public/payments/webhook')({ server: {
         if(!token)throw new Error('Convite de ativação ausente.');
         const {error:tokenError}=await supabaseAdmin.from('public_subscription_purchases').update({activation_token_hash:await hashPurchaseToken(token),activation_expires_at:purchase.activation_expires_at??new Date(Date.now()+7*86400000).toISOString()}).eq('id',purchase.id).eq('status','paid');
         if(tokenError)throw tokenError;
-        const {error:paymentError}=await supabaseAdmin.rpc('process_subscription_payment',{_event_id:event.id,_environment:environment,_occurred_at:new Date(event.created*1000).toISOString(),_event_type:normalized.type,_payload:JSON.parse(JSON.stringify({...normalized.payload,checkoutId:purchase.id}))});
+        const {error:paymentError}=await supabaseAdmin.rpc('process_subscription_payment',{_event_id:event.id,_environment:environment,_occurred_at:new Date(event.created*1000).toISOString(),_event_type:normalized.type,_payload:JSON.parse(JSON.stringify(publicPurchasePaymentPayload(normalized.payload,purchase.id)))});
         if(paymentError)throw paymentError;
         const {sendTemplateEmail}=await import('@/lib/email-templates/send-email');
         await sendTemplateEmail('purchase-activation',purchase.email,{templateData:{name:purchase.full_name,activationUrl:`https://serviceproos.app/ativar?purchase=${purchase.id}&token=${token}`},idempotencyKey:stripeConfirmationKey(environment,normalized.invoiceId)});
