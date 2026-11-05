@@ -11,10 +11,10 @@ import { changeSubscriptionPlan, createBillingPortal, getBillingOverview } from 
 // Operational access remains live even while preview checkout uses test prices.
 export const billingQueryOptions = (organizationId?: string) => ({ queryKey: ['subscription', organizationId, 'live'], queryFn: () => getBillingOverview({ data: { organizationId, environment: 'live' as const } }) });
 const date = (value: string | null | undefined) => value ? new Date(value).toLocaleDateString('pt-BR') : '—';
-export function SubscriptionPage({ organizationId, embedded = false }: { organizationId?: string; embedded?: boolean }) {
+export function SubscriptionPage({ organizationId, embedded = false, initialPlan }: { organizationId?: string; embedded?: boolean; initialPlan?: PlanId }) {
   const { data, error, isPending, refetch, isFetching } = useQuery({ ...billingQueryOptions(organizationId), refetchInterval: 5000 });
   const { data: testBilling } = useQuery({ queryKey: ['subscription', organizationId, 'sandbox'], queryFn: () => getBillingOverview({ data: { organizationId, environment: 'sandbox' } }), enabled: import.meta.env['VITE_PAYMENTS_CLIENT_TOKEN']?.startsWith('pk_test_'), refetchInterval: 5000 });
-  const [selected, setSelected] = useState<PlanId | null>(null);
+  const [selected, setSelected] = useState<PlanId | null>(initialPlan ?? null);
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const onCheckoutError = useCallback((message: string) => { setNotice(message); setSelected(null); }, []);
