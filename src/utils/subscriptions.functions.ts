@@ -19,7 +19,7 @@ export const getBillingOverview = createServerFn({ method: "GET" })
     const organization = member.organizations;
     const { data: subscription, error: subscriptionError } = await context.supabase.from("subscriptions").select("status,price_id,current_period_end,cancel_at_period_end,first_failed_at,payment_confirmed_at,gateway_subscription_id,gateway_customer_id").eq("organization_id", member.organization_id).eq("environment", data.environment).order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (subscriptionError) throw new Error("Não foi possível consultar a assinatura.");
-    return { organization, subscription, canManage: ["owner", "admin"].includes(member.role), paidAccess: hasPaidAccess(subscription), trialActive: Boolean(organization.trial_ends_at && Date.parse(organization.trial_ends_at) > Date.now()) };
+    return { organization, subscription, canManage: ["owner", "admin"].includes(member.role), paidAccess: hasPaidAccess(subscription), trialActive: false };
   });
 
 type CheckoutResult = { clientSecret: string } | { error: string };
@@ -119,7 +119,7 @@ export const changeSubscriptionPlan = createServerFn({ method: "POST" })
       const stripe = createStripeClient(data.environment);
       const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
       const stripePrice = prices.data[0];
-      if (!stripePrice) throw new Error("O preço deste plano ainda não está disponível neste ambiente.");
+      if (!stripePrice || !stripePrice.active || stripePrice.type !== "recurring" || stripePrice.currency !== "brl" || stripePrice.unit_amount !== plan.amount || stripePrice.recurring?.interval !== plan.interval || stripePrice.recurring.interval_count !== plan.frequency) throw new Error("O preço ou ciclo deste plano não confere com o catálogo.");
 
       const current = await stripe.subscriptions.retrieve(subscription.gateway_subscription_id);
       const itemId = current.items.data[0]?.id;

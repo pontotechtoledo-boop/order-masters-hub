@@ -21,5 +21,5 @@ export function hasPaidAccess(subscription: { status: string; current_period_end
   if (!subscription) return false;
   if (subscription.status === "past_due") return Boolean(subscription.first_failed_at && now < Date.parse(subscription.first_failed_at) + 7 * 86400000);
   if (subscription.status === "canceled") return Boolean(subscription.current_period_end && Date.parse(subscription.current_period_end) > now);
-  return ["active", "trialing"].includes(subscription.status) && (!subscription.current_period_end || Date.parse(subscription.current_period_end) + RENEWAL_GRACE_MS > now);
+  return ["active", "trialing"].includes(subscription.status) && Boolean(subscription.current_period_end && Date.parse(subscription.current_period_end) + RENEWAL_GRACE_MS > now);
 }

@@ -40,11 +40,15 @@ export function SubscriptionPage({ organizationId, embedded = false }: { organiz
     setNotice('');
     try {
       const environment = getStripeEnvironment();
+      if (stripeSubscription && environment === 'live' && (!paidAccess || sub?.status !== 'active')) {
+        await manage();
+        return;
+      }
       if (stripeSubscription && environment === 'live' && paidAccess && sub?.status === 'active') {
         setBusy(true);
         const result = await changeSubscriptionPlan({ data: { organizationId: data.organization.id, environment, priceId } });
         if ('error' in result) throw new Error(result.error);
-        setNotice('Novo ciclo agendado para a próxima renovação.');
+        setNotice('Novo ciclo agendado para a próxima renovação. A atualização do plano será automática quando entrar em vigor.');
       } else { setSelected(priceId); }
     } catch (error) { setNotice(error instanceof Error ? error.message : 'Não foi possível selecionar o plano.'); }
     finally { setBusy(false); }
