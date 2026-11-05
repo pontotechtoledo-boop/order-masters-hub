@@ -63,7 +63,6 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
           return_url: data.returnUrl,
           locale: "pt-BR",
           customer: customerId,
-          automatic_tax: { enabled: true },
           customer_update: { address: "auto" },
           billing_address_collection: "required",
           metadata: { checkoutId: intent.id, userId: context.userId, organizationId: data.organizationId },
