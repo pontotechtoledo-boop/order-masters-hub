@@ -1,5 +1,9 @@
 # Roadmap PontoTech Toledo
 
+## Google Search Console e sitemap
+- [x] Conectar a conta Google e conferir sitemap público com oito páginas e indicação em robots.txt
+- [ ] Publicar confirmação de propriedade, verificar o site e enviar sitemap ao Google
+
 ## Compatibilidade e novos testes
 - [x] Destacar computadores e celulares na página de vendas — verificado em 393px sem rolagem horizontal; publicação do texto ainda necessária
 - [x] Apagar todas as contas, registros e arquivos da aplicação — conferidos zero usuários, zero registros nas 23 tabelas e zero arquivos; estrutura e configuração Stripe preservadas, cobranças externas não canceladas
