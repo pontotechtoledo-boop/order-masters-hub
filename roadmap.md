@@ -2,7 +2,7 @@
 
 ## Google Search Console e sitemap
 - [x] Conectar a conta Google e conferir sitemap público com oito páginas e indicação em robots.txt
-- [ ] Publicar confirmação de propriedade, verificar o site e enviar sitemap ao Google
+- [x] Publicar confirmação de propriedade, verificar o site e enviar sitemap ao Google — confirmação presente no HTML público, propriedade siteOwner e envio aceito (HTTP 204)
 
 ## Compatibilidade e novos testes
 - [x] Destacar computadores e celulares na página de vendas — verificado em 393px sem rolagem horizontal; publicação do texto ainda necessária
