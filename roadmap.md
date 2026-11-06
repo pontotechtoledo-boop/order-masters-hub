@@ -1,5 +1,11 @@
 # Roadmap PontoTech Toledo
 
+## Campanha Google Search e medição
+- [x] Registrar textos, palavras-chave e orçamento de R$ 10/dia aprovados; confirmar que só a ação no Google estava configurada
+- [x] Conectar recibos pagos Stripe à medição com bloqueio regional sem aviso e opção de recusa
+- [ ] Publicar e conferir versão pública e confirmação de compra antes de criar campanha — 14 testes e build OK; navegador verificou bloqueio regional, deduplicação e recusa com evento simulado; compra e recebimento Google não verificados
+- [ ] Criar campanha aprovada após verificações e cartão de criação
+
 ## Google Search Console e sitemap
 - [x] Conectar a conta Google e conferir sitemap público com oito páginas e indicação em robots.txt
 - [x] Publicar confirmação de propriedade, verificar o site e enviar sitemap ao Google — confirmação presente no HTML público, propriedade siteOwner e envio aceito (HTTP 204)

@@ -22,7 +22,7 @@ export const getBillingOverview = createServerFn({ method: "GET" })
     return { organization, subscription, canManage: ["owner", "admin"].includes(member.role), paidAccess: hasPaidAccess(subscription), trialActive: false };
   });
 
-type CheckoutResult = { clientSecret: string } | { error: string };
+type CheckoutResult = { clientSecret: string; sessionId: string } | { error: string };
 
 export const createSubscriptionCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -50,7 +50,7 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
       // Sessão reutilizada: devolve o clientSecret já vinculado à contratação.
       if (intent.gateway_session_id) {
         const existing = await stripe.checkout.sessions.retrieve(intent.gateway_session_id);
-        if (existing.status === "open" && existing.client_secret) return { clientSecret: existing.client_secret };
+        if (existing.status === "open" && existing.client_secret) return { clientSecret: existing.client_secret, sessionId: existing.id };
       }
 
       try {
@@ -72,7 +72,7 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
         if (!session.client_secret) throw new Error("Não foi possível preparar o pagamento. Tente novamente.");
         const { error: saveError } = await supabaseAdmin.from("subscription_checkouts").update({ gateway_session_id: session.id }).eq("id", intent.id);
         if (saveError) throw new Error("Não foi possível vincular o pagamento à empresa.");
-        return { clientSecret: session.client_secret };
+        return { clientSecret: session.client_secret, sessionId: session.id };
       } catch (error) {
         // Libera a contratação para uma nova tentativa imediata.
         await supabaseAdmin.from("subscription_checkouts").update({ status: "failed" }).eq("id", intent.id).is("gateway_session_id", null);
@@ -81,6 +81,16 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
     } catch (error) {
       return { error: error instanceof Error && !("type" in error) ? error.message : getStripeErrorMessage(error) };
     }
+  });
+
+export const getCheckoutPurchaseReceipt = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(value => z.object({ sessionId: z.string().regex(/^cs_[a-zA-Z0-9_]+$/) }).parse(value))
+  .handler(async ({ data, context }) => {
+    const { data: checkout, error } = await context.supabase.from('subscription_checkouts').select('id,status').eq('gateway_session_id', data.sessionId).eq('user_id', context.userId).eq('environment', 'live').maybeSingle();
+    if (error || checkout?.status !== 'completed') return { receipt: null };
+    try { const { receiptForPaidSession } = await import('@/lib/purchase-receipt.server'); return { receipt: await receiptForPaidSession(data.sessionId) }; }
+    catch (error) { return { receipt: null, error: getStripeErrorMessage(error) }; }
   });
 
 type PortalResult = { url: string } | { error: string };

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Check, CreditCard, ExternalLink, LoaderCircle, RefreshCw, ShieldCheck, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,12 +6,23 @@ import { PaymentTestModeBanner } from '@/components/payment-test-mode-banner';
 import { StripeEmbeddedCheckout } from '@/components/stripe-embedded-checkout';
 import { getStripeEnvironment } from '@/lib/stripe';
 import { formatPlanPrice, hasPaidAccess, isInRenewalGrace, RENEWAL_GRACE_MS, subscriptionPlans, type PlanId } from '@/lib/subscriptions';
-import { changeSubscriptionPlan, createBillingPortal, getBillingOverview } from '@/utils/subscriptions.functions';
+import { changeSubscriptionPlan, createBillingPortal, getBillingOverview, getCheckoutPurchaseReceipt } from '@/utils/subscriptions.functions';
+import { reportPaidPurchase } from '@/lib/ads-measurement-browser';
 
 // Operational access remains live even while preview checkout uses test prices.
 export const billingQueryOptions = (organizationId?: string) => ({ queryKey: ['subscription', organizationId, 'live'], queryFn: () => getBillingOverview({ data: { organizationId, environment: 'live' as const } }) });
 const date = (value: string | null | undefined) => value ? new Date(value).toLocaleDateString('pt-BR') : '—';
 export function SubscriptionPage({ organizationId, embedded = false, initialPlan }: { organizationId?: string; embedded?: boolean; initialPlan?: PlanId }) {
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('session_id');
+    if (!id || !/^cs_[a-zA-Z0-9_]+$/.test(id)) return;
+    let attempts = 0;
+    const timer = window.setInterval(async () => {
+      try { const result = await getCheckoutPurchaseReceipt({ data: { sessionId: id } }); if (result.receipt) { window.clearInterval(timer); void reportPaidPurchase(result.receipt); } } catch { window.clearInterval(timer); }
+      if (++attempts >= 10) window.clearInterval(timer);
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, []);
   const { data, error, isPending, refetch, isFetching } = useQuery({ ...billingQueryOptions(organizationId), refetchInterval: 5000 });
   const { data: testBilling } = useQuery({ queryKey: ['subscription', organizationId, 'sandbox'], queryFn: () => getBillingOverview({ data: { organizationId, environment: 'sandbox' } }), enabled: import.meta.env['VITE_PAYMENTS_CLIENT_TOKEN']?.startsWith('pk_test_'), refetchInterval: 5000 });
   const [selected, setSelected] = useState<PlanId | null>(initialPlan ?? null);

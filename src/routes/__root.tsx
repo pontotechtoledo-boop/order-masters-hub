@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { loadAdsMeasurement, stopAdsMeasurement } from '@/lib/ads-measurement-browser';
 
 function NotFoundComponent() {
   return (
@@ -124,6 +125,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => {
+    void loadAdsMeasurement();
+    const changed = (event: StorageEvent) => { if (event.key === 'cookie_consent' && event.newValue === 'denied') stopAdsMeasurement(); };
+    window.addEventListener('storage', changed);
+    return () => window.removeEventListener('storage', changed);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -37,8 +37,12 @@ const statusInput=z.object({purchaseId:z.string().uuid(),browserToken:z.string()
 export const publicPurchaseStatus=createServerFn({method:'POST'}).inputValidator(value=>statusInput.parse(value)).handler(async({data})=>{
   const {supabaseAdmin}=await import('@/integrations/supabase/client.server');
   const {hashPurchaseToken}=await import('@/lib/public-purchase.server');
-  const {data:purchase}=await supabaseAdmin.from('public_subscription_purchases').select('status').eq('id',data.purchaseId).eq('browser_token_hash',await hashPurchaseToken(data.browserToken)).maybeSingle();
-  return {status:purchase?.status??'unavailable'};
+  const {data:purchase}=await supabaseAdmin.from('public_subscription_purchases').select('status,environment,gateway_session_id').eq('id',data.purchaseId).eq('browser_token_hash',await hashPurchaseToken(data.browserToken)).maybeSingle();
+  let receipt = null;
+  if(purchase?.environment==='live' && ['paid','activated'].includes(purchase.status) && purchase.gateway_session_id) {
+    try { const {receiptForPaidSession}=await import('@/lib/purchase-receipt.server'); receipt=await receiptForPaidSession(purchase.gateway_session_id); } catch { /* Measurement must never block access. */ }
+  }
+  return {status:purchase?.status??'unavailable',receipt};
 });
 
 export const activatePublicPurchase=createServerFn({method:'POST'}).inputValidator(value=>z.object({purchaseId:z.string().uuid(),token:z.string().min(64).max(100),password:z.string().min(8).max(128)}).parse(value)).handler(async({data})=>{
