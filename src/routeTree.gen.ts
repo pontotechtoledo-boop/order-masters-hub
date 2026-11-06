@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as ComprarRouteImport } from './routes/comprar'
 import { Route as ConhecerRouteImport } from './routes/conhecer'
+import { Route as LandingpageRouteImport } from './routes/landingpage'
 import { Route as PlanosRouteImport } from './routes/planos'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ReembolsoRouteImport } from './routes/reembolso'
@@ -62,6 +63,11 @@ const ComprarRoute = ComprarRouteImport.update({
 const ConhecerRoute = ConhecerRouteImport.update({
   id: '/conhecer',
   path: '/conhecer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandingpageRoute = LandingpageRouteImport.update({
+  id: '/landingpage',
+  path: '/landingpage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlanosRoute = PlanosRouteImport.update({
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/cadastro': typeof CadastroRoute
   '/comprar': typeof ComprarRoute
   '/conhecer': typeof ConhecerRoute
+  '/landingpage': typeof LandingpageRoute
   '/planos': typeof PlanosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/reembolso': typeof ReembolsoRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/cadastro': typeof CadastroRoute
   '/comprar': typeof ComprarRoute
   '/conhecer': typeof ConhecerRoute
+  '/landingpage': typeof LandingpageRoute
   '/planos': typeof PlanosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/reembolso': typeof ReembolsoRoute
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/cadastro': typeof CadastroRoute
   '/comprar': typeof ComprarRoute
   '/conhecer': typeof ConhecerRoute
+  '/landingpage': typeof LandingpageRoute
   '/planos': typeof PlanosRoute
   '/privacidade': typeof PrivacidadeRoute
   '/reembolso': typeof ReembolsoRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/comprar'
     | '/conhecer'
+    | '/landingpage'
     | '/planos'
     | '/privacidade'
     | '/reembolso'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/comprar'
     | '/conhecer'
+    | '/landingpage'
     | '/planos'
     | '/privacidade'
     | '/reembolso'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/comprar'
     | '/conhecer'
+    | '/landingpage'
     | '/planos'
     | '/privacidade'
     | '/reembolso'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   CadastroRoute: typeof CadastroRoute
   ComprarRoute: typeof ComprarRoute
   ConhecerRoute: typeof ConhecerRoute
+  LandingpageRoute: typeof LandingpageRoute
   PlanosRoute: typeof PlanosRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   ReembolsoRoute: typeof ReembolsoRoute
@@ -334,6 +347,13 @@ declare module '@tanstack/react-router' {
       path: '/conhecer'
       fullPath: '/conhecer'
       preLoaderRoute: typeof ConhecerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/landingpage': {
+      id: '/landingpage'
+      path: '/landingpage'
+      fullPath: '/landingpage'
+      preLoaderRoute: typeof LandingpageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/planos': {
@@ -451,6 +471,7 @@ const rootRouteChildren: RootRouteChildren = {
   CadastroRoute: CadastroRoute,
   ComprarRoute: ComprarRoute,
   ConhecerRoute: ConhecerRoute,
+  LandingpageRoute: LandingpageRoute,
   PlanosRoute: PlanosRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   ReembolsoRoute: ReembolsoRoute,
