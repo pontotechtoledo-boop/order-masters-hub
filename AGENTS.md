@@ -36,3 +36,4 @@
 - Derive the public SVG favicon from the login's wrench icon and reference it in the root head so the site icon matches the product identity.
 - Send purchase and renewal confirmations only from the verified Stripe invoice.paid handler after payment processing, using managed email and a payment-scoped idempotency key; replayed database events can retry failed email without extending access again.
 - Google purchase measurement uses capability/auth-scoped checkout receipts verified against paid live Stripe invoices; region and current opt-out gates run before tag loading and event sending, and invoice IDs deduplicate reports without sharing customer identity.
+- Share the login presentation between root and legacy auth routes; keep the sales page independent so advertising destinations never become sign-in pages.

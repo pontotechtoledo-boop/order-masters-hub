@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { loadAdsMeasurement, stopAdsMeasurement } from '@/lib/ads-measurement-browser';
+import { EmailSupport } from '@/components/email-support';
 
 function NotFoundComponent() {
   return (
@@ -136,6 +137,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <EmailSupport />
     </QueryClientProvider>
   );
 }

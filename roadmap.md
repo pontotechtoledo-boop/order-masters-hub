@@ -1,5 +1,10 @@
 # Roadmap PontoTech Toledo
 
+## Abertura, suporte e publicação
+- [x] Login em /, página comercial em /landingpage e /auth preservado — conferidos computador e celular, sem erros
+- [x] Botão flutuante de suporte por e-mail — destino pontotechtoledo@gmail.com conferido
+- [ ] Conferir telas e solicitar publicação; campanha aguarda medição publicada verificada
+
 ## Campanha Google Search e medição
 - [x] Registrar textos, palavras-chave e orçamento de R$ 10/dia aprovados; confirmar que só a ação no Google estava configurada
 - [x] Conectar recibos pagos Stripe à medição com bloqueio regional sem aviso e opção de recusa
