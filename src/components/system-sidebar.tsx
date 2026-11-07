@@ -1,11 +1,11 @@
-import { BarChart3, Boxes, Building2, ChevronLeft, ChevronRight, CircleDollarSign, ClipboardList, FileCheck2, LayoutDashboard, LockKeyhole, Receipt, ShieldCheck, Users, Wrench, X } from 'lucide-react';
+import { BarChart3, Boxes, Building2, ChevronLeft, ChevronRight, CircleDollarSign, ClipboardList, FileCheck2, LayoutDashboard, LockKeyhole, Receipt, ShieldCheck, Users, Wrench, X, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export type Section = 'Visão geral' | 'Dashboard' | 'Bancada' | 'Ordens de serviço' | 'Clientes' | 'Garantias' | 'Estoque' | 'Financeiro / Vendas' | 'Despesas' | 'Relatórios' | 'Assinatura' | 'Administração';
+export type Section = 'Visão geral' | 'Dashboard' | 'Bancada' | 'Ordens de serviço' | 'Clientes' | 'Garantias' | 'Estoque' | 'Financeiro / Vendas' | 'Despesas' | 'Relatórios' | 'Tutoriais' | 'Assinatura' | 'Administração';
 export const systemNavigation: { label: Section; icon: typeof Wrench; group?: string }[] = [
   {label:'Visão geral',icon:LayoutDashboard},{label:'Dashboard',icon:BarChart3},
   {label:'Bancada',icon:Wrench,group:'OPERAÇÃO'},{label:'Ordens de serviço',icon:ClipboardList},{label:'Clientes',icon:Users},{label:'Garantias',icon:ShieldCheck},
-  {label:'Estoque',icon:Boxes,group:'GESTÃO'},{label:'Financeiro / Vendas',icon:CircleDollarSign},{label:'Despesas',icon:Receipt},{label:'Relatórios',icon:FileCheck2},
+  {label:'Estoque',icon:Boxes,group:'GESTÃO'},{label:'Financeiro / Vendas',icon:CircleDollarSign},{label:'Despesas',icon:Receipt},{label:'Relatórios',icon:FileCheck2},{label:'Tutoriais',icon:GraduationCap,group:'AJUDA'},
   {label:'Assinatura',icon:CircleDollarSign,group:'PLATAFORMA'},{label:'Administração',icon:Building2},
 ];
 export function SystemSidebar({section,setSection,open,close,collapsed,toggleCollapsed,locked=false}:{section:Section;setSection:(section:Section)=>void;open:boolean;close:()=>void;collapsed:boolean;toggleCollapsed:()=>void;locked?:boolean}) {
