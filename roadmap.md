@@ -166,6 +166,13 @@
 ## Separar Assinatura e Administração
 - [x] Abas separadas no grupo Plataforma
 
+## Ajustes operacionais solicitados em 07/11/2026
+- [ ] Atalho para nova OS no topo e aviso inicial de dados da empresa
+- [ ] Identificar produtos por SKU e assistência por OS nos relatórios
+- [ ] Limitar listas iniciais a cinco e adicionar busca de clientes no PDV
+- [ ] Unificar cadastro de itens e remover campos redundantes
+- [ ] Validar testes e fluxo autenticado em computador e celular
+
 ## Verificação das alterações da Hotmart
 - [x] Executar os testes existentes de planos, acesso e integração Hotmart
 - [x] Usar os tipos gerados na chamada de processamento de eventos Hotmart
