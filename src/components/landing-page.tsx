@@ -6,7 +6,10 @@ import screenGarantia from "@/assets/screen-garantia.png";
 
 export function LandingPage() {
   const goToSignup = () => { document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }); };
-  const goToLogin = () => { window.location.href = "/auth"; };
+  const goToLogin = (source: "header" | "rodape" = "header") => {
+    window.__lovableEvents?.track?.("project.landing_login_clicked", { source });
+    window.location.href = "/";
+  };
 
   const features = [
     { icon: ClipboardList, title: "Do balcão à entrega, sem perder o histórico", description: "Registre o defeito, o checklist e as fotos do aparelho. Consulte a OS por número, nome ou CPF e acompanhe cada etapa do atendimento." },
@@ -54,7 +57,7 @@ export function LandingPage() {
           <a href="#planos" className="text-muted-foreground transition hover:text-foreground">Planos</a>
         </nav>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" className="hidden sm:inline-flex" onClick={goToLogin}>Entrar</Button>
+          <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => goToLogin("header")}>Entrar</Button>
           <Button onClick={goToSignup} className="gap-2">Assinar <ArrowRight className="size-4" /></Button>
         </div>
       </div>
@@ -157,7 +160,7 @@ export function LandingPage() {
       { question: "Posso cancelar a renovação?", answer: "Sim. Gerencie a assinatura dentro do sistema. Ao cancelar a renovação, o acesso permanece até o fim do período já pago. Para pedidos de reembolso, consulte a política de 7 dias." },
     ].map((item) => <details key={item.question} className="py-5"><summary className="cursor-pointer font-semibold">{item.question}</summary><p className="mt-3 text-sm leading-7 text-muted-foreground">{item.answer}</p></details>)}</div></div></section>
 
-    <section className="py-16 sm:py-20"><div className="mx-auto max-w-4xl px-5 text-center sm:px-8"><span className="mx-auto grid size-14 place-items-center rounded-lg bg-primary/10 text-primary"><Wrench className="size-7" /></span><h2 className="mt-5 font-display text-3xl font-extrabold sm:text-4xl">Pronto para organizar sua assistência?</h2><p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">Assine com 7 dias de garantia e descubra como o Service Pro OS pode simplificar sua rotina.</p><Button size="lg" className="mt-7 gap-2" onClick={goToSignup}>Assinar agora <ArrowRight className="size-4" /></Button><p className="mt-3 text-xs text-muted-foreground">Já tem conta? <a className="font-semibold text-primary underline-offset-4 hover:underline" href="/auth">Entre aqui</a></p></div></section>
+    <section className="py-16 sm:py-20"><div className="mx-auto max-w-4xl px-5 text-center sm:px-8"><span className="mx-auto grid size-14 place-items-center rounded-lg bg-primary/10 text-primary"><Wrench className="size-7" /></span><h2 className="mt-5 font-display text-3xl font-extrabold sm:text-4xl">Pronto para organizar sua assistência?</h2><p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">Assine com 7 dias de garantia e descubra como o Service Pro OS pode simplificar sua rotina.</p><Button size="lg" className="mt-7 gap-2" onClick={goToSignup}>Assinar agora <ArrowRight className="size-4" /></Button><p className="mt-3 text-xs text-muted-foreground">Já tem conta? <a className="font-semibold text-primary underline-offset-4 hover:underline" href="/" onClick={(e) => { e.preventDefault(); goToLogin("rodape"); }}>Entre aqui</a></p></div></section>
 
     <footer className="border-t"><div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-7 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8"><div><span className="font-display font-bold text-foreground">Service Pro OS</span><span className="ml-2">Gestão para assistência técnica</span></div><p className="flex flex-wrap gap-3"><a href="/termos" className="underline">Termos</a><a href="/privacidade" className="underline">Privacidade</a><a href="/reembolso" className="underline">Reembolso</a><span>© {new Date().getFullYear()} Service Pro OS</span></p></div></footer>
   </main>;

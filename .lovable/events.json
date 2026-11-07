@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "events": {
+    "project.landing_login_clicked": {
+      "event_schema_version": 1,
+      "description": "A visitor clicked a login button on the /landingpage sales page.",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "header",
+              "rodape"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
