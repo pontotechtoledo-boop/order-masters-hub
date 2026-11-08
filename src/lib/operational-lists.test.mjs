@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { initialList, matchesOrderSearch, warrantyNumber } from "./operational-lists";
+import { initialList, matchesCustomerSearch, matchesOrderSearch, warrantyNumber } from "./operational-lists";
 
 test("garantias sem filtros mostram cinco registros", () => {
   expect(initialList([1,2,3,4,5,6,7], false)).toEqual([1,2,3,4,5]);
@@ -12,6 +12,18 @@ test("aparelhos em loja sem busca mostram cinco registros", () => {
 });
 test("filtros permitem consultar além dos cinco iniciais", () => {
   expect(initialList([1,2,3,4,5,6], true)).toHaveLength(6);
+});
+test("clientes e estoque mostram cinco registros sem busca", () => {
+  const rows = Array.from({ length: 8 }, (_, id) => ({ id }));
+  expect(initialList(rows, false).map(x => x.id)).toEqual([0, 1, 2, 3, 4]);
+  expect(initialList(rows, true)).toHaveLength(8);
+});
+test("PDV encontra cliente antigo por nome sem acentos ou CPF sem pontuação", () => {
+  const customers = Array.from({ length: 7 }, (_, id) => ({ id, name: id === 6 ? "João Silva" : "Maria", document: id === 6 ? "123.456.789-09" : "" }));
+  for (const query of ["joao", "12345678909", "123.456.789-09"]) {
+    expect(initialList(customers.filter(c => matchesCustomerSearch(query, c.name, c.document)), true).map(c => c.id)).toEqual([6]);
+  }
+  expect(matchesCustomerSearch("inexistente", "João Silva", "123.456.789-09")).toBe(false);
 });
 test("número da garantia é o número da OS", () => {
   expect(warrantyNumber("OS-123")).toBe("123");

@@ -26,7 +26,7 @@
 - Use authenticated Stripe embedded checkout for subscription CTAs; preserve legacy paid periods without converting provider IDs or silently transferring recurring charges.
 - Derive Stripe checkout environment strictly from valid publishable token prefixes, while operational access always reads live billing records.
 - Route all dashboard section selections through one navigation handler so sidebar expansion and scroll reset stay consistent across menus and quick actions.
-- Reuse operational-list helpers for initial limits and customer/order searches so the three operational lists follow the same rules.
+- Reuse operational-list helpers for five-row defaults and normalized customer/order searches across operational lists and pickers; filtered results must remain uncapped.
 - Use warranties.order_number for the public number and retain warranties.code as the unique authenticity identifier; different organizations can have the same OS number.
 - Persist service-order edits through edit_service_order so equipment, totals and existing financial income update atomically.
 - Store order photos in private storage with organization/order-scoped metadata and refresh signed URLs when opening documents to preserve confidentiality and printable access.

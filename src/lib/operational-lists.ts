@@ -4,6 +4,14 @@ export function initialList<T>(items: T[], filtered: boolean): T[] {
   return filtered ? items : items.slice(0, INITIAL_LIST_LIMIT);
 }
 
+export function matchesCustomerSearch(query: string, name: string, document = ""): boolean {
+  const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const text = normalize(query);
+  if (!text) return true;
+  const digits = query.replace(/\D/g, "");
+  return normalize(name).includes(text) || (/^[\d.\-/\s]+$/.test(query) && !!digits && document.replace(/\D/g, "").includes(digits));
+}
+
 export function matchesOrderSearch(query: string, number: string, name: string, document: string): boolean {
   const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   const text = normalize(query);

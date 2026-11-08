@@ -167,11 +167,13 @@
 - [x] Abas separadas no grupo Plataforma
 
 ## Ajustes operacionais solicitados em 07/11/2026
-- [ ] Atalho para nova OS no topo e aviso inicial de dados da empresa
-- [ ] Identificar produtos por SKU e assistência por OS nos relatórios
-- [ ] Limitar listas iniciais a cinco e adicionar busca de clientes no PDV
-- [ ] Unificar cadastro de itens e remover campos redundantes
-- [ ] Validar testes e fluxo autenticado em computador e celular
+- [x] Conferir implementação externa e completar apenas os ajustes faltantes (08/11/2026)
+- [x] Atalho para nova OS no topo e aviso de dados da empresa — atalho existente conferido; aviso permanece até dados completos
+- [x] Identificar produtos por SKU e assistência por OS nos relatórios — SKU na tela e impressão, OS em lançamentos vinculados
+- [x] Limitar listas iniciais a cinco e adicionar busca de clientes no PDV — corrigidos OS/clientes, buscas no estoque, CPF sem pontuação e filtros de garantias sem corte
+- [x] Unificar cadastro de itens e remover campos redundantes — removida ação “Nova peça” duplicada; formulário existente preservado
+- [x] Validar testes e telas autenticadas em computador e celular — 10 testes aprovados; nova OS, cadastro de item, buscas e coluna SKU conferidos sem gravação de dados
+- [ ] Conferir relatório com vendas reais — conta atual sem vendas no período; nenhuma venda ou cobrança criada para o teste
 
 ## Verificação das alterações da Hotmart
 - [x] Executar os testes existentes de planos, acesso e integração Hotmart
