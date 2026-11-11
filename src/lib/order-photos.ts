@@ -13,9 +13,7 @@ export async function uploadOrderPhotos(organizationId: string, orderId: string,
       await supabase.storage.from('order-photos').remove([path]);
       throw new Error(saved.error.message);
     }
-    const signed = await supabase.storage.from('order-photos').createSignedUrl(path, 3600);
-    if (signed.error) throw new Error(signed.error.message);
-    urls.push(signed.data.signedUrl);
+    urls.push(URL.createObjectURL(file));
   }
   return urls;
 }
@@ -24,8 +22,9 @@ export async function loadOrderPhotos(orderId: string) {
   const { data, error } = await supabase.from('order_photos').select('storage_path').eq('order_id', orderId).order('created_at');
   if (error) throw new Error(error.message);
   return Promise.all((data ?? []).map(async photo => {
-    const signed = await supabase.storage.from('order-photos').createSignedUrl(photo.storage_path, 3600);
-    if (signed.error) throw new Error(signed.error.message);
-    return signed.data.signedUrl;
+    // Download through RLS each time instead of issuing shareable bearer links.
+    const file = await supabase.storage.from('order-photos').download(photo.storage_path);
+    if (file.error) throw new Error(file.error.message);
+    return URL.createObjectURL(file.data);
   }));
 }
