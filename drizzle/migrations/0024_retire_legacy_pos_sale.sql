@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.create_pos_sale(uuid,text,text,uuid,numeric,text,text,jsonb) FROM PUBLIC, anon, authenticated;
+COMMENT ON FUNCTION public.create_pos_sale(uuid,text,text,uuid,numeric,text,text,jsonb) IS 'DEPRECATED: replaced by create_pos_sale_compat';

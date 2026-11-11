@@ -12,7 +12,8 @@ export const startPublicPurchase=createServerFn({method:'POST'}).inputValidator(
     const {hashPurchaseToken}=await import('@/lib/public-purchase.server');
     const {data:exists,error:existsError}=await supabaseAdmin.rpc('registration_email_exists',{_email:data.email});
     if(existsError) throw new Error('Não foi possível conferir o cadastro.');
-    if(exists) return {error:'Este e-mail já possui uma conta. Entre para contratar ou recuperar sua senha.',existingAccount:true};
+    // Same neutral reply as other refusals so the page never confirms which emails are registered.
+    if(exists) return {error:'Não foi possível iniciar a contratação com estes dados. Se você já tem conta, entre no sistema para assinar.'};
     const stripe=createStripeClient(data.environment),plan=findPlan(data.priceId);
     const price=(await stripe.prices.list({lookup_keys:[plan.id]})).data[0];
     if(!price||!price.active||price.currency!=='brl'||price.unit_amount!==plan.amount||price.recurring?.interval!==plan.interval||price.recurring.interval_count!==plan.frequency) throw new Error('Plano indisponível neste ambiente.');

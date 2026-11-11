@@ -169,6 +169,13 @@
       "when": 1794397136952,
       "tag": "0023_tighten_announcements_and_org_assets",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794439875628,
+      "tag": "0024_retire_legacy_pos_sale",
+      "breakpoints": true
     }
   ]
 }
