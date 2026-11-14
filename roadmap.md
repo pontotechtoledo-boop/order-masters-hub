@@ -1,5 +1,13 @@
 # Roadmap PontoTech Toledo
 
+## Validação geral solicitada em 13/11/2026
+- [x] Executar os 50 testes existentes e conferir páginas públicas; 9 verificações de cadastro no banco passaram. Testes SQL de assinatura bloqueados por permissão de diagnóstico, sem alterar permissões.
+- [x] Conferir sessão real, assinatura e 13 áreas; 11 áreas no celular, PDF baixado e relatórios com vendas existentes. Gravações não repetidas; limitações em validation-report.md.
+- [x] Conferir segurança, pagamentos e e-mails sem criar cobranças ou modificar dados: assinatura live ativa, habilitação Stripe completa, envios registrados; renovação e recebimento ainda não comprovados, análises aprofundadas desatualizadas.
+- [x] Entregar parecer de prontidão comercial com evidências e pendências em validation-report.md: início acompanhado, não certificação integral.
+- [ ] Inserir vídeos tutoriais — aguarda arquivos que o usuário enviará amanhã; não implementar agora.
+- [ ] Cache, controle completo de caixa e demais ampliações — adiados pelo usuário; não implementar nesta validação.
+
 ## Abertura, suporte e publicação
 - [x] Login em /, página comercial em /landingpage e /auth preservado — conferidos computador e celular, sem erros
 - [x] Botão flutuante de suporte por e-mail — destino pontotechtoledo@gmail.com conferido
