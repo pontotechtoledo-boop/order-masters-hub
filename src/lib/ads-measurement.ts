@@ -1,5 +1,6 @@
 export const GOOGLE_ADS_DESTINATION = 'AW-17105796606/VM0SCNrWs9QaEP771tw_';
 export const GOOGLE_ADS_TAG = 'AW-17105796606';
+export const META_PIXEL_ID = '1163268056216032';
 const regulated = new Set(['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH','CA']);
 export type PurchaseReceipt = { transactionId: string; value: number; currency: string };
 export function traceAllowsAds(trace: string, hostname: string) {
