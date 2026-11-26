@@ -44,6 +44,7 @@ export function LandingPage() {
   ];
 
   return <main className="min-h-screen overflow-x-clip bg-background text-foreground">
+    <div className="sales-strip px-4 py-2 text-center text-xs font-bold sm:text-sm">Mais de 300 usuários ativos já organizam a assistência com o Service Pro OS · 7 dias de garantia</div>
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <a href="/planos" className="flex items-center gap-3" aria-label="Service Pro OS - início">
@@ -58,7 +59,7 @@ export function LandingPage() {
         </nav>
         <div className="flex items-center gap-2">
           <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => goToLogin("header")}>Entrar</Button>
-          <Button onClick={goToSignup} className="gap-2">Assinar <ArrowRight className="size-4" /></Button>
+          <Button onClick={goToSignup} className="sales-cta gap-2">Assinar <ArrowRight className="size-4" /></Button>
         </div>
       </div>
     </header>
@@ -67,14 +68,15 @@ export function LandingPage() {
       <img src={screenVisaoGeral} alt="Visão geral do Service Pro OS" className="absolute inset-0 h-full w-full object-cover object-top" />
       <div className="sales-hero-shade absolute inset-0" />
       <div className="relative mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
-        <p className="mb-4 text-sm font-bold text-brand-highlight">NÃO DEIXE MAIS UM ATENDIMENTO SEM REGISTRO.</p>
+        <p className="sales-badge mb-4 inline-block rounded-full px-3 py-1 text-xs font-bold sm:text-sm">NÃO DEIXE MAIS UM ATENDIMENTO SEM REGISTRO.</p>
         <h1 className="max-w-3xl font-display text-4xl font-extrabold leading-tight text-brand-ink-foreground sm:text-5xl">Service Pro OS</h1>
         <p className="mt-5 max-w-xl text-xl font-semibold leading-8 text-brand-ink-foreground">Sua bancada precisa de consertos. Sua gestão, de controle.</p>
         <p className="mt-4 max-w-xl text-base leading-7 text-brand-ink-muted">Fotos na entrada, OS organizada, garantia profissional e lucro sob controle. Comece a organizar o próximo atendimento — sem esperar o próximo prejuízo.</p>
         <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold text-brand-ink-foreground"><span className="inline-flex items-center gap-2"><Monitor className="size-5 shrink-0"/>Computadores</span><span aria-hidden="true">+</span><span className="inline-flex items-center gap-2"><Smartphone className="size-5 shrink-0"/>Celulares</span><span className="w-full text-brand-ink-muted">Acesse pelo navegador no desktop ou smartphone, sem instalar.</span></p>
         <p className="mt-6 text-lg font-bold text-brand-ink-foreground">Todos os recursos a partir de R$ 29,90/mês.</p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row"><Button asChild size="lg" className="h-12"><a href="/comprar">Assinar agora <ArrowRight className="size-4" /></a></Button><Button asChild size="lg" variant="outline" className="h-12 bg-card"><a href="/conhecer">Acesse e conheça o sistema <ArrowRight className="size-4" /></a></Button></div>
-        <p className="mt-5 flex items-center gap-2 text-sm text-brand-ink-muted"><ShieldCheck className="size-4 text-brand-highlight"/>7 dias de garantia ou seu dinheiro de volta · Pagamento Stripe</p>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row"><Button asChild size="lg" className="sales-cta h-12"><a href="/comprar">Assinar agora <ArrowRight className="size-4" /></a></Button><Button asChild size="lg" variant="outline" className="h-12 bg-card"><a href="/conhecer">Acesse e conheça o sistema <ArrowRight className="size-4" /></a></Button></div>
+        <p className="mt-5 flex items-center gap-2 text-sm font-bold text-brand-ink-foreground"><Users className="size-4 text-brand-highlight"/>+300 usuários ativos</p>
+        <p className="mt-2 flex items-center gap-2 text-sm text-brand-ink-muted"><ShieldCheck className="size-4 text-brand-highlight"/>7 dias de garantia ou seu dinheiro de volta · Pagamento Stripe</p>
       </div>
     </section>
 

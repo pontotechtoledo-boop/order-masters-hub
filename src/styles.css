@@ -111,3 +111,8 @@ button, [role="button"] {
 @media (max-width: 767px) {
   .sales-hero { min-height: 0; }
 }
+:root { --sales-accent: oklch(.55 .23 295); --sales-accent-foreground: oklch(.99 0 0); }
+.sales-strip { background: var(--sales-accent); color: var(--sales-accent-foreground); }
+.sales-badge { background: var(--sales-accent); color: var(--sales-accent-foreground); }
+.sales-cta { background: var(--sales-accent); color: var(--sales-accent-foreground); box-shadow: 0 10px 28px oklch(.55 .23 295 / .35); }
+.sales-cta:hover { background: oklch(.5 .23 295); }
