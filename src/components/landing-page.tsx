@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import screenVisaoGeral from "@/assets/screen-visao-geral.png";
 import screenNovaOs from "@/assets/screen-nova-os.png";
 import screenGarantia from "@/assets/screen-garantia.png";
+import screenDash from "@/assets/screen-02-dashboard.png";
+import screenBanc from "@/assets/screen-03-bancada.png";
+import screenCli from "@/assets/screen-05-clientes.png";
+import screenEst from "@/assets/screen-07-estoque.png";
+import screenFin from "@/assets/screen-08-financeiro-vendas.png";
+import screenDesp from "@/assets/screen-09-despesas.png";
+import screenRel from "@/assets/screen-10-relatorios.png";
 
 export function LandingPage() {
   const goToSignup = () => { document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }); };
@@ -119,12 +126,19 @@ export function LandingPage() {
 
     <section id="por-dentro" className="py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Por dentro do sistema</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Veja como é trabalhar com o Service Pro OS</h2><p className="mt-4 leading-7 text-muted-foreground">Telas reais do sistema: a visão geral do seu dia, a abertura de uma OS passo a passo e a emissão da garantia vinculada à ordem.</p></div>
+        <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-bold uppercase tracking-widest text-primary">Por dentro do sistema</p><h2 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">Veja como é trabalhar com o Service Pro OS</h2><p className="mt-4 leading-7 text-muted-foreground">Telas reais do sistema: da bancada ao relatório de lucro, conheça cada área antes de assinar.</p></div>
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {[
             { src: screenVisaoGeral, alt: "Tela de visão geral do Service Pro OS com faturamento do dia e acesso rápido às áreas", title: "Visão geral do seu dia", desc: "Faturamento, despesas e acesso rápido a cada área assim que você entra." },
             { src: screenNovaOs, alt: "Abertura de ordem de serviço em passos: cliente, aparelho e defeito, peças e valores", title: "Nova OS em passos guiados", desc: "Cliente, aparelho com checklist e fotos, peças e valores — sem se perder no caminho." },
             { src: screenGarantia, alt: "Emissão de garantia vinculada ao número da ordem de serviço", title: "Garantia ligada à OS", desc: "O número da garantia acompanha a ordem e o certificado sai pronto para imprimir ou enviar." },
+            { src: screenDash, alt: "Dashboard com indicadores da assistência", title: "Dashboard de resultados", desc: "Indicadores de ordens, vendas e faturamento para decidir com números." },
+            { src: screenBanc, alt: "Bancada com aparelhos em atendimento por etapa", title: "Bancada organizada", desc: "Veja cada aparelho por etapa: recebido, em análise, aguardando peça e pronto." },
+            { src: screenCli, alt: "Cadastro e busca de clientes", title: "Clientes e histórico", desc: "Busque por nome ou CPF e encontre ordens e garantias de cada cliente." },
+            { src: screenEst, alt: "Controle de estoque de peças e produtos", title: "Estoque sob controle", desc: "Entradas, saídas e peças usadas nas ordens, com custo e preço de venda." },
+            { src: screenFin, alt: "Financeiro e vendas no PDV", title: "Vendas e financeiro", desc: "Registre vendas no PDV e acompanhe as receitas dos serviços finalizados." },
+            { src: screenDesp, alt: "Registro de despesas da assistência", title: "Despesas da empresa", desc: "Aluguel, peças, contas: tudo registrado para saber o que sobra no fim do mês." },
+            { src: screenRel, alt: "Relatório gerencial com lucro líquido", title: "Relatórios com lucro", desc: "Filtre por período e veja receitas, custos, despesas e lucro líquido." },
           ].map((shot) => <figure key={shot.title} className="overflow-hidden rounded-lg border bg-card shadow-lg">
             <img src={shot.src} alt={shot.alt} loading="lazy" className="aspect-[8/5] w-full object-cover object-top" />
             <figcaption className="p-5"><h3 className="font-display text-lg font-bold">{shot.title}</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">{shot.desc}</p></figcaption>
